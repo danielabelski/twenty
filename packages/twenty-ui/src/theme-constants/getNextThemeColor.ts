@@ -1,7 +1,7 @@
 import { type ThemeColor } from '@ui/theme/constants/MainColorNames';
 
 export const getNextThemeColor = (
-  colorNames: ThemeColor[],
+  colorNames: ReadonlyArray<ThemeColor>,
   currentColor?: ThemeColor,
 ): ThemeColor => {
   if (currentColor === null || currentColor === undefined) {

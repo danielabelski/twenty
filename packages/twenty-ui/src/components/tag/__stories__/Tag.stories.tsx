@@ -82,7 +82,7 @@ export const Catalog: CatalogStory<Story, typeof Tag> = {
       dimensions: [
         {
           name: 'colors',
-          values: MAIN_COLOR_NAMES,
+          values: [...MAIN_COLOR_NAMES],
           props: (color: ThemeColor) => ({ color }),
         },
       ],

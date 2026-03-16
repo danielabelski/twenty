@@ -34,7 +34,7 @@ export const Catalog: CatalogStory<Story, typeof MenuItemSelectColor> = {
       dimensions: [
         {
           name: 'color',
-          values: MAIN_COLOR_NAMES,
+          values: [...MAIN_COLOR_NAMES],
           props: (color: ThemeColor) => ({ color }),
           labels: (color: ThemeColor) => color,
         },
