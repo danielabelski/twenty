@@ -3,6 +3,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { type ToolSet, zodSchema } from 'ai';
 import { isDefined } from 'twenty-shared/utils';
 
+import { MCP_SERVER_METADATA } from 'src/engine/api/mcp/constants/mcp.const';
 import { type JsonRpc } from 'src/engine/api/mcp/dtos/json-rpc';
 import { McpToolExecutorService } from 'src/engine/api/mcp/services/mcp-tool-executor.service';
 import { wrapJsonRpcResponse } from 'src/engine/api/mcp/utils/wrap-jsonrpc-response.util';
@@ -51,6 +52,7 @@ export class McpProtocolService {
   handleInitialize(requestId: string | number) {
     return wrapJsonRpcResponse(requestId, {
       result: {
+        ...MCP_SERVER_METADATA,
         capabilities: {
           tools: { listChanged: false },
           resources: { listChanged: false },
@@ -172,13 +174,9 @@ export class McpProtocolService {
       }
 
       if (method === 'ping') {
-        return wrapJsonRpcResponse(
-          id,
-          {
-            result: {},
-          },
-          true,
-        );
+        return wrapJsonRpcResponse(id, {
+          result: {},
+        });
       }
 
       const roleId = await this.getRoleId(
@@ -212,9 +210,6 @@ export class McpProtocolService {
       if (method === 'prompts/list') {
         return wrapJsonRpcResponse(id, {
           result: {
-            capabilities: {
-              prompts: { listChanged: false },
-            },
             prompts: [],
           },
         });
@@ -223,9 +218,6 @@ export class McpProtocolService {
       if (method === 'resources/list') {
         return wrapJsonRpcResponse(id, {
           result: {
-            capabilities: {
-              resources: { listChanged: false },
-            },
             resources: [],
           },
         });

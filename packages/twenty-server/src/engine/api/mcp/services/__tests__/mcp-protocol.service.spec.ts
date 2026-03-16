@@ -276,6 +276,54 @@ describe('McpProtocolService', () => {
       );
     });
 
+    it('should return prompts list without initialize metadata', async () => {
+      userRoleService.getRoleIdForUserWorkspace.mockResolvedValue(mockRoleId);
+
+      const mockRequest: JsonRpc = {
+        jsonrpc: '2.0',
+        method: 'prompts/list',
+        id: '123',
+      };
+
+      const result = await service.handleMCPCoreQuery(mockRequest, {
+        workspace: mockWorkspace,
+        userWorkspaceId: mockUserWorkspaceId,
+        apiKey: undefined,
+      });
+
+      expect(result).toEqual({
+        id: '123',
+        jsonrpc: '2.0',
+        result: {
+          prompts: [],
+        },
+      });
+    });
+
+    it('should return resources list without initialize metadata', async () => {
+      userRoleService.getRoleIdForUserWorkspace.mockResolvedValue(mockRoleId);
+
+      const mockRequest: JsonRpc = {
+        jsonrpc: '2.0',
+        method: 'resources/list',
+        id: '123',
+      };
+
+      const result = await service.handleMCPCoreQuery(mockRequest, {
+        workspace: mockWorkspace,
+        userWorkspaceId: mockUserWorkspaceId,
+        apiKey: undefined,
+      });
+
+      expect(result).toEqual({
+        id: '123',
+        jsonrpc: '2.0',
+        result: {
+          resources: [],
+        },
+      });
+    });
+
     it('should handle tools/call with apiKey authentication', async () => {
       const mockToolCallResponse = {
         id: '123',
@@ -333,7 +381,6 @@ describe('McpProtocolService', () => {
         id: '123',
         jsonrpc: '2.0',
         error: {
-          ...MCP_SERVER_METADATA,
           code: HttpStatus.NOT_FOUND,
           message: "Tool 'nonExistentTool' not found",
         },

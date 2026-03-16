@@ -63,12 +63,7 @@ export class McpToolExecutorService {
 
     return wrapJsonRpcResponse(id, {
       result: {
-        capabilities: {
-          tools: { listChanged: false },
-        },
         tools: toolsArray,
-        resources: [],
-        prompts: [],
       },
     });
   }
