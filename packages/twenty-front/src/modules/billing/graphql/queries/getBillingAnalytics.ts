@@ -5,10 +5,12 @@ export const GET_BILLING_ANALYTICS = gql`
     getBillingAnalytics(input: $input) {
       usageByUser {
         key
+        label
         creditsUsed
       }
       usageByResource {
         key
+        label
         creditsUsed
       }
       usageByExecutionType {

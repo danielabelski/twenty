@@ -257,6 +257,12 @@ const SettingsUsage = lazy(() =>
   })),
 );
 
+const SettingsUsageUserDetail = lazy(() =>
+  import('~/pages/settings/SettingsUsageUserDetail').then((module) => ({
+    default: module.SettingsUsageUserDetail,
+  })),
+);
+
 const SettingsObjects = lazy(() =>
   import('~/pages/settings/data-model/SettingsObjects').then((module) => ({
     default: module.SettingsObjects,
@@ -511,6 +517,10 @@ export const SettingsRoutes = ({ isAdminPageEnabled }: SettingsRoutesProps) => (
           }
         >
           <Route path={SettingsPath.Usage} element={<SettingsUsage />} />
+          <Route
+            path={SettingsPath.UsageUserDetail}
+            element={<SettingsUsageUserDetail />}
+          />
         </Route>
         <Route path={SettingsPath.Domain} element={<SettingsDomain />} />
         <Route

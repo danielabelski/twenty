@@ -1,11 +1,14 @@
 /* @license Enterprise */
 
 import { UseFilters, UseGuards, UsePipes } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Args, Mutation, Query } from '@nestjs/graphql';
 
 import { PermissionFlagType } from 'twenty-shared/constants';
 import { FeatureFlagKey } from 'twenty-shared/types';
+import { isDefined } from 'twenty-shared/utils';
 import { WorkspaceActivationStatus } from 'twenty-shared/workspace';
+import { In, type Repository } from 'typeorm';
 
 import { type ApiKeyEntity } from 'src/engine/core-modules/api-key/api-key.entity';
 import { BillingCheckoutSessionInput } from 'src/engine/core-modules/billing/dtos/inputs/billing-checkout-session.input';
@@ -21,7 +24,10 @@ import {
   BillingAnalyticsInput,
 } from 'src/engine/core-modules/billing/dtos/billing-usage-breakdown.dto';
 import { BillingPlanKey } from 'src/engine/core-modules/billing/enums/billing-plan-key.enum';
-import { BillingAnalyticsService } from 'src/engine/core-modules/billing/services/billing-analytics.service';
+import {
+  type BillingUsageBreakdownItem,
+  BillingAnalyticsService,
+} from 'src/engine/core-modules/billing/services/billing-analytics.service';
 import { BillingPlanService } from 'src/engine/core-modules/billing/services/billing-plan.service';
 import { BillingPortalWorkspaceService } from 'src/engine/core-modules/billing/services/billing-portal.workspace-service';
 import { BillingSubscriptionUpdateService } from 'src/engine/core-modules/billing/services/billing-subscription-update.service';
@@ -36,6 +42,7 @@ import {
 import { PreventNestToAutoLogGraphqlErrorsFilter } from 'src/engine/core-modules/graphql/filters/prevent-nest-to-auto-log-graphql-errors.filter';
 import { ResolverValidationPipe } from 'src/engine/core-modules/graphql/pipes/resolver-validation.pipe';
 import { type AuthContextUser } from 'src/engine/core-modules/auth/types/auth-context.type';
+import { UserWorkspaceEntity } from 'src/engine/core-modules/user-workspace/user-workspace.entity';
 import { type WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { AuthApiKey } from 'src/engine/decorators/auth/auth-api-key.decorator';
 import { AuthUserWorkspaceId } from 'src/engine/decorators/auth/auth-user-workspace-id.decorator';
@@ -57,6 +64,7 @@ import {
   RequireFeatureFlag,
 } from 'src/engine/guards/feature-flag.guard';
 import { MetadataResolver } from 'src/engine/api/graphql/graphql-config/decorators/metadata-resolver.decorator';
+import { AgentEntity } from 'src/engine/metadata-modules/ai/ai-agent/entities/agent.entity';
 
 @MetadataResolver()
 @UsePipes(ResolverValidationPipe)
@@ -74,6 +82,10 @@ export class BillingResolver {
     private readonly billingUsageService: BillingUsageService,
     private readonly billingAnalyticsService: BillingAnalyticsService,
     private readonly permissionsService: PermissionsService,
+    @InjectRepository(UserWorkspaceEntity)
+    private readonly userWorkspaceRepository: Repository<UserWorkspaceEntity>,
+    @InjectRepository(AgentEntity)
+    private readonly agentRepository: Repository<AgentEntity>,
   ) {}
 
   @Query(() => BillingSessionDTO)
@@ -358,33 +370,38 @@ export class BillingResolver {
     const periodStart = input?.periodStart ?? defaultPeriodStart;
     const periodEnd = input?.periodEnd ?? defaultPeriodEnd;
 
+    const periodParams = {
+      workspaceId: workspace.id,
+      periodStart,
+      periodEnd,
+    };
+
     const [usageByUser, usageByResource, usageByExecutionType, timeSeries] =
       await Promise.all([
-        this.billingAnalyticsService.getUsageByUser(
-          workspace.id,
-          periodStart,
-          periodEnd,
-        ),
-        this.billingAnalyticsService.getUsageByResource(
-          workspace.id,
-          periodStart,
-          periodEnd,
-        ),
-        this.billingAnalyticsService.getUsageByExecutionType(
-          workspace.id,
-          periodStart,
-          periodEnd,
-        ),
-        this.billingAnalyticsService.getUsageTimeSeries(
-          workspace.id,
-          periodStart,
-          periodEnd,
-        ),
+        this.billingAnalyticsService.getUsageByUser(periodParams),
+        this.billingAnalyticsService.getUsageByResource(periodParams),
+        this.billingAnalyticsService.getUsageByExecutionType({
+          ...periodParams,
+          userWorkspaceId: input?.userWorkspaceId ?? undefined,
+        }),
+        this.billingAnalyticsService.getUsageTimeSeries(periodParams),
       ]);
 
+    const resolvedUsageByUser =
+      await this.resolveBreakdownKeys(
+        usageByUser,
+        (ids) => this.resolveUserNames(ids),
+      );
+
+    const resolvedUsageByResource =
+      await this.resolveBreakdownKeys(
+        usageByResource,
+        (ids) => this.resolveResourceNames(ids, workspace.id),
+      );
+
     const result: BillingAnalyticsDTO = {
-      usageByUser,
-      usageByResource,
+      usageByUser: resolvedUsageByUser,
+      usageByResource: resolvedUsageByResource,
       usageByExecutionType,
       timeSeries,
       periodStart,
@@ -393,12 +410,10 @@ export class BillingResolver {
 
     if (input?.userWorkspaceId) {
       const dailyUsage =
-        await this.billingAnalyticsService.getUsageByUserTimeSeries(
-          workspace.id,
-          input.userWorkspaceId,
-          periodStart,
-          periodEnd,
-        );
+        await this.billingAnalyticsService.getUsageByUserTimeSeries({
+          ...periodParams,
+          userWorkspaceId: input.userWorkspaceId,
+        });
 
       result.userDailyUsage = {
         userWorkspaceId: input.userWorkspaceId,
@@ -469,5 +484,73 @@ export class BillingResolver {
     }
 
     return;
+  }
+
+  private async resolveBreakdownKeys(
+    items: BillingUsageBreakdownItem[],
+    resolveNames: (ids: string[]) => Promise<Map<string, string>>,
+  ): Promise<BillingUsageBreakdownItem[]> {
+    if (items.length === 0) {
+      return items;
+    }
+
+    const ids = items.map((item) => item.key);
+    const nameMap = await resolveNames(ids);
+
+    return items.map((item) => ({
+      ...item,
+      label: nameMap.get(item.key),
+    }));
+  }
+
+  private async resolveUserNames(
+    userWorkspaceIds: string[],
+  ): Promise<Map<string, string>> {
+    const nameMap = new Map<string, string>();
+
+    if (userWorkspaceIds.length === 0) {
+      return nameMap;
+    }
+
+    const userWorkspaces = await this.userWorkspaceRepository.find({
+      where: { id: In(userWorkspaceIds) },
+      relations: ['user'],
+      select: { id: true, user: { firstName: true, lastName: true, email: true } },
+    });
+
+    for (const userWorkspace of userWorkspaces) {
+      if (!isDefined(userWorkspace.user)) {
+        continue;
+      }
+
+      const { firstName, lastName, email } = userWorkspace.user;
+      const fullName = `${firstName} ${lastName}`.trim();
+
+      nameMap.set(userWorkspace.id, fullName || email);
+    }
+
+    return nameMap;
+  }
+
+  private async resolveResourceNames(
+    resourceIds: string[],
+    workspaceId: string,
+  ): Promise<Map<string, string>> {
+    const nameMap = new Map<string, string>();
+
+    if (resourceIds.length === 0) {
+      return nameMap;
+    }
+
+    const agents = await this.agentRepository.find({
+      where: { id: In(resourceIds), workspaceId },
+      select: { id: true, label: true },
+    });
+
+    for (const agent of agents) {
+      nameMap.set(agent.id, agent.label);
+    }
+
+    return nameMap;
   }
 }

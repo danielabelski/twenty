@@ -11,5 +11,5 @@ CREATE TABLE IF NOT EXISTS billingEvent
     `metadata`           JSON
 )
     ENGINE = MergeTree
-    ORDER BY (workspaceId, timestamp, executionType, userWorkspaceId)
+    ORDER BY (workspaceId, timestamp, executionType, userWorkspaceId, resourceId)
     TTL timestamp + INTERVAL 3 YEAR DELETE;

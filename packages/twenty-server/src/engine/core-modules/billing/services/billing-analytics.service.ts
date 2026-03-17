@@ -4,15 +4,23 @@ import { Injectable, Logger } from '@nestjs/common';
 
 import { ClickHouseService } from 'src/database/clickHouse/clickHouse.service';
 import { formatDateForClickHouse } from 'src/database/clickHouse/clickHouse.util';
+import { toDisplayCredits } from 'src/engine/core-modules/billing/utils/to-display-credits.util';
 
 export type BillingUsageBreakdownItem = {
   key: string;
+  label?: string;
   creditsUsed: number;
 };
 
 export type BillingUsageTimeSeriesPoint = {
   date: string;
   creditsUsed: number;
+};
+
+type PeriodParams = {
+  workspaceId: string;
+  periodStart: Date;
+  periodEnd: Date;
 };
 
 @Injectable()
@@ -22,111 +30,104 @@ export class BillingAnalyticsService {
   constructor(private readonly clickHouseService: ClickHouseService) {}
 
   async getUsageByUser(
-    workspaceId: string,
-    periodStart: Date,
-    periodEnd: Date,
+    params: PeriodParams,
   ): Promise<BillingUsageBreakdownItem[]> {
-    const query = `
-      SELECT
-        userWorkspaceId AS key,
-        sum(creditsUsed) AS creditsUsed
-      FROM billingEvent
-      WHERE workspaceId = {workspaceId:String}
-        AND timestamp >= {periodStart:String}
-        AND timestamp < {periodEnd:String}
-        AND userWorkspaceId != ''
-      GROUP BY userWorkspaceId
-      ORDER BY creditsUsed DESC
-    `;
-
-    return this.clickHouseService.select<BillingUsageBreakdownItem>(query, {
-      workspaceId,
-      periodStart: formatDateForClickHouse(periodStart),
-      periodEnd: formatDateForClickHouse(periodEnd),
+    return this.queryBreakdown({
+      ...params,
+      groupByField: 'userWorkspaceId',
+      extraWhere: "AND userWorkspaceId != ''",
     });
   }
 
   async getUsageByResource(
-    workspaceId: string,
-    periodStart: Date,
-    periodEnd: Date,
+    params: PeriodParams,
   ): Promise<BillingUsageBreakdownItem[]> {
-    const query = `
-      SELECT
-        resourceId AS key,
-        sum(creditsUsed) AS creditsUsed
-      FROM billingEvent
-      WHERE workspaceId = {workspaceId:String}
-        AND timestamp >= {periodStart:String}
-        AND timestamp < {periodEnd:String}
-        AND resourceId != ''
-      GROUP BY resourceId
-      ORDER BY creditsUsed DESC
-    `;
-
-    return this.clickHouseService.select<BillingUsageBreakdownItem>(query, {
-      workspaceId,
-      periodStart: formatDateForClickHouse(periodStart),
-      periodEnd: formatDateForClickHouse(periodEnd),
+    return this.queryBreakdown({
+      ...params,
+      groupByField: 'resourceId',
+      extraWhere: "AND resourceId != ''",
     });
   }
 
   async getUsageByExecutionType(
-    workspaceId: string,
-    periodStart: Date,
-    periodEnd: Date,
+    params: PeriodParams & { userWorkspaceId?: string },
   ): Promise<BillingUsageBreakdownItem[]> {
-    const query = `
-      SELECT
-        executionType AS key,
-        sum(creditsUsed) AS creditsUsed
-      FROM billingEvent
-      WHERE workspaceId = {workspaceId:String}
-        AND timestamp >= {periodStart:String}
-        AND timestamp < {periodEnd:String}
-      GROUP BY executionType
-      ORDER BY creditsUsed DESC
-    `;
-
-    return this.clickHouseService.select<BillingUsageBreakdownItem>(query, {
-      workspaceId,
-      periodStart: formatDateForClickHouse(periodStart),
-      periodEnd: formatDateForClickHouse(periodEnd),
+    return this.queryBreakdown({
+      ...params,
+      groupByField: 'executionType',
+      ...(params.userWorkspaceId && {
+        extraWhere: 'AND userWorkspaceId = {userWorkspaceId:String}',
+        extraParams: { userWorkspaceId: params.userWorkspaceId },
+      }),
     });
   }
 
   async getUsageByUserTimeSeries(
-    workspaceId: string,
-    userWorkspaceId: string,
-    periodStart: Date,
-    periodEnd: Date,
+    params: PeriodParams & { userWorkspaceId: string },
   ): Promise<BillingUsageTimeSeriesPoint[]> {
-    const query = `
-      SELECT
-        formatDateTime(timestamp, '%Y-%m-%d') AS date,
-        sum(creditsUsed) AS creditsUsed
-      FROM billingEvent
-      WHERE workspaceId = {workspaceId:String}
-        AND userWorkspaceId = {userWorkspaceId:String}
-        AND timestamp >= {periodStart:String}
-        AND timestamp < {periodEnd:String}
-      GROUP BY date
-      ORDER BY date ASC
-    `;
-
-    return this.clickHouseService.select<BillingUsageTimeSeriesPoint>(query, {
-      workspaceId,
-      userWorkspaceId,
-      periodStart: formatDateForClickHouse(periodStart),
-      periodEnd: formatDateForClickHouse(periodEnd),
+    return this.queryTimeSeries({
+      ...params,
+      extraWhere: 'AND userWorkspaceId = {userWorkspaceId:String}',
+      extraParams: { userWorkspaceId: params.userWorkspaceId },
     });
   }
 
   async getUsageTimeSeries(
-    workspaceId: string,
-    periodStart: Date,
-    periodEnd: Date,
+    params: PeriodParams,
   ): Promise<BillingUsageTimeSeriesPoint[]> {
+    return this.queryTimeSeries(params);
+  }
+
+  private async queryBreakdown({
+    workspaceId,
+    periodStart,
+    periodEnd,
+    groupByField,
+    extraWhere = '',
+    extraParams = {},
+  }: PeriodParams & {
+    groupByField: string;
+    extraWhere?: string;
+    extraParams?: Record<string, unknown>;
+  }): Promise<BillingUsageBreakdownItem[]> {
+    const query = `
+      SELECT
+        ${groupByField} AS key,
+        sum(creditsUsed) AS creditsUsed
+      FROM billingEvent
+      WHERE workspaceId = {workspaceId:String}
+        AND timestamp >= {periodStart:String}
+        AND timestamp < {periodEnd:String}
+        ${extraWhere}
+      GROUP BY ${groupByField}
+      ORDER BY creditsUsed DESC
+      LIMIT 50
+    `;
+
+    const rows =
+      await this.clickHouseService.select<BillingUsageBreakdownItem>(query, {
+        workspaceId,
+        periodStart: formatDateForClickHouse(periodStart),
+        periodEnd: formatDateForClickHouse(periodEnd),
+        ...extraParams,
+      });
+
+    return rows.map((row) => ({
+      ...row,
+      creditsUsed: toDisplayCredits(row.creditsUsed),
+    }));
+  }
+
+  private async queryTimeSeries({
+    workspaceId,
+    periodStart,
+    periodEnd,
+    extraWhere = '',
+    extraParams = {},
+  }: PeriodParams & {
+    extraWhere?: string;
+    extraParams?: Record<string, unknown>;
+  }): Promise<BillingUsageTimeSeriesPoint[]> {
     const query = `
       SELECT
         formatDateTime(timestamp, '%Y-%m-%d') AS date,
@@ -135,14 +136,22 @@ export class BillingAnalyticsService {
       WHERE workspaceId = {workspaceId:String}
         AND timestamp >= {periodStart:String}
         AND timestamp < {periodEnd:String}
+        ${extraWhere}
       GROUP BY date
       ORDER BY date ASC
     `;
 
-    return this.clickHouseService.select<BillingUsageTimeSeriesPoint>(query, {
-      workspaceId,
-      periodStart: formatDateForClickHouse(periodStart),
-      periodEnd: formatDateForClickHouse(periodEnd),
-    });
+    const rows =
+      await this.clickHouseService.select<BillingUsageTimeSeriesPoint>(query, {
+        workspaceId,
+        periodStart: formatDateForClickHouse(periodStart),
+        periodEnd: formatDateForClickHouse(periodEnd),
+        ...extraParams,
+      });
+
+    return rows.map((row) => ({
+      ...row,
+      creditsUsed: toDisplayCredits(row.creditsUsed),
+    }));
   }
 }

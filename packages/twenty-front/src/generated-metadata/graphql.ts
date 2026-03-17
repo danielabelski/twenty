@@ -580,6 +580,23 @@ export type Billing = {
   trialPeriods: Array<BillingTrialPeriod>;
 };
 
+export type BillingAnalytics = {
+  __typename?: 'BillingAnalytics';
+  periodEnd: Scalars['DateTime'];
+  periodStart: Scalars['DateTime'];
+  timeSeries: Array<BillingUsageTimeSeries>;
+  usageByExecutionType: Array<BillingUsageBreakdownItem>;
+  usageByResource: Array<BillingUsageBreakdownItem>;
+  usageByUser: Array<BillingUsageBreakdownItem>;
+  userDailyUsage?: Maybe<BillingUserDailyUsage>;
+};
+
+export type BillingAnalyticsInput = {
+  periodEnd?: InputMaybe<Scalars['DateTime']>;
+  periodStart?: InputMaybe<Scalars['DateTime']>;
+  userWorkspaceId?: InputMaybe<Scalars['String']>;
+};
+
 export type BillingEndTrialPeriod = {
   __typename?: 'BillingEndTrialPeriod';
   /** Billing portal URL for payment method update (returned when no payment method exists) */
@@ -749,10 +766,29 @@ export type BillingUpdate = {
   currentBillingSubscription: BillingSubscription;
 };
 
+export type BillingUsageBreakdownItem = {
+  __typename?: 'BillingUsageBreakdownItem';
+  creditsUsed: Scalars['Float'];
+  key: Scalars['String'];
+  label?: Maybe<Scalars['String']>;
+};
+
+export type BillingUsageTimeSeries = {
+  __typename?: 'BillingUsageTimeSeries';
+  creditsUsed: Scalars['Float'];
+  date: Scalars['String'];
+};
+
 export enum BillingUsageType {
   LICENSED = 'LICENSED',
   METERED = 'METERED'
 }
+
+export type BillingUserDailyUsage = {
+  __typename?: 'BillingUserDailyUsage';
+  dailyUsage: Array<BillingUsageTimeSeries>;
+  userWorkspaceId: Scalars['String'];
+};
 
 export type BooleanFieldComparison = {
   is?: InputMaybe<Scalars['Boolean']>;
@@ -1588,6 +1624,7 @@ export type EventLogRecord = {
 };
 
 export enum EventLogTable {
+  BILLING_EVENT = 'BILLING_EVENT',
   OBJECT_EVENT = 'OBJECT_EVENT',
   PAGEVIEW = 'PAGEVIEW',
   WORKSPACE_EVENT = 'WORKSPACE_EVENT'
@@ -1633,7 +1670,8 @@ export enum FeatureFlagKey {
   IS_RICH_TEXT_V1_MIGRATED = 'IS_RICH_TEXT_V1_MIGRATED',
   IS_ROW_LEVEL_PERMISSION_PREDICATES_ENABLED = 'IS_ROW_LEVEL_PERMISSION_PREDICATES_ENABLED',
   IS_TASK_TARGET_MIGRATED = 'IS_TASK_TARGET_MIGRATED',
-  IS_UNIQUE_INDEXES_ENABLED = 'IS_UNIQUE_INDEXES_ENABLED'
+  IS_UNIQUE_INDEXES_ENABLED = 'IS_UNIQUE_INDEXES_ENABLED',
+  IS_USAGE_ANALYTICS_ENABLED = 'IS_USAGE_ANALYTICS_ENABLED'
 }
 
 export type Field = {
@@ -4000,6 +4038,7 @@ export type Query = {
   getApprovedAccessDomains: Array<ApprovedAccessDomain>;
   getAutoCompleteAddress: Array<AutocompleteResult>;
   getAvailablePackages: Scalars['JSON'];
+  getBillingAnalytics: BillingAnalytics;
   getConfigVariablesGrouped: ConfigVariables;
   getConnectedImapSmtpCaldavAccount: ConnectedImapSmtpCaldavAccount;
   getDatabaseConfigVariable: ConfigVariable;
@@ -4212,6 +4251,11 @@ export type QueryGetAutoCompleteAddressArgs = {
 
 export type QueryGetAvailablePackagesArgs = {
   input: LogicFunctionIdInput;
+};
+
+
+export type QueryGetBillingAnalyticsArgs = {
+  input?: InputMaybe<BillingAnalyticsInput>;
 };
 
 
@@ -6294,6 +6338,13 @@ export type BillingPortalSessionQueryVariables = Exact<{
 
 export type BillingPortalSessionQuery = { __typename?: 'Query', billingPortalSession: { __typename?: 'BillingSession', url?: string | null } };
 
+export type GetBillingAnalyticsQueryVariables = Exact<{
+  input?: InputMaybe<BillingAnalyticsInput>;
+}>;
+
+
+export type GetBillingAnalyticsQuery = { __typename?: 'Query', getBillingAnalytics: { __typename?: 'BillingAnalytics', periodStart: string, periodEnd: string, usageByUser: Array<{ __typename?: 'BillingUsageBreakdownItem', key: string, label?: string | null, creditsUsed: number }>, usageByResource: Array<{ __typename?: 'BillingUsageBreakdownItem', key: string, label?: string | null, creditsUsed: number }>, usageByExecutionType: Array<{ __typename?: 'BillingUsageBreakdownItem', key: string, creditsUsed: number }>, timeSeries: Array<{ __typename?: 'BillingUsageTimeSeries', date: string, creditsUsed: number }>, userDailyUsage?: { __typename?: 'BillingUserDailyUsage', userWorkspaceId: string, dailyUsage: Array<{ __typename?: 'BillingUsageTimeSeries', date: string, creditsUsed: number }> } | null } };
+
 export type GetMeteredProductsUsageQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -7681,6 +7732,7 @@ export const SetMeteredSubscriptionPriceDocument = {"kind":"Document","definitio
 export const SwitchBillingPlanDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SwitchBillingPlan"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"switchBillingPlan"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currentBillingSubscription"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"CurrentBillingSubscriptionFragment"}}]}},{"kind":"Field","name":{"kind":"Name","value":"billingSubscriptions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"BillingSubscriptionFragment"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"BillingSubscriptionSchedulePhaseItemFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"BillingSubscriptionSchedulePhaseItem"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"price"}},{"kind":"Field","name":{"kind":"Name","value":"quantity"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"BillingSubscriptionSchedulePhaseFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"BillingSubscriptionSchedulePhase"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"start_date"}},{"kind":"Field","name":{"kind":"Name","value":"end_date"}},{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"BillingSubscriptionSchedulePhaseItemFragment"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CurrentBillingSubscriptionFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"BillingSubscription"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"interval"}},{"kind":"Field","name":{"kind":"Name","value":"metadata"}},{"kind":"Field","name":{"kind":"Name","value":"currentPeriodEnd"}},{"kind":"Field","name":{"kind":"Name","value":"phases"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"BillingSubscriptionSchedulePhaseFragment"}}]}},{"kind":"Field","name":{"kind":"Name","value":"billingSubscriptionItems"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"hasReachedCurrentPeriodCap"}},{"kind":"Field","name":{"kind":"Name","value":"quantity"}},{"kind":"Field","name":{"kind":"Name","value":"stripePriceId"}},{"kind":"Field","name":{"kind":"Name","value":"billingProduct"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"images"}},{"kind":"Field","name":{"kind":"Name","value":"metadata"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"productKey"}},{"kind":"Field","name":{"kind":"Name","value":"planKey"}},{"kind":"Field","name":{"kind":"Name","value":"priceUsageBased"}}]}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"BillingSubscriptionFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"BillingSubscription"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"metadata"}},{"kind":"Field","name":{"kind":"Name","value":"phases"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"BillingSubscriptionSchedulePhaseFragment"}}]}}]}}]} as unknown as DocumentNode<SwitchBillingPlanMutation, SwitchBillingPlanMutationVariables>;
 export const SwitchSubscriptionIntervalDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SwitchSubscriptionInterval"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"switchSubscriptionInterval"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currentBillingSubscription"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"CurrentBillingSubscriptionFragment"}}]}},{"kind":"Field","name":{"kind":"Name","value":"billingSubscriptions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"BillingSubscriptionFragment"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"BillingSubscriptionSchedulePhaseItemFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"BillingSubscriptionSchedulePhaseItem"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"price"}},{"kind":"Field","name":{"kind":"Name","value":"quantity"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"BillingSubscriptionSchedulePhaseFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"BillingSubscriptionSchedulePhase"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"start_date"}},{"kind":"Field","name":{"kind":"Name","value":"end_date"}},{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"BillingSubscriptionSchedulePhaseItemFragment"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CurrentBillingSubscriptionFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"BillingSubscription"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"interval"}},{"kind":"Field","name":{"kind":"Name","value":"metadata"}},{"kind":"Field","name":{"kind":"Name","value":"currentPeriodEnd"}},{"kind":"Field","name":{"kind":"Name","value":"phases"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"BillingSubscriptionSchedulePhaseFragment"}}]}},{"kind":"Field","name":{"kind":"Name","value":"billingSubscriptionItems"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"hasReachedCurrentPeriodCap"}},{"kind":"Field","name":{"kind":"Name","value":"quantity"}},{"kind":"Field","name":{"kind":"Name","value":"stripePriceId"}},{"kind":"Field","name":{"kind":"Name","value":"billingProduct"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"images"}},{"kind":"Field","name":{"kind":"Name","value":"metadata"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"productKey"}},{"kind":"Field","name":{"kind":"Name","value":"planKey"}},{"kind":"Field","name":{"kind":"Name","value":"priceUsageBased"}}]}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"BillingSubscriptionFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"BillingSubscription"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"metadata"}},{"kind":"Field","name":{"kind":"Name","value":"phases"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"BillingSubscriptionSchedulePhaseFragment"}}]}}]}}]} as unknown as DocumentNode<SwitchSubscriptionIntervalMutation, SwitchSubscriptionIntervalMutationVariables>;
 export const BillingPortalSessionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"BillingPortalSession"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"returnUrlPath"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"billingPortalSession"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"returnUrlPath"},"value":{"kind":"Variable","name":{"kind":"Name","value":"returnUrlPath"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"url"}}]}}]}}]} as unknown as DocumentNode<BillingPortalSessionQuery, BillingPortalSessionQueryVariables>;
+export const GetBillingAnalyticsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetBillingAnalytics"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"BillingAnalyticsInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getBillingAnalytics"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"usageByUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"key"}},{"kind":"Field","name":{"kind":"Name","value":"label"}},{"kind":"Field","name":{"kind":"Name","value":"creditsUsed"}}]}},{"kind":"Field","name":{"kind":"Name","value":"usageByResource"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"key"}},{"kind":"Field","name":{"kind":"Name","value":"label"}},{"kind":"Field","name":{"kind":"Name","value":"creditsUsed"}}]}},{"kind":"Field","name":{"kind":"Name","value":"usageByExecutionType"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"key"}},{"kind":"Field","name":{"kind":"Name","value":"creditsUsed"}}]}},{"kind":"Field","name":{"kind":"Name","value":"timeSeries"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"creditsUsed"}}]}},{"kind":"Field","name":{"kind":"Name","value":"periodStart"}},{"kind":"Field","name":{"kind":"Name","value":"periodEnd"}},{"kind":"Field","name":{"kind":"Name","value":"userDailyUsage"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"userWorkspaceId"}},{"kind":"Field","name":{"kind":"Name","value":"dailyUsage"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"creditsUsed"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetBillingAnalyticsQuery, GetBillingAnalyticsQueryVariables>;
 export const GetMeteredProductsUsageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMeteredProductsUsage"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getMeteredProductsUsage"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"productKey"}},{"kind":"Field","name":{"kind":"Name","value":"usedCredits"}},{"kind":"Field","name":{"kind":"Name","value":"grantedCredits"}},{"kind":"Field","name":{"kind":"Name","value":"rolloverCredits"}},{"kind":"Field","name":{"kind":"Name","value":"totalGrantedCredits"}},{"kind":"Field","name":{"kind":"Name","value":"unitPriceCents"}}]}}]}}]} as unknown as DocumentNode<GetMeteredProductsUsageQuery, GetMeteredProductsUsageQueryVariables>;
 export const ListPlansDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"listPlans"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"listPlans"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"planKey"}},{"kind":"Field","name":{"kind":"Name","value":"licensedProducts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"images"}},{"kind":"Field","name":{"kind":"Name","value":"metadata"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"productKey"}},{"kind":"Field","name":{"kind":"Name","value":"planKey"}},{"kind":"Field","name":{"kind":"Name","value":"priceUsageBased"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"BillingLicensedProduct"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"prices"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"BillingPriceLicensedFragment"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"meteredProducts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"images"}},{"kind":"Field","name":{"kind":"Name","value":"metadata"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"productKey"}},{"kind":"Field","name":{"kind":"Name","value":"planKey"}},{"kind":"Field","name":{"kind":"Name","value":"priceUsageBased"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"BillingMeteredProduct"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"prices"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"BillingPriceMeteredFragment"}}]}}]}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"BillingPriceLicensedFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"BillingPriceLicensed"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"stripePriceId"}},{"kind":"Field","name":{"kind":"Name","value":"unitAmount"}},{"kind":"Field","name":{"kind":"Name","value":"recurringInterval"}},{"kind":"Field","name":{"kind":"Name","value":"priceUsageType"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"BillingPriceMeteredFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"BillingPriceMetered"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"priceUsageType"}},{"kind":"Field","name":{"kind":"Name","value":"recurringInterval"}},{"kind":"Field","name":{"kind":"Name","value":"stripePriceId"}},{"kind":"Field","name":{"kind":"Name","value":"tiers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"flatAmount"}},{"kind":"Field","name":{"kind":"Name","value":"unitAmount"}},{"kind":"Field","name":{"kind":"Name","value":"upTo"}}]}}]}}]} as unknown as DocumentNode<ListPlansQuery, ListPlansQueryVariables>;
 export const FindManyCommandMenuItemsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"FindManyCommandMenuItems"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"commandMenuItems"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"CommandMenuItemFields"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CommandMenuItemFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"CommandMenuItem"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"workflowVersionId"}},{"kind":"Field","name":{"kind":"Name","value":"frontComponentId"}},{"kind":"Field","name":{"kind":"Name","value":"frontComponent"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"isHeadless"}}]}},{"kind":"Field","name":{"kind":"Name","value":"engineComponentKey"}},{"kind":"Field","name":{"kind":"Name","value":"label"}},{"kind":"Field","name":{"kind":"Name","value":"icon"}},{"kind":"Field","name":{"kind":"Name","value":"shortLabel"}},{"kind":"Field","name":{"kind":"Name","value":"position"}},{"kind":"Field","name":{"kind":"Name","value":"isPinned"}},{"kind":"Field","name":{"kind":"Name","value":"conditionalAvailabilityExpression"}},{"kind":"Field","name":{"kind":"Name","value":"availabilityType"}},{"kind":"Field","name":{"kind":"Name","value":"availabilityObjectMetadataId"}}]}}]} as unknown as DocumentNode<FindManyCommandMenuItemsQuery, FindManyCommandMenuItemsQueryVariables>;
