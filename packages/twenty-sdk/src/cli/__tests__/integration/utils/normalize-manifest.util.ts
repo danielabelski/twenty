@@ -1,9 +1,5 @@
 import { type Manifest } from 'twenty-shared/application';
 
-const sortByUniversalIdentifier = <T extends { universalIdentifier: string }>(
-  items: T[],
-): T[] => [...items].sort((a, b) => a.universalIdentifier.localeCompare(b.universalIdentifier));
-
 export const normalizeManifestForComparison = <T extends Manifest>(
   manifest: T,
 ): T => ({
@@ -20,12 +16,6 @@ export const normalizeManifestForComparison = <T extends Manifest>(
       ? '[checksum]'
       : null,
   },
-  objects: sortByUniversalIdentifier(
-    manifest.objects.map((object) => ({
-      ...object,
-      fields: sortByUniversalIdentifier(object.fields),
-    })),
-  ),
   logicFunctions: manifest.logicFunctions?.map((fn) => ({
     ...fn,
     builtHandlerChecksum: fn.builtHandlerChecksum ? '[checksum]' : null,
