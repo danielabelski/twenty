@@ -28,6 +28,7 @@ describe('FeatureFlagService', () => {
     find: jest.fn(),
     upsert: jest.fn(),
     findOne: jest.fn(),
+    findOneOrFail: jest.fn(),
     save: jest.fn(),
   };
 
@@ -196,7 +197,10 @@ describe('FeatureFlagService', () => {
         workspaceId,
       };
 
-      mockFeatureFlagRepository.save.mockResolvedValue(mockFeatureFlag);
+      mockFeatureFlagRepository.upsert.mockResolvedValue({});
+      mockFeatureFlagRepository.findOneOrFail.mockResolvedValue(
+        mockFeatureFlag,
+      );
       mockWorkspaceCacheService.invalidateAndRecompute.mockResolvedValue(
         undefined,
       );
@@ -214,10 +218,12 @@ describe('FeatureFlagService', () => {
 
       // Assert
       expect(result).toEqual(mockFeatureFlag);
-      expect(mockFeatureFlagRepository.save).toHaveBeenCalledWith({
-        key: FeatureFlagKey[featureFlag],
-        value,
-        workspaceId,
+      expect(mockFeatureFlagRepository.upsert).toHaveBeenCalledWith(
+        { workspaceId, key: featureFlag, value },
+        { conflictPaths: ['workspaceId', 'key'] },
+      );
+      expect(mockFeatureFlagRepository.findOneOrFail).toHaveBeenCalledWith({
+        where: { key: featureFlag, workspaceId },
       });
       expect(
         mockWorkspaceCacheService.invalidateAndRecompute,

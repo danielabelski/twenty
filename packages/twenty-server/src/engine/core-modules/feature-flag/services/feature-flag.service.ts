@@ -106,25 +106,19 @@ export class FeatureFlagService {
       );
     }
 
-    const existingFeatureFlag = await this.featureFlagRepository.findOne({
+    await this.featureFlagRepository.upsert(
+      { workspaceId, key: featureFlag, value },
+      {
+        conflictPaths: ['workspaceId', 'key'],
+      },
+    );
+
+    const result = await this.featureFlagRepository.findOneOrFail({
       where: {
         key: featureFlag,
         workspaceId: workspaceId,
       },
     });
-
-    const featureFlagToSave = existingFeatureFlag
-      ? {
-          ...existingFeatureFlag,
-          value,
-        }
-      : {
-          key: featureFlag,
-          value,
-          workspaceId: workspaceId,
-        };
-
-    const result = await this.featureFlagRepository.save(featureFlagToSave);
 
     await this.workspaceCacheService.invalidateAndRecompute(workspaceId, [
       'featureFlagsMap',
