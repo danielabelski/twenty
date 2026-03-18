@@ -15,7 +15,7 @@ export const mapPaginatedObjectMetadataItemsToObjectMetadataItems = ({
     ObjectMetadataItem,
     'readableFields' | 'updatableFields'
   >[] =
-    pagedObjectMetadataItems?.objects.edges.map((object) => {
+    pagedObjectMetadataItems?.objects?.edges?.map((object) => {
       const labelIdentifierFieldMetadataId =
         objectMetadataItemSchema.shape.labelIdentifierFieldMetadataId.parse(
           object.node.labelIdentifierFieldMetadataId,
