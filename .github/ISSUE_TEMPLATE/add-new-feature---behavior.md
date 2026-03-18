@@ -2,7 +2,7 @@
 name: Add new feature / behavior
 about: Describe the desired product increment
 title: 'Ex: Add custom field from Companies / People table options menu'
-labels: ''
+labels: ['type: feature']
 assignees: ''
 
 ---

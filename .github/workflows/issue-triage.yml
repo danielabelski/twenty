@@ -1,0 +1,165 @@
+name: Auto-Triage Issues
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  triage:
+    # Skip if issue already has labels (e.g. from a template)
+    # or if it mentions @claude (handled by claude.yml)
+    if: |
+      github.event.issue.labels[0] == null &&
+      !contains(github.event.issue.title, '@claude') &&
+      !contains(github.event.issue.body, '@claude')
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Triage issue with Claude
+        id: triage
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          direct_prompt: |
+            You are an issue triager for Twenty, an open-source CRM (https://github.com/twentyhq/twenty).
+
+            Analyze the following GitHub issue and classify it. Respond with ONLY a valid JSON object, no other text.
+
+            Issue #${{ github.event.issue.number }}
+            Title: ${{ github.event.issue.title }}
+            Body:
+            ${{ github.event.issue.body }}
+
+            Respond with this exact JSON structure:
+            {
+              "type": "<one of: bug, feature, chore, question, design improvement, documentation>",
+              "scope": "<one of: front, backend, back+front, infra, self-host, or null if unclear>",
+              "priority": "<one of: critical, high, medium, low>",
+              "size": "<one of: short, medium, long>",
+              "good_first_issue": <true or false>,
+              "needs_reproduction": <true or false - set true for bugs with no clear repro steps>,
+              "summary": "<one sentence summary of what this issue is about>"
+            }
+
+            Classification guidelines:
+            - type "bug": something is broken or not working as expected
+            - type "feature": a new capability or enhancement request
+            - type "chore": refactoring, cleanup, or tech debt with no user-facing change
+            - type "question": user asking how to do something or if something is possible
+            - type "design improvement": UI/UX improvement to existing functionality
+            - type "documentation": docs updates or additions
+            - scope "self-host": issues specific to self-hosted deployments (Docker, env config, migration problems)
+            - scope "front": UI-only issues (React, components, styling)
+            - scope "backend": server-only issues (API, database, GraphQL, workers)
+            - scope "back+front": requires changes in both frontend and backend
+            - scope "infra": CI/CD, deployment, infrastructure
+            - priority "critical": data loss, security vulnerability, or complete feature breakage
+            - priority "high": significant functionality broken, blocking multiple users
+            - priority "medium": moderate impact, workaround exists
+            - priority "low": minor issue, cosmetic, or nice-to-have
+            - good_first_issue: true only if the fix is straightforward and well-scoped
+            - needs_reproduction: true for bugs that lack clear steps to reproduce
+          claude_args: '--max-turns 1 --model haiku'
+
+      - name: Apply labels from triage
+        if: steps.triage.outputs.result
+        uses: actions/github-script@v7
+        with:
+          script: |
+            let triage;
+            try {
+              const raw = `${{ steps.triage.outputs.result }}`;
+              // Extract JSON from response (Claude may wrap it in markdown)
+              const jsonMatch = raw.match(/\{[\s\S]*\}/);
+              if (!jsonMatch) {
+                console.log('No JSON found in response:', raw);
+                return;
+              }
+              triage = JSON.parse(jsonMatch[0]);
+            } catch (e) {
+              console.log('Failed to parse triage response:', e.message);
+              return;
+            }
+
+            const labels = [];
+
+            const validTypes = ['bug', 'feature', 'chore', 'question', 'design improvement', 'documentation'];
+            if (triage.type && validTypes.includes(triage.type)) {
+              labels.push(`type: ${triage.type}`);
+            }
+
+            const validScopes = ['front', 'backend', 'back+front', 'infra', 'self-host'];
+            if (triage.scope && validScopes.includes(triage.scope)) {
+              if (triage.scope === 'self-host') {
+                labels.push('type: SELF_HOST');
+              } else {
+                labels.push(`scope: ${triage.scope}`);
+              }
+            }
+
+            const validPriorities = ['critical', 'high', 'medium', 'low'];
+            if (triage.priority && validPriorities.includes(triage.priority)) {
+              labels.push(`prio: ${triage.priority}`);
+            }
+
+            const validSizes = ['short', 'medium', 'long'];
+            if (triage.size && validSizes.includes(triage.size)) {
+              labels.push(`size: ${triage.size}`);
+            }
+
+            if (triage.good_first_issue === true) {
+              labels.push('good first issue');
+            }
+
+            if (triage.needs_reproduction === true) {
+              labels.push('needs: reproduction');
+            }
+
+            if (labels.length === 0) {
+              console.log('No valid labels to apply');
+              return;
+            }
+
+            // Ensure all labels exist before applying
+            const existingLabels = await github.rest.issues.listLabelsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100,
+            });
+            const existingLabelNames = existingLabels.data.map(l => l.name);
+
+            for (const label of labels) {
+              if (!existingLabelNames.includes(label)) {
+                try {
+                  await github.rest.issues.createLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    name: label,
+                    color: 'ededed',
+                  });
+                } catch (e) {
+                  console.log(`Could not create label "${label}": ${e.message}`);
+                }
+              }
+            }
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              labels: labels,
+            });
+
+            console.log(`Applied labels: ${labels.join(', ')}`);
+
+            // Post a brief triage comment if summary exists
+            if (triage.summary) {
+              const body = `**Auto-triage:** ${triage.summary}\n\n_Labels applied: ${labels.map(l => '`' + l + '`').join(', ')}_`;
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.issue.number,
+                body: body,
+              });
+            }
