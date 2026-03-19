@@ -277,14 +277,22 @@ export class FileCorePictureService {
     targetWorkspaceId: string;
     targetApplicationUniversalIdentifier?: string;
     queryRunner?: QueryRunner;
-  }): Promise<FileWithSignedUrlDTO> {
-    const sourceFile = await this.fileRepository.findOneOrFail({
+  }): Promise<FileWithSignedUrlDTO | undefined> {
+    const sourceFile = await this.fileRepository.findOne({
       where: {
         id: sourceFileId,
         workspaceId: sourceWorkspaceId,
         path: Like(`${FileFolder.CorePicture}/%`),
       },
     });
+
+    if (!isDefined(sourceFile)) {
+      this.logger.warn(
+        `Core picture file not found for copy — sourceFileId: ${sourceFileId}, sourceWorkspaceId: ${sourceWorkspaceId}`,
+      );
+
+      return undefined;
+    }
 
     const { workspaceCustomFlatApplication: sourceApplication } =
       await this.applicationService.findWorkspaceTwentyStandardAndCustomApplicationOrThrow(

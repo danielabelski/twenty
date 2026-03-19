@@ -469,7 +469,7 @@ export class UserWorkspaceService extends TypeOrmQueryService<UserWorkspaceEntit
             queryRunner,
           });
 
-        return savedFile.url;
+        return savedFile?.url;
       } catch (error) {
         if (error.code === FileStorageExceptionCode.FILE_NOT_FOUND) {
           return;
