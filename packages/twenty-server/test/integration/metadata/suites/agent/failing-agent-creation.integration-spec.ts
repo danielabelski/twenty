@@ -69,15 +69,6 @@ describe('Agent creation should fail', () => {
       },
     },
     {
-      title: 'when modelId is missing',
-      context: {
-        input: {
-          label: 'Test Agent Missing ModelId',
-          prompt: 'Test prompt',
-        } as CreateAgentInput,
-      },
-    },
-    {
       title: 'when label is empty string',
       context: {
         input: {

@@ -226,7 +226,7 @@ type Agent {
   icon: String
   description: String
   prompt: String!
-  modelId: String!
+  modelId: String
   responseFormat: JSON
   roleId: UUID
   isCustom: Boolean!
@@ -4000,7 +4000,7 @@ input CreateAgentInput {
   icon: String
   description: String
   prompt: String!
-  modelId: String!
+  modelId: String
   roleId: UUID
   responseFormat: JSON
   modelConfiguration: JSON

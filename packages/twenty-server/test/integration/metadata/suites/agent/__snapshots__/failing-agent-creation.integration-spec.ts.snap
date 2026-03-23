@@ -122,20 +122,6 @@ exports[`Agent creation should fail when modelId is empty string 1`] = `
 }
 `;
 
-exports[`Agent creation should fail when modelId is missing 1`] = `
-{
-  "extensions": {
-    "code": "BAD_USER_INPUT",
-    "http": {
-      "status": 400,
-    },
-    "userFriendlyMessage": "An error occurred.",
-  },
-  "message": "Field "modelId" of required type "String!" was not provided.",
-  "name": "GraphQLError",
-}
-`;
-
 exports[`Agent creation should fail when prompt is empty string 1`] = `
 {
   "extensions": {
