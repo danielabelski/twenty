@@ -12,12 +12,12 @@ import {
 
 import { PermissionFlagType } from 'twenty-shared/constants';
 
+import { InjectRepository } from '@nestjs/typeorm';
+import { UI_MESSAGE_STREAM_HEADERS } from 'ai';
 import type { Response } from 'express';
 import type { ExtendedUIMessage } from 'twenty-shared/ai';
 import { isDefined } from 'twenty-shared/utils';
-import { InjectRepository } from '@nestjs/typeorm';
 import type { Repository } from 'typeorm';
-import { UI_MESSAGE_STREAM_HEADERS } from 'ai';
 
 import { RestApiExceptionFilter } from 'src/engine/api/rest/rest-api-exception.filter';
 import {
@@ -40,9 +40,9 @@ import {
 } from 'src/engine/metadata-modules/ai/ai-agent/agent.exception';
 import { AgentRestApiExceptionFilter } from 'src/engine/metadata-modules/ai/ai-agent/filters/agent-api-exception.filter';
 import type { BrowsingContextType } from 'src/engine/metadata-modules/ai/ai-agent/types/browsingContext.type';
+import { AgentChatThreadEntity } from 'src/engine/metadata-modules/ai/ai-chat/entities/agent-chat-thread.entity';
 import { AgentChatResumableStreamService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-resumable-stream.service';
 import { AgentChatStreamingService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat-streaming.service';
-import { AgentChatThreadEntity } from 'src/engine/metadata-modules/ai/ai-chat/entities/agent-chat-thread.entity';
 import { AiModelRegistryService } from 'src/engine/metadata-modules/ai/ai-models/services/ai-model-registry.service';
 
 @Controller('rest/agent-chat')
@@ -125,6 +125,8 @@ export class AgentChatController {
     @AuthUserWorkspaceId() userWorkspaceId: string,
     @Res() response: Response,
   ) {
+    console.log('Received request to resume stream for threadId:', threadId);
+
     const uuidRegex =
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 

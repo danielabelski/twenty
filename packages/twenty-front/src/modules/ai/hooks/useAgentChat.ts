@@ -11,13 +11,13 @@ import { currentAIChatThreadTitleState } from '@/ai/states/currentAIChatThreadTi
 import { AGENT_CHAT_RETRY_EVENT_NAME } from '@/ai/constants/AgentChatRetryEventName';
 import { AGENT_CHAT_STOP_EVENT_NAME } from '@/ai/constants/AgentChatStopEventName';
 import { AGENT_CHAT_UNKNOWN_THREAD_ID } from '@/ai/constants/AgentChatUnknownThreadId';
+import { useAgentChatInstanceForThread } from '@/ai/hooks/useAgentChatInstanceForThread';
+import { useAgentChatModelId } from '@/ai/hooks/useAgentChatModelId';
 import {
   AGENT_CHAT_NEW_THREAD_DRAFT_KEY,
   agentChatDraftsByThreadIdState,
 } from '@/ai/states/agentChatDraftsByThreadIdState';
 import { agentChatInputState } from '@/ai/states/agentChatInputState';
-import { useAgentChatModelId } from '@/ai/hooks/useAgentChatModelId';
-import { REST_API_BASE_URL } from '@/apollo/constant/rest-api-base-url';
 import { getTokenPair } from '@/apollo/utils/getTokenPair';
 import { renewToken } from '@/auth/services/AuthService';
 import { tokenPairState } from '@/auth/states/tokenPairState';
@@ -26,14 +26,13 @@ import { useAtomState } from '@/ui/utilities/state/jotai/hooks/useAtomState';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
 import { useChat } from '@ai-sdk/react';
-import { DefaultChatTransport } from 'ai';
 import { useStore } from 'jotai';
 import { useCallback, useEffect, useState } from 'react';
 import { type ExtendedUIMessage } from 'twenty-shared/ai';
 import { isDefined } from 'twenty-shared/utils';
 import { REACT_APP_SERVER_BASE_URL } from '~/config';
+import { cookieStorage } from '~/utils/cookie-storage';
 export const useAgentChat = (
-  uiMessages: ExtendedUIMessage[],
   ensureThreadIdForSend: () => Promise<string | null>,
   onStreamingComplete?: () => void,
 ) => {
@@ -64,100 +63,53 @@ export const useAgentChat = (
     agentChatDraftsByThreadIdState,
   );
 
-  const retryFetchWithRenewedToken = async (
-    input: RequestInfo | URL,
-    init?: RequestInit,
-  ) => {
-    const tokenPair = getTokenPair();
+  const retryFetchWithRenewedToken = useCallback(
+    async (input: RequestInfo | URL, init?: RequestInit) => {
+      const tokenPair = getTokenPair();
 
-    if (!isDefined(tokenPair)) {
-      return null;
-    }
-
-    try {
-      const renewedTokens = await renewToken(
-        `${REACT_APP_SERVER_BASE_URL}/metadata`,
-        tokenPair,
-      );
-
-      if (!isDefined(renewedTokens)) {
-        setTokenPair(null);
+      if (!isDefined(tokenPair)) {
         return null;
       }
 
-      const renewedAccessToken =
-        renewedTokens.accessOrWorkspaceAgnosticToken?.token;
+      try {
+        const renewedTokens = await renewToken(
+          `${REACT_APP_SERVER_BASE_URL}/metadata`,
+          tokenPair,
+        );
 
-      if (!isDefined(renewedAccessToken)) {
+        if (!isDefined(renewedTokens)) {
+          setTokenPair(null);
+          return null;
+        }
+
+        const renewedAccessToken =
+          renewedTokens.accessOrWorkspaceAgnosticToken?.token;
+
+        if (!isDefined(renewedAccessToken)) {
+          setTokenPair(null);
+          return null;
+        }
+
+        cookieStorage.setItem('tokenPair', JSON.stringify(renewedTokens));
+        setTokenPair(renewedTokens);
+
+        const updatedHeaders = new Headers(init?.headers ?? {});
+        updatedHeaders.set('Authorization', `Bearer ${renewedAccessToken}`);
+
+        return fetch(input, {
+          ...init,
+          headers: updatedHeaders,
+        });
+      } catch {
         setTokenPair(null);
         return null;
       }
+    },
+    [setTokenPair],
+  );
 
-      setTokenPair(renewedTokens);
-
-      const updatedHeaders = new Headers(init?.headers ?? {});
-      updatedHeaders.set('Authorization', `Bearer ${renewedAccessToken}`);
-
-      return fetch(input, {
-        ...init,
-        headers: updatedHeaders,
-      });
-    } catch {
-      setTokenPair(null);
-      return null;
-    }
-  };
-
-  const {
-    sendMessage,
-    messages,
-    status,
-    error,
-    regenerate,
-    stop,
-    resumeStream,
-  } = useChat({
-    transport: new DefaultChatTransport({
-      api: `${REST_API_BASE_URL}/agent-chat/stream`,
-      headers: () => ({
-        Authorization: `Bearer ${getTokenPair()?.accessOrWorkspaceAgnosticToken.token}`,
-      }),
-      prepareReconnectToStreamRequest: ({ id }) => ({
-        api: `${REST_API_BASE_URL}/agent-chat/${id}/stream`,
-        headers: {
-          Authorization: `Bearer ${getTokenPair()?.accessOrWorkspaceAgnosticToken.token}`,
-        },
-      }),
-      fetch: async (input, init) => {
-        const response = await fetch(input, init);
-
-        if (response.status === 401) {
-          const retriedResponse = await retryFetchWithRenewedToken(input, init);
-
-          return retriedResponse ?? response;
-        }
-
-        if (!response.ok) {
-          const errorBody = await response.json().catch(() => ({}));
-          const error = new Error(
-            errorBody.messages?.[0] ||
-              `Request failed with status ${response.status}`,
-          ) as Error & { code?: string };
-
-          if (isDefined(errorBody.code)) {
-            error.code = errorBody.code;
-          }
-          throw error;
-        }
-
-        return response;
-      },
-    }),
-    messages: uiMessages,
-    id: currentAIChatThread,
-    resume: true,
-    experimental_throttle: 100,
-    onFinish: ({ message }) => {
+  const handleOnFinish = useCallback(
+    ({ message }: { message: ExtendedUIMessage }) => {
       type UsageMetadata = {
         inputTokens: number;
         outputTokens: number;
@@ -198,7 +150,8 @@ export const useAgentChat = (
       );
 
       setPendingThreadIdAfterFirstSend((pendingId) => {
-        const threadIdForTitle = pendingId ?? currentAIChatThread;
+        const threadIdForTitle =
+          pendingId ?? store.get(currentAIChatThreadState.atom);
         if (isDefined(titlePart) && titlePart.type === 'data-thread-title') {
           setCurrentAIChatThreadTitle(titlePart.data.title);
           if (isDefined(threadIdForTitle)) {
@@ -224,6 +177,34 @@ export const useAgentChat = (
 
       onStreamingComplete?.();
     },
+    [
+      setAgentChatUsage,
+      store,
+      apolloClient.cache,
+      setCurrentAIChatThreadTitle,
+      setCurrentAIChatThread,
+      onStreamingComplete,
+    ],
+  );
+
+  const { agentChatInstanceForThread } = useAgentChatInstanceForThread({
+    threadId: currentAIChatThread ?? AGENT_CHAT_UNKNOWN_THREAD_ID,
+    onFinish: handleOnFinish,
+    retryFetchWithRenewedToken,
+  });
+
+  const {
+    sendMessage,
+    messages,
+    status,
+    error,
+    regenerate,
+    stop,
+    resumeStream,
+  } = useChat({
+    chat: agentChatInstanceForThread,
+    resume: true,
+    experimental_throttle: 100,
   });
 
   useEffect(() => {
@@ -239,16 +220,6 @@ export const useAgentChat = (
 
   const isStreaming = status === 'streaming';
   const isLoading = isStreaming || agentChatSelectedFiles.length > 0;
-
-  // eslint-disable-next-line no-console
-  useEffect(() => {
-    console.log(
-      '[useAgentChat] status changed:',
-      status,
-      '| messages in useChat:',
-      messages.length,
-    );
-  }, [status, messages.length]);
 
   const handleSendMessage = useCallback(async () => {
     const draftKey =
@@ -271,15 +242,6 @@ export const useAgentChat = (
     if (!threadId) {
       return;
     }
-
-    // eslint-disable-next-line no-console
-    console.log(
-      '[useAgentChat] sendMessage — threadId:',
-      threadId,
-      '| messages being sent:',
-      messages.length,
-      messages.map((m) => ({ role: m.role, id: m.id })),
-    );
 
     if (draftKey === AGENT_CHAT_NEW_THREAD_DRAFT_KEY) {
       setPendingThreadIdAfterFirstSend(threadId);

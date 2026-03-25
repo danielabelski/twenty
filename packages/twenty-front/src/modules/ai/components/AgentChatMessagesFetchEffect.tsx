@@ -1,10 +1,11 @@
 import { useCallback, useMemo } from 'react';
+import { useStore } from 'jotai';
 import { isDefined } from 'twenty-shared/utils';
 
 import { AGENT_CHAT_REFETCH_MESSAGES_EVENT_NAME } from '@/ai/constants/AgentChatRefetchMessagesEventName';
 import { AGENT_CHAT_UNKNOWN_THREAD_ID } from '@/ai/constants/AgentChatUnknownThreadId';
 import { AGENT_CHAT_NEW_THREAD_DRAFT_KEY } from '@/ai/states/agentChatDraftsByThreadIdState';
-import { agentChatFetchedMessagesComponentFamilyState } from '@/ai/states/agentChatFetchedMessagesComponentFamilyState';
+import { agentChatInstanceByThreadIdFamilyState } from '@/ai/states/agentChatInstanceByThreadIdFamilyState';
 import { agentChatMessagesLoadingState } from '@/ai/states/agentChatMessagesLoadingState';
 import { currentAIChatThreadState } from '@/ai/states/currentAIChatThreadState';
 import { skipMessagesSkeletonUntilLoadedState } from '@/ai/states/skipMessagesSkeletonUntilLoadedState';
@@ -12,7 +13,6 @@ import { mapDBMessagesToUIMessages } from '@/ai/utils/mapDBMessagesToUIMessages'
 import { useQueryWithCallbacks } from '@/apollo/hooks/useQueryWithCallbacks';
 import { useListenToBrowserEvent } from '@/browser-event/hooks/useListenToBrowserEvent';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
-import { useSetAtomComponentFamilyState } from '@/ui/utilities/state/jotai/hooks/useSetAtomComponentFamilyState';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
 import {
   GetChatMessagesDocument,
@@ -21,6 +21,7 @@ import {
 
 export const AgentChatMessagesFetchEffect = () => {
   const currentAIChatThread = useAtomStateValue(currentAIChatThreadState);
+  const store = useStore();
 
   const isNewThread = useMemo(
     () =>
@@ -37,11 +38,6 @@ export const AgentChatMessagesFetchEffect = () => {
     skipMessagesSkeletonUntilLoadedState,
   );
 
-  const setAgentChatFetchedMessages = useSetAtomComponentFamilyState(
-    agentChatFetchedMessagesComponentFamilyState,
-    { threadId: currentAIChatThread },
-  );
-
   const handleFirstLoad = useCallback(
     (_data: GetChatMessagesQuery) => {
       setSkipMessagesSkeletonUntilLoaded(false);
@@ -52,9 +48,34 @@ export const AgentChatMessagesFetchEffect = () => {
   const handleDataLoaded = useCallback(
     (data: GetChatMessagesQuery) => {
       const uiMessages = mapDBMessagesToUIMessages(data.chatMessages ?? []);
-      setAgentChatFetchedMessages(uiMessages);
+
+      const threadId = store.get(currentAIChatThreadState.atom);
+
+      if (!isDefined(threadId)) {
+        return;
+      }
+
+      const threadAtom = agentChatInstanceByThreadIdFamilyState.atomFamily({
+        threadId,
+      });
+
+      const chatInstance = store.get(threadAtom);
+
+      if (chatInstance === null) {
+        return;
+      }
+
+      const isStreaming =
+        chatInstance.status === 'streaming' ||
+        chatInstance.status === 'submitted';
+
+      if (isStreaming) {
+        return;
+      }
+
+      chatInstance.messages = uiMessages;
     },
-    [setAgentChatFetchedMessages],
+    [store],
   );
 
   const handleLoadingChange = useCallback(
