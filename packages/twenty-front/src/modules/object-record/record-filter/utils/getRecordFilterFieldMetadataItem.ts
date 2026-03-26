@@ -1,6 +1,6 @@
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
+import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
 import { type RecordFilter } from '@/object-record/record-filter/types/RecordFilter';
-import { isDefined } from 'twenty-shared/utils';
 
 export const getRecordFilterFieldMetadataItem = ({
   recordFilter,
@@ -8,21 +8,13 @@ export const getRecordFilterFieldMetadataItem = ({
 }: {
   recordFilter: RecordFilter;
   objectMetadataItems: EnrichedObjectMetadataItem[];
-}) => {
+}): FieldMetadataItem | undefined => {
   const allFieldMetadataItems = objectMetadataItems.flatMap(
     (objectMetadataItem) => objectMetadataItem.fields,
   );
 
-  const foundFieldMetadataItem = allFieldMetadataItems.find(
+  return allFieldMetadataItems.find(
     (fieldMetadataItem) =>
       fieldMetadataItem.id === recordFilter.fieldMetadataId,
   );
-
-  if (!isDefined(foundFieldMetadataItem)) {
-    throw new Error(
-      `Field metadata item not found for field metadata id: ${recordFilter.fieldMetadataId}`,
-    );
-  }
-
-  return foundFieldMetadataItem;
 };

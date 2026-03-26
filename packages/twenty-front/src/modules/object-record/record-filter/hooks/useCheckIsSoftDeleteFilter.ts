@@ -4,6 +4,7 @@ import { type RecordFilter } from '@/object-record/record-filter/types/RecordFil
 import { RecordFilterOperand } from '@/object-record/record-filter/types/RecordFilterOperand';
 import { getRecordFilterFieldMetadataItem } from '@/object-record/record-filter/utils/getRecordFilterFieldMetadataItem';
 import { isRecordFilterAboutSoftDelete as isRecordFilterAboutSoftDeleteUtil } from '@/object-record/record-filter/utils/isRecordFilterAboutSoftDelete';
+import { isDefined } from 'twenty-shared/utils';
 
 export const useCheckIsSoftDeleteFilter = () => {
   const { objectMetadataItems } = useObjectMetadataItems();
@@ -20,6 +21,10 @@ export const useCheckIsSoftDeleteFilter = () => {
       recordFilter,
       objectMetadataItems,
     });
+
+    if (!isDefined(foundFieldMetadataItem)) {
+      return false;
+    }
 
     const isNotEmptyFilter =
       recordFilter.operand === RecordFilterOperand.IS_NOT_EMPTY;
