@@ -59,6 +59,16 @@ type CopySourceParams = Identifier & {
   toBuiltHandlerPath: string;
 };
 
+type CopySourceResourcesParams = Identifier & {
+  fromSourceHandlerPath: string;
+  toSourceHandlerPath: string;
+};
+
+type CopyBuiltResourcesParams = Identifier & {
+  fromBuiltHandlerPath: string;
+  toBuiltHandlerPath: string;
+};
+
 @Injectable()
 export class LogicFunctionResourceService {
   constructor(private readonly fileStorageService: FileStorageService) {}
@@ -232,6 +242,50 @@ export class LogicFunctionResourceService {
       },
     });
 
+    await this.fileStorageService.copy({
+      from: {
+        workspaceId,
+        applicationUniversalIdentifier,
+        fileFolder: FileFolder.BuiltLogicFunction,
+        resourcePath: fromBuiltHandlerPath,
+      },
+      to: {
+        workspaceId,
+        applicationUniversalIdentifier,
+        fileFolder: FileFolder.BuiltLogicFunction,
+        resourcePath: toBuiltHandlerPath,
+      },
+    });
+  }
+
+  async copySourceResources({
+    fromSourceHandlerPath,
+    toSourceHandlerPath,
+    workspaceId,
+    applicationUniversalIdentifier,
+  }: CopySourceResourcesParams): Promise<void> {
+    await this.fileStorageService.copy({
+      from: {
+        workspaceId,
+        applicationUniversalIdentifier,
+        fileFolder: FileFolder.Source,
+        resourcePath: fromSourceHandlerPath,
+      },
+      to: {
+        workspaceId,
+        applicationUniversalIdentifier,
+        fileFolder: FileFolder.Source,
+        resourcePath: toSourceHandlerPath,
+      },
+    });
+  }
+
+  async copyBuiltResources({
+    fromBuiltHandlerPath,
+    toBuiltHandlerPath,
+    workspaceId,
+    applicationUniversalIdentifier,
+  }: CopyBuiltResourcesParams): Promise<void> {
     await this.fileStorageService.copy({
       from: {
         workspaceId,

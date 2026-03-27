@@ -155,14 +155,22 @@ export class LogicFunctionFromSourceService {
       newId,
     );
 
-    await this.logicFunctionResourceService.copyResources({
+    await this.logicFunctionResourceService.copySourceResources({
       fromSourceHandlerPath: sourceHandlerPath,
       toSourceHandlerPath,
-      fromBuiltHandlerPath: builtHandlerPath,
-      toBuiltHandlerPath,
       workspaceId,
       applicationUniversalIdentifier: ownerFlatApplication.universalIdentifier,
     });
+
+    if (existingLogicFunction.isBuildUpToDate) {
+      await this.logicFunctionResourceService.copyBuiltResources({
+        fromBuiltHandlerPath: builtHandlerPath,
+        toBuiltHandlerPath,
+        workspaceId,
+        applicationUniversalIdentifier:
+          ownerFlatApplication.universalIdentifier,
+      });
+    }
 
     const universalFlatLogicFunctionToCreate =
       buildUniversalFlatLogicFunctionToCreate({
