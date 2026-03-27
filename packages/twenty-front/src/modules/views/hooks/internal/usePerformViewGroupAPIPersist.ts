@@ -34,13 +34,15 @@ export const usePerformViewGroupAPIPersist = () => {
       }
 
       try {
-        const results = await Promise.all(
-          updateViewGroupInputs.map((variables) =>
-            updateViewGroupMutation({
-              variables,
-            }),
-          ),
-        );
+        const results: Awaited<ReturnType<typeof updateViewGroupMutation>>[] =
+          [];
+
+        for (const variables of updateViewGroupInputs) {
+          const result = await updateViewGroupMutation({
+            variables,
+          });
+          results.push(result);
+        }
 
         return {
           status: 'successful',
