@@ -15,6 +15,7 @@ import { isMicrosoftCalendarEnabledState } from '@/client-config/states/isMicros
 import { isMicrosoftMessagingEnabledState } from '@/client-config/states/isMicrosoftMessagingEnabledState';
 import { useTriggerApisOAuth } from '@/settings/accounts/hooks/useTriggerApiOAuth';
 import { PageFocusId } from '@/types/PageFocusId';
+import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
 import { ModalContent } from 'twenty-ui/layout';
 import { useHotkeysOnFocusedElement } from '@/ui/utilities/hotkey/hooks/useHotkeysOnFocusedElement';
 import { t } from '@lingui/core/macro';
@@ -23,6 +24,7 @@ import { IconGoogle, IconMicrosoft } from 'twenty-ui/display';
 import { MainButton } from 'twenty-ui/input';
 import { ClickToActionLink } from 'twenty-ui/navigation';
 import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
+import { CombinedGraphQLErrors } from '@apollo/client/errors';
 import { useMutation } from '@apollo/client/react';
 import {
   CalendarChannelVisibility,
@@ -57,6 +59,8 @@ export const SyncEmails = () => {
   const { theme } = useContext(ThemeContext);
   const { triggerApisOAuth } = useTriggerApisOAuth();
   const setNextOnboardingStatus = useSetNextOnboardingStatus();
+  const { enqueueErrorSnackBar } = useSnackBar();
+  const [isLoading, setIsLoading] = useState(false);
   const [visibility, setVisibility] = useState<MessageChannelVisibility>(
     MessageChannelVisibility.SHARE_EVERYTHING,
   );
@@ -66,22 +70,48 @@ export const SyncEmails = () => {
   );
 
   const handleButtonClick = async (provider: ConnectedAccountProvider) => {
-    const calendarChannelVisibility =
-      visibility === MessageChannelVisibility.SHARE_EVERYTHING
-        ? CalendarChannelVisibility.SHARE_EVERYTHING
-        : CalendarChannelVisibility.METADATA;
+    if (isLoading) {
+      return;
+    }
 
-    await triggerApisOAuth(provider, {
-      redirectLocation: AppPath.Index,
-      messageVisibility: visibility,
-      calendarVisibility: calendarChannelVisibility,
-      skipMessageChannelConfiguration: true,
-    });
+    setIsLoading(true);
+
+    try {
+      const calendarChannelVisibility =
+        visibility === MessageChannelVisibility.SHARE_EVERYTHING
+          ? CalendarChannelVisibility.SHARE_EVERYTHING
+          : CalendarChannelVisibility.METADATA;
+
+      await triggerApisOAuth(provider, {
+        redirectLocation: AppPath.Index,
+        messageVisibility: visibility,
+        calendarVisibility: calendarChannelVisibility,
+        skipMessageChannelConfiguration: true,
+      });
+    } catch (error: any) {
+      enqueueErrorSnackBar({
+        apolloError: CombinedGraphQLErrors.is(error) ? error : undefined,
+      });
+      setIsLoading(false);
+    }
   };
 
   const continueWithoutSync = async () => {
-    await skipSyncEmailOnboardingStatusMutation();
-    setNextOnboardingStatus();
+    if (isLoading) {
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      await skipSyncEmailOnboardingStatusMutation();
+      setNextOnboardingStatus();
+    } catch (error: any) {
+      enqueueErrorSnackBar({
+        apolloError: CombinedGraphQLErrors.is(error) ? error : undefined,
+      });
+      setIsLoading(false);
+    }
   };
 
   const userAuthenticatedWithSSO =
@@ -133,6 +163,7 @@ export const SyncEmails = () => {
           <MainButton
             title={t`Sync with Google`}
             onClick={() => handleButtonClick(ConnectedAccountProvider.GOOGLE)}
+            disabled={isLoading}
             width={200}
             Icon={() => <IconGoogle size={theme.icon.size.sm} />}
           />
@@ -143,6 +174,7 @@ export const SyncEmails = () => {
             onClick={() =>
               handleButtonClick(ConnectedAccountProvider.MICROSOFT)
             }
+            disabled={isLoading}
             width={200}
             Icon={() => <IconMicrosoft size={theme.icon.size.sm} />}
           />
@@ -151,6 +183,7 @@ export const SyncEmails = () => {
           <MainButton
             title={t`Continue`}
             onClick={continueWithoutSync}
+            disabled={isLoading}
             width={144}
           />
         )}
@@ -160,6 +193,7 @@ export const SyncEmails = () => {
             onClick={() =>
               handleButtonClick(ConnectedAccountProvider.MICROSOFT)
             }
+            disabled={isLoading}
             width={144}
           />
         )}
@@ -167,6 +201,7 @@ export const SyncEmails = () => {
           <MainButton
             title={t`Continue`}
             onClick={() => handleButtonClick(ConnectedAccountProvider.GOOGLE)}
+            disabled={isLoading}
             width={144}
           />
         )}
