@@ -205,9 +205,7 @@ export class ApolloFactory implements ApolloManager {
         }
 
         return from(renewalPromise).pipe(
-          switchMap((succeeded) =>
-            succeeded ? forward(operation) : EMPTY,
-          ),
+          switchMap((succeeded) => (succeeded ? forward(operation) : EMPTY)),
         );
       };
 

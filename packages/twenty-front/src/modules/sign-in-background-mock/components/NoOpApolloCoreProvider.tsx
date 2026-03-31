@@ -1,12 +1,19 @@
-import { ApolloClient, ApolloLink, InMemoryCache, Observable } from '@apollo/client';
 import { ApolloCoreClientContext } from '@/object-metadata/contexts/ApolloCoreClientContext';
+import {
+  ApolloClient,
+  ApolloLink,
+  InMemoryCache,
+  Observable,
+} from '@apollo/client';
+import { ApolloProvider } from '@apollo/client/react';
 import { type ReactNode } from 'react';
 
 const noOpLink = new ApolloLink(
-  () => new Observable((observer) => {
-    observer.next({ data: {} });
-    observer.complete();
-  }),
+  () =>
+    new Observable((observer) => {
+      observer.next({ data: {} });
+      observer.complete();
+    }),
 );
 
 const noOpClient = new ApolloClient({
@@ -19,7 +26,9 @@ export const NoOpApolloCoreProvider = ({
 }: {
   children: ReactNode;
 }) => (
-  <ApolloCoreClientContext.Provider value={noOpClient}>
-    {children}
-  </ApolloCoreClientContext.Provider>
+  <ApolloProvider client={noOpClient}>
+    <ApolloCoreClientContext.Provider value={noOpClient}>
+      {children}
+    </ApolloCoreClientContext.Provider>
+  </ApolloProvider>
 );
