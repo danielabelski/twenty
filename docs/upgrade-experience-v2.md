@@ -127,6 +127,8 @@ The upgrade runs in two phases:
 
 The orchestrator runs the `fast` array for **every version from the oldest needed up to the target**, in order. Since fast commands are global and affect the shared database, they must all run to bring the core schema to the target state. TypeORM migrations are naturally incremental (pending migrations run in timestamp order), but non-TypeORM global commands in `fast` also need to execute for each intermediate version.
 
+**If any fast command fails, the upgrade aborts immediately** -- Phase 2 does not start. There is no rollback of previously completed fast commands; each command runs in its own transaction, so only the failing command's transaction is not applied. Previously completed commands remain in effect. The operator must fix the issue and re-run the upgrade (idempotency ensures already-completed commands no-op).
+
 **Phase 2 -- Slow commands (per-workspace, sorted by version desc)**:
 
 Workspaces are sorted by version descending (most up-to-date first). This gets the majority upgraded quickly -- most workspaces are near the latest version and only need one version bundle. Stragglers on older versions are handled after.
