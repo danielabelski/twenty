@@ -388,6 +388,16 @@ The orchestrator uses the history tables as a **control mechanism**: before runn
 
 A `--force-rerun` flag overrides this and re-executes all commands regardless of history. This is useful for debugging or when a command was recorded as `completed` but produced incorrect results (e.g. a buggy version ran it). All commands must still be idempotent -- `--force-rerun` relies on this guarantee.
 
+### Row Eviction
+
+Because the tables are append-only, rows accumulate over time. In practice the volume is modest -- a version bundle has ~5-10 commands, retries are rare, and even cloud environments with thousands of workspaces produce manageable row counts. Still, stale rows serve no operational purpose once their version is no longer part of the upgrade path.
+
+**Policy**: when a version is dropped from `UPGRADE_COMMAND_SUPPORTED_VERSIONS` (see "Breaking Changes and Stale Versions"), all history rows for that version are deleted from both `instance_upgrade_history` and `workspace_upgrade_history`. The commands those rows reference no longer exist in the codebase and can never be re-run -- the history is purely archival at that point.
+
+**Timing**: eviction runs at the start of the upgrade orchestrator, before processing any version bundle. The orchestrator compares the versions present in the history tables against `UPGRADE_COMMAND_SUPPORTED_VERSIONS` and deletes rows whose `version` is not in the list. This keeps the tables tight without requiring a separate cleanup job or manual intervention.
+
+**No time-based eviction**: rows are not evicted by age. A version may stay in `UPGRADE_COMMAND_SUPPORTED_VERSIONS` for a long time (e.g. the oldest supported source version), and its history rows must remain queryable for the skip-if-completed mechanism to work. Version-based eviction is the only safe trigger.
+
 ---
 
 ## Deploying a Partial Next Version to Cloud Production
