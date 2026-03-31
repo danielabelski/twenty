@@ -93,6 +93,7 @@ describe('getGroupByExpression', () => {
         getGroupByExpression({ groupByField, columnNameWithQuotes }),
       ).toThrow();
     });
+
   });
 
   describe('missing timezone handling', () => {

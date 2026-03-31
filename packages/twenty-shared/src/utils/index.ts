@@ -147,6 +147,7 @@ export { isAutoSelectModelId } from './isAutoSelectModelId';
 export { fastDeepEqual } from './json/fast-deep-equal';
 export { getAppPath } from './navigation/getAppPath';
 export { getSettingsPath } from './navigation/getSettingsPath';
+export { normalizeTimezone } from './normalizeTimezone';
 export { parseJson } from './parseJson';
 export { removePropertiesFromRecord } from './removePropertiesFromRecord';
 export { removeUndefinedFields } from './removeUndefinedFields';
