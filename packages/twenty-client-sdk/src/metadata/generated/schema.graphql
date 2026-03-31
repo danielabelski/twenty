@@ -2790,6 +2790,7 @@ type AgentMessage {
   turnId: UUID!
   agentId: UUID
   role: String!
+  status: String!
   parts: [AgentMessagePart!]!
   createdAt: DateTime!
 }

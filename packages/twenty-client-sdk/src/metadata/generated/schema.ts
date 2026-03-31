@@ -2451,6 +2451,7 @@ export interface AgentMessage {
     turnId: Scalars['UUID']
     agentId?: Scalars['UUID']
     role: Scalars['String']
+    status: Scalars['String']
     parts: AgentMessagePart[]
     createdAt: Scalars['DateTime']
     __typename: 'AgentMessage'
@@ -5598,6 +5599,7 @@ export interface AgentMessageGenqlSelection{
     turnId?: boolean | number
     agentId?: boolean | number
     role?: boolean | number
+    status?: boolean | number
     parts?: AgentMessagePartGenqlSelection
     createdAt?: boolean | number
     __typename?: boolean | number
