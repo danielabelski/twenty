@@ -19,5 +19,19 @@ export const useInvalidateMetadataStore = () => {
     store.set(metadataLoadedVersionState.atom, (prev) => prev + 1);
   }, [store]);
 
-  return { invalidateMetadataStore };
+  // Resets statuses to 'empty' so isMinimalMetadataReady becomes false
+  // and loadMinimalMetadata writes fresh server data. Use during login
+  // flows where stale localStorage metadata must not gate rendering.
+  const resetMetadataStore = useCallback(() => {
+    for (const key of ALL_METADATA_ENTITY_KEYS) {
+      store.set(metadataStoreState.atomFamily(key), (prev) => ({
+        ...prev,
+        status: 'empty',
+        currentCollectionHash: undefined,
+      }));
+    }
+    store.set(metadataLoadedVersionState.atom, (prev) => prev + 1);
+  }, [store]);
+
+  return { invalidateMetadataStore, resetMetadataStore };
 };

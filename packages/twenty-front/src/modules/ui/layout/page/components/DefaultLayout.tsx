@@ -11,6 +11,7 @@ import { MobileNavigationBar } from '@/navigation/components/MobileNavigationBar
 import { PageDragDropProvider } from '@/navigation-menu-item/display/dnd/providers/PageDragDropProvider';
 import { useIsSettingsPage } from '@/navigation/hooks/useIsSettingsPage';
 import { OBJECT_SETTINGS_WIDTH } from '@/settings/data-model/constants/ObjectSettings';
+import { NoOpApolloCoreProvider } from '@/sign-in-background-mock/components/NoOpApolloCoreProvider';
 import { SignInAppNavigationDrawerMock } from '@/sign-in-background-mock/components/SignInAppNavigationDrawerMock';
 import { Suspense, lazy, useContext } from 'react';
 
@@ -105,9 +106,11 @@ export const DefaultLayout = () => {
                 {showAuthModal ? (
                   <>
                     <StyledMainContainer>
-                      <Suspense fallback={null}>
-                        <SignInBackgroundMockPage />
-                      </Suspense>
+                      <NoOpApolloCoreProvider>
+                        <Suspense fallback={null}>
+                          <SignInBackgroundMockPage />
+                        </Suspense>
+                      </NoOpApolloCoreProvider>
                     </StyledMainContainer>
                     <AnimatePresence mode="wait">
                       <LayoutGroup>

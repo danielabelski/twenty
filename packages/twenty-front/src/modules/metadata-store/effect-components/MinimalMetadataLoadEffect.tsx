@@ -1,4 +1,4 @@
-import { useHasAccessTokenPair } from '@/auth/hooks/useHasAccessTokenPair';
+import { useHasWorkspaceSpecificToken } from '@/auth/hooks/useHasWorkspaceSpecificToken';
 import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
 import { isCurrentUserLoadedState } from '@/auth/states/isCurrentUserLoadedState';
 import { useLoadMinimalMetadata } from '@/metadata-store/hooks/useLoadMinimalMetadata';
@@ -12,10 +12,10 @@ import { isWorkspaceActiveOrSuspended } from 'twenty-shared/workspace';
 type LoadedState = 'none' | 'mocked' | 'real';
 
 const computeDesiredLoadState = (
-  hasAccessTokenPair: boolean,
+  hasWorkspaceSpecificToken: boolean,
   isActiveWorkspace: boolean,
 ): LoadedState => {
-  if (hasAccessTokenPair && isActiveWorkspace) {
+  if (hasWorkspaceSpecificToken && isActiveWorkspace) {
     return 'real';
   }
 
@@ -23,7 +23,7 @@ const computeDesiredLoadState = (
 };
 
 export const MinimalMetadataLoadEffect = () => {
-  const hasAccessTokenPair = useHasAccessTokenPair();
+  const hasWorkspaceSpecificToken = useHasWorkspaceSpecificToken();
   const isCurrentUserLoaded = useAtomStateValue(isCurrentUserLoadedState);
   const currentWorkspace = useAtomStateValue(currentWorkspaceState);
   const metadataLoadedVersion = useAtomStateValue(metadataLoadedVersionState);
@@ -39,7 +39,7 @@ export const MinimalMetadataLoadEffect = () => {
   const isActiveWorkspace = isWorkspaceActiveOrSuspended(currentWorkspace);
 
   const desiredLoadState = computeDesiredLoadState(
-    hasAccessTokenPair,
+    hasWorkspaceSpecificToken,
     isActiveWorkspace,
   );
 
@@ -76,7 +76,7 @@ export const MinimalMetadataLoadEffect = () => {
     performLoad();
   }, [
     isCurrentUserLoaded,
-    hasAccessTokenPair,
+    hasWorkspaceSpecificToken,
     isActiveWorkspace,
     desiredLoadState,
     lastMetadataLoadData,

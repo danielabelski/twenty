@@ -24,7 +24,7 @@ import { labPublicFeatureFlagsState } from '@/client-config/states/labPublicFeat
 import { sentryConfigState } from '@/client-config/states/sentryConfigState';
 import { supportChatState } from '@/client-config/states/supportChatState';
 import { domainConfigurationState } from '@/domain-manager/states/domainConfigurationState';
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 import { clientConfigApiStatusState } from '@/client-config/states/clientConfigApiStatusState';
 import { getClientConfig } from '@/client-config/utils/getClientConfig';
 import { allowRequestsToTwentyIconsState } from '@/client-config/states/allowRequestsToTwentyIcons';
@@ -107,15 +107,7 @@ export const useClientConfig = () => {
 
   const setAppVersion = useSetAtomState(appVersionState);
 
-  const isFetchingRef = useRef(false);
-
   const fetchClientConfig = useCallback(async () => {
-    if (isFetchingRef.current) {
-      return;
-    }
-
-    isFetchingRef.current = true;
-
     try {
       const clientConfig = await getClientConfig();
 
@@ -172,8 +164,6 @@ export const useClientConfig = () => {
       const error =
         err instanceof Error ? err : new Error('Failed to fetch client config');
       setClientConfigApiStatus({ isLoaded: true, error });
-    } finally {
-      isFetchingRef.current = false;
     }
   }, [
     setAiModels,
