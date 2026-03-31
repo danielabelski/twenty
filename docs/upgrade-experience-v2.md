@@ -56,24 +56,18 @@ type UpgradeCommandResult =
 - Commands must **never throw**. They return `{ status: 'failure', error }` instead.
 - The orchestrator wraps each command execution in a try/catch to handle unexpected exceptions -- these are converted into a `failure` result with the caught error message and stack.
 
-**Log capture**:
+**Log capture via correlation ID**:
 
-Commands use the standard NestJS `Logger` (`this.logger`) -- no custom callback or API change. The orchestrator intercepts log output at two levels:
+Commands use the standard NestJS `Logger` (`this.logger`) -- no custom callback or API change. The orchestrator captures all logs emitted during a command's execution using a correlation ID:
 
-**Command logger -- signal** (full capture, tail-truncated):
-- The orchestrator wraps the command's own `Logger` instance to tee its output into a per-command buffer, in addition to normal stdout behavior.
-- This captures the command's own narrative: progress, warnings, decisions. No change needed in command code.
+- Before executing a command, the orchestrator sets a correlation ID (e.g. `commandName + workspaceId`) in async local storage.
+- The global `LoggerService` includes this correlation ID in every log line, regardless of which Logger instance or service emits it (command code, TypeORM, repositories, framework internals).
+- A per-command buffer captures all correlated log lines during execution. This gives true per-command log isolation -- ORM queries, SQL errors, service calls, and the command's own narrative all appear in one unified stream.
 - Tail-truncated to last 5,000 lines if exceeded. A `[TRUNCATED]` header is prepended when truncation occurs.
-- On **failure**: the buffer is stored in the `commandLogs` column of the `workspace_upgrade_history` table.
+- On **failure**: the buffer is stored in the `logs` column of the `workspace_upgrade_history` table.
 - On **success**: the buffer is discarded (already written to stdout).
 
-**Global NestJS logger -- noise/context** (rolling buffer):
-- During each command execution, the orchestrator captures a rolling buffer of the last 500 lines from the global NestJS `LoggerService`, all log levels. This includes ORM queries, SQL errors, service-level logs, and framework context from other services the command calls.
-- A `[TRUNCATED]` header is prepended when the buffer wraps.
-- On **failure**: the buffer is stored in the `serverLogs` column of the history table.
-- On **success**: the buffer is discarded.
-
-The two columns are a **signal-to-noise separation**: `commandLogs` is the clean story of what the command was doing; `serverLogs` is the system-level context underneath. Debuggers read `commandLogs` first, then `serverLogs` only if they need to dig deeper.
+This approach avoids the fragility of wrapping individual Logger instances and naturally supports future parallelized workspace upgrades (each command execution has its own correlation ID).
 
 **Orchestrator error handling**:
 
@@ -361,54 +355,24 @@ A new table in the **core schema** (shared, not per-workspace) that records ever
 - `startedAt` (timestamp)
 - `completedAt` (timestamp, nullable)
 - `error` (text, nullable -- full error string from `UpgradeCommandResult.error` on failure, including stack trace)
-- `commandLogs` (text, nullable -- **signal**: the command's own narrative via its `Logger` instance. Contains progress, warnings, decisions made by the command. Tail-truncated to last 5,000 lines if exceeded; when truncated, a `[TRUNCATED - showing last 5000 of N total lines]` header is prepended. Stored on failure only.)
-- `serverLogs` (text, nullable -- **noise/context**: rolling buffer of the last 500 lines from the global NestJS logger during the command's execution window, all log levels. Contains ORM queries, SQL errors, framework-level context. When the buffer is full, oldest lines are dropped and a `[TRUNCATED - showing last 500 of N total lines]` header is prepended. Stored on failure only.)
+- `logs` (text, nullable -- all log output correlated to this command execution via correlation ID. Includes the command's own logs, ORM queries, SQL errors, service calls, and framework context -- one unified stream. Tail-truncated to last 5,000 lines if exceeded; when truncated, a `[TRUNCATED - showing last 5000 of N total lines]` header is prepended. Stored on failure only.)
 - `createdAt` / `updatedAt` (timestamps)
-
-**Debugging workflow**: read `commandLogs` first -- it tells you what the command was doing and where it went wrong. Only dig into `serverLogs` if you need deeper system-level context (e.g. the actual SQL query that failed, connection errors, framework exceptions).
 
 **Lifecycle**: the orchestrator writes a `started` row before executing a command, then updates it to `completed` or `failed` when it finishes. This means a crash mid-command leaves a `started` row with no `completedAt` -- the orchestrator treats this as "not completed" on re-run.
 
-### Skip vs Re-Run Behavior
+### Re-Run Behavior
 
-Two layers control whether a previously completed command is re-run:
+All commands always run, relying on idempotency. The history table is an **audit log**, not a control mechanism -- the orchestrator does not query it to decide whether to run a command.
 
-**1. Per-command configuration (`skipIfCompleted`)**:
+On re-run after a partial failure, the orchestrator walks through all commands again. Already-completed commands no-op quickly thanks to idempotency (e.g. a backfill with `WHERE column IS NULL` returns 0 rows on an indexed column). The workspace version stamp ensures the orchestrator only processes version bundles the workspace hasn't fully completed.
 
-Each command declares whether it's safe to skip when already recorded as `completed` in the history table:
+### Future Optimization: Skip-If-Completed
 
-```typescript
-{ type: 'per-workspace', command: this.backfillCommandMenuItems, skipIfCompleted: true }
-{ type: 'per-workspace', command: this.recomputeDerivedData, skipIfCompleted: false }
-```
+If idempotent no-op commands become a performance bottleneck at scale (e.g. a full table scan on a very large table that no-ops row by row), a `skipIfCompleted` mechanism could be introduced:
 
-- `skipIfCompleted: true` (default for most commands): if the history table shows this command completed successfully for this workspace (or globally), the orchestrator skips it. Suitable for backfills and one-time migrations.
-- `skipIfCompleted: false`: the command always re-runs regardless of history. Suitable for commands that recompute derived data that may have drifted, or commands where idempotent re-execution is cheap and correctness matters more than speed.
-
-**2. Global override flag (`--force-rerun`)**:
-
-Overrides all per-command `skipIfCompleted` settings -- every command runs regardless of history. Useful for debugging, or when a previous "successful" run is suspected of leaving inconsistent state.
-
-**Decision flow**:
-
-```mermaid
-flowchart TD
-  Cmd["Command to execute"] --> ForceFlag{"--force-rerun flag?"}
-  ForceFlag -->|yes| Run["Run the command"]
-  ForceFlag -->|no| CheckConfig{"skipIfCompleted?"}
-  CheckConfig -->|false| Run
-  CheckConfig -->|true| CheckHistory{"History shows completed?"}
-  CheckHistory -->|no| Run
-  CheckHistory -->|yes| Skip["Skip the command (log as skipped)"]
-```
-
-### Impact on the Real-World Example
-
-With the history table, re-running the upgrade after a partial failure becomes much faster. If Workspace B failed during `bundle_1190.slow` and the operator re-runs:
-
-- Phase 1 fast commands: all skip (already completed in history)
-- Workspace A and C: all commands skip (already completed)
-- Workspace B: `bundle_1180.slow` commands skip (completed), `bundle_1190.slow` resumes from the failed command
+- Each command could declare `skipIfCompleted: true` to let the orchestrator check the history table and skip it if already recorded as `completed`.
+- A `--force-rerun` flag would override this and run everything regardless.
+- This adds complexity (configuration per command, history table becomes a control mechanism, risk of masking bugs) so it should only be added when there's a demonstrated need.
 
 ---
 
