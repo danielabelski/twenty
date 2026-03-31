@@ -36,8 +36,9 @@ export const CommandMenuContextProviderDefault = ({
   );
 
   const isRecordSelection =
-    contextStoreTargetedRecordsRule.mode === 'selection' &&
-    contextStoreTargetedRecordsRule.selectedRecordIds.length > 0;
+    contextStoreTargetedRecordsRule.mode === 'exclusion' ||
+    (contextStoreTargetedRecordsRule.mode === 'selection' &&
+      contextStoreTargetedRecordsRule.selectedRecordIds.length > 0);
 
   const runWorkflowRecordCommands = useRunWorkflowRecordCommands({
     objectMetadataItem,

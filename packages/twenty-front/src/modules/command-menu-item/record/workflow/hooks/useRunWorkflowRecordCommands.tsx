@@ -5,9 +5,12 @@ import { CommandMenuItemType } from '@/command-menu-item/types/CommandMenuItemTy
 import { contextStoreIsPageInEditModeComponentState } from '@/context-store/states/contextStoreIsPageInEditModeComponentState';
 import { contextStoreTargetedRecordsRuleComponentState } from '@/context-store/states/contextStoreTargetedRecordsRuleComponentState';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
+import { recordIndexAllRecordIdsComponentSelector } from '@/object-record/record-index/states/selectors/recordIndexAllRecordIdsComponentSelector';
+import { useRecordIndexIdFromCurrentContextStore } from '@/object-record/record-index/hooks/useRecordIndexIdFromCurrentContextStore';
 import { recordStoreFamilyState } from '@/object-record/record-store/states/recordStoreFamilyState';
 import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
+import { useAtomComponentSelectorCallbackState } from '@/ui/utilities/state/jotai/hooks/useAtomComponentSelectorCallbackState';
 import { useActiveWorkflowVersionsWithManualTrigger } from '@/workflow/hooks/useActiveWorkflowVersionsWithManualTrigger';
 import { useRunWorkflowVersion } from '@/workflow/hooks/useRunWorkflowVersion';
 
@@ -39,10 +42,27 @@ export const useRunWorkflowRecordCommands = ({
     contextStoreIsPageInEditModeComponentState,
   );
 
-  const selectedRecordIds =
-    contextStoreTargetedRecordsRule.mode === 'selection'
-      ? contextStoreTargetedRecordsRule.selectedRecordIds
-      : undefined;
+  const { recordIndexId } = useRecordIndexIdFromCurrentContextStore();
+
+  const recordIndexAllRecordIds = useAtomComponentSelectorCallbackState(
+    recordIndexAllRecordIdsComponentSelector,
+    recordIndexId,
+  );
+
+  const getSelectedRecordIds = useCallback(() => {
+    if (contextStoreTargetedRecordsRule.mode === 'selection') {
+      return contextStoreTargetedRecordsRule.selectedRecordIds;
+    }
+
+    const allRecordIds = store.get(recordIndexAllRecordIds);
+    const excludedRecordIds = new Set(
+      contextStoreTargetedRecordsRule.excludedRecordIds,
+    );
+
+    return allRecordIds.filter(
+      (recordId) => !excludedRecordIds.has(recordId),
+    );
+  }, [contextStoreTargetedRecordsRule, recordIndexAllRecordIds, store]);
 
   const { records: activeWorkflowVersions } =
     useActiveWorkflowVersionsWithManualTrigger({
@@ -144,12 +164,14 @@ export const useRunWorkflowRecordCommands = ({
         component: (
           <Command
             onClick={async () => {
-              if (!isDefined(selectedRecordIds)) {
+              const resolvedRecordIds = getSelectedRecordIds();
+
+              if (resolvedRecordIds.length === 0) {
                 return;
               }
 
               await runWorkflowVersionOnSelectedRecords(
-                selectedRecordIds,
+                resolvedRecordIds,
                 activeWorkflowVersion,
               );
             }}
