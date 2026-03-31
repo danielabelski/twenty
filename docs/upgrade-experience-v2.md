@@ -12,10 +12,10 @@ The current upgrade system has several pain points:
 
 ## Success Metrics
 
-- **Cross-version upgrade** works across the ordered list of supported versions (a workspace on `1.18.0` targeting `1.20.0` runs `1.19.0` then `1.20.0` steps sequentially).
-- **Patch-version upgrade support**: the upgrade triggers on patch version differences, not just major.minor. Currently `compareVersionMajorAndMinor` ignores patches entirely, meaning a workspace on `1.20.0` is considered "equal" to `1.20.1` and patch-level upgrade steps cannot run.
+- **Cross-version upgrade** works across the ordered list of supported versions (a workspace on `1.18.0` targeting `1.20.0` runs `1.19.0` then `1.20.0` bundles sequentially).
+- **Patch-version upgrade support**: the upgrade triggers on patch version differences, not just major.minor. Currently `compareVersionMajorAndMinor` ignores patches entirely, meaning a workspace on `1.20.0` is considered "equal" to `1.20.1` and patch-level upgrade commands cannot run.
 - **Post-upgrade health check** validates workspace consistency after migration.
-- **Improved developer experience** for twenty-eng: clear command taxonomy, scoped responsibilities, easy to add new version bundles and steps.
+- **Improved developer experience** for twenty-eng: clear command taxonomy, scoped responsibilities, easy to add new version bundles and commands.
 - **Report-a-problem template** that gathers workspace status including upgrade stack traces.
 - **Settings page** (follow-up) shows current workspace version; if it differs from the installed server version, prompts the user to contact their administrator.
 
@@ -31,54 +31,57 @@ The current upgrade system has several pain points:
 
 ## Command Taxonomy
 
-Replace the current deep inheritance chain with two explicit base classes and an orchestrator.
+Replace the current deep inheritance chain with explicit base classes and an orchestrator.
 
-### Base Command Types
+### Terminology
 
-- **GlobalCommand**: Runs once, globally, workspace-agnostic. Example: running pending TypeORM core migrations (`transaction: 'each'`), applying a breaking schema change.
-- **PerWorkspaceCommand**: Iterates over all active/suspended workspaces and executes per-workspace logic. Example: backfilling data, migrating workspace schemas.
+- **UpgradeCommandOrchestrator**: the top-level orchestrator that resolves versions, runs phases, and manages the upgrade flow.
+- **UpgradeVersionBundle**: the per-version `{ fast, slow }` object (e.g. `bundle_1200`). Groups all commands needed to upgrade workspaces *to* that version.
+- **UpgradeCommand**: an individual command within a bundle's `fast` or `slow` array. Base class for all upgrade commands. Subtypes:
+  - **GlobalCommand**: runs once, globally, workspace-agnostic. Example: TypeORM core migrations, breaking schema changes.
+  - **PerWorkspaceCommand**: iterates over all active/suspended workspaces and executes per-workspace logic. Example: backfilling data, migrating workspace schemas.
 
-### Step Contract
+### Command Contract
 
-Every step (both `GlobalCommand` and `PerWorkspaceCommand`) must follow a strict contract:
+Every `UpgradeCommand` (both `GlobalCommand` and `PerWorkspaceCommand`) must follow a strict contract:
 
 **Return type -- discriminated union**:
 
 ```typescript
-type UpgradeStepResult =
+type UpgradeCommandResult =
   | { status: 'success' }
   | { status: 'failure'; error: string };
 ```
 
-- Steps must **never throw**. They return `{ status: 'failure', error }` instead.
-- The orchestrator wraps each step execution in a try/catch to handle unexpected exceptions -- these are converted into a `failure` result with the caught error message and stack.
+- Commands must **never throw**. They return `{ status: 'failure', error }` instead.
+- The orchestrator wraps each command execution in a try/catch to handle unexpected exceptions -- these are converted into a `failure` result with the caught error message and stack.
 
 **Log capture**:
 
-Steps use the standard NestJS `Logger` (`this.logger`) -- no custom callback or API change. The orchestrator intercepts log output at two levels:
+Commands use the standard NestJS `Logger` (`this.logger`) -- no custom callback or API change. The orchestrator intercepts log output at two levels:
 
-**Step logger -- signal** (full capture, tail-truncated):
-- The orchestrator wraps the step's own `Logger` instance to tee its output into a per-step buffer, in addition to normal stdout behavior.
-- This captures the step's own narrative: progress, warnings, decisions. No change needed in step code.
+**Command logger -- signal** (full capture, tail-truncated):
+- The orchestrator wraps the command's own `Logger` instance to tee its output into a per-command buffer, in addition to normal stdout behavior.
+- This captures the command's own narrative: progress, warnings, decisions. No change needed in command code.
 - Tail-truncated to last 5,000 lines if exceeded. A `[TRUNCATED]` header is prepended when truncation occurs.
-- On **failure**: the buffer is stored in the `stepLogs` column of the `workspace_upgrade_history` table.
+- On **failure**: the buffer is stored in the `commandLogs` column of the `workspace_upgrade_history` table.
 - On **success**: the buffer is discarded (already written to stdout).
 
 **Global NestJS logger -- noise/context** (rolling buffer):
-- During each step execution, the orchestrator captures a rolling buffer of the last 500 lines from the global NestJS `LoggerService`, all log levels. This includes ORM queries, SQL errors, service-level logs, and framework context from other services the step calls.
+- During each command execution, the orchestrator captures a rolling buffer of the last 500 lines from the global NestJS `LoggerService`, all log levels. This includes ORM queries, SQL errors, service-level logs, and framework context from other services the command calls.
 - A `[TRUNCATED]` header is prepended when the buffer wraps.
 - On **failure**: the buffer is stored in the `serverLogs` column of the history table.
 - On **success**: the buffer is discarded.
 
-The two columns are a **signal-to-noise separation**: `stepLogs` is the clean story of what the step was doing; `serverLogs` is the system-level context underneath. Debuggers read `stepLogs` first, then `serverLogs` only if they need to dig deeper.
+The two columns are a **signal-to-noise separation**: `commandLogs` is the clean story of what the command was doing; `serverLogs` is the system-level context underneath. Debuggers read `commandLogs` first, then `serverLogs` only if they need to dig deeper.
 
 **Orchestrator error handling**:
 
 ```typescript
-let result: UpgradeStepResult;
+let result: UpgradeCommandResult;
 
 try {
-  result = await step.command.execute(context);
+  result = await command.execute(context);
 } catch (unexpectedError) {
   result = {
     status: 'failure',
@@ -87,12 +90,7 @@ try {
 }
 ```
 
-### Version Bundles and Steps
-
-**Terminology**:
-
-- A **version bundle** is the per-version `{ fast, slow }` object (e.g. `steps_1200`). It groups all commands needed to upgrade workspaces *to* that version.
-- A **step** is an individual entry within a `fast` or `slow` array -- a single `{ type, command }` pair.
+### Version Bundles
 
 Each version defines its upgrade bundle as two ordered arrays:
 
@@ -100,7 +98,7 @@ Each version defines its upgrade bundle as two ordered arrays:
 - **`slow`**: Commands that may take longer (backfills, data migrations). Contains an **interleaved mix of `GlobalCommand` and `PerWorkspaceCommand` entries**. These run after `fast` completes.
 
 ```typescript
-const steps_1200: VersionUpgradeSteps = {
+const bundle_1200: UpgradeVersionBundle = {
   fast: [
     { type: 'global', command: this.typeOrmMigrationCommand },
   ],
@@ -120,7 +118,7 @@ const steps_1200: VersionUpgradeSteps = {
 1. Resolving the current app version and the supported upgrade range.
 2. Determining which version bundles to run based on the workspace's current version.
 3. **Phase 1**: run `fast` arrays (global-only) for all intermediate version bundles up to the target.
-4. **Phase 2**: for each workspace (sorted by version desc), walk through missing version bundles running each `slow` array as-is (global + per-workspace steps interleaved).
+4. **Phase 2**: for each workspace (sorted by version desc), walk through missing version bundles running each `slow` array as-is (global + per-workspace commands interleaved).
 
 ### Diagram
 
@@ -132,16 +130,16 @@ flowchart TD
   FastLoop --> SortWs["Phase 2: sort workspaces by version desc"]
   SortWs --> WsLoop["For each workspace"]
   WsLoop --> DetectGap["Detect version gap"]
-  DetectGap --> VersionBundleLoop["For each missing version bundle"]
-  VersionBundleLoop --> SlowStep["For each step in slow array"]
-  SlowStep --> IsGlobal{Step type?}
+  DetectGap --> BundleLoop["For each missing version bundle"]
+  BundleLoop --> SlowCmd["For each command in slow array"]
+  SlowCmd --> IsGlobal{Command type?}
   IsGlobal -->|global| RunGlobal["Execute GlobalCommand (idempotent)"]
   IsGlobal -->|per-workspace| RunPerWs["Execute for this workspace"]
-  RunGlobal --> SlowStep
-  RunPerWs --> SlowStep
-  SlowStep --> StampVersion["Stamp workspace version"]
-  StampVersion --> VersionBundleLoop
-  VersionBundleLoop --> WsLoop
+  RunGlobal --> SlowCmd
+  RunPerWs --> SlowCmd
+  SlowCmd --> StampVersion["Stamp workspace version"]
+  StampVersion --> BundleLoop
+  BundleLoop --> WsLoop
   WsLoop --> HealthCheck["Post-upgrade health check"]
   HealthCheck --> Report["Generate upgrade report"]
 ```
@@ -164,7 +162,7 @@ No per-version allowlist is needed. The ordered list itself defines the upgrade 
 
 The cross-version upgrade attempts to bring **all** workspaces within the supported range up to the target version -- not just workspaces that were on the previously installed version. If a workspace was already behind before this deploy (e.g. it failed a previous upgrade), the orchestrator still attempts to walk it through all intermediate version bundles.
 
-This means the `1.20.0` codebase must ship all version bundles back to the oldest supported version. If `UPGRADE_COMMAND_SUPPORTED_VERSIONS` is `['1.17.0', '1.18.0', '1.19.0', '1.20.0']`, then the `1.20.0` release includes `steps_1180`, `steps_1190`, and `steps_1200`.
+This means the `1.20.0` codebase must ship all version bundles back to the oldest supported version. If `UPGRADE_COMMAND_SUPPORTED_VERSIONS` is `['1.17.0', '1.18.0', '1.19.0', '1.20.0']`, then the `1.20.0` release includes `bundle_1180`, `bundle_1190`, and `bundle_1200`.
 
 Workspaces below the oldest supported version (e.g. `1.16.0` when the oldest is `1.17.0`) are out of range and handled by the guard/force logic.
 
@@ -182,7 +180,7 @@ The orchestrator runs the `fast` array for **every version from the oldest neede
 
 Workspaces are sorted by version descending (most up-to-date first). This gets the majority upgraded quickly -- most workspaces are near the latest version and only need one version bundle. Stragglers on older versions are handled after.
 
-For each workspace, the orchestrator walks through the missing version bundles in order, running each bundle's `slow` array **as-is** -- both `global` and `per-workspace` steps, interleaved, preserving their defined order. Global commands in `slow` are idempotent and no-op after their first execution. The workspace version is stamped after each version bundle completes.
+For each workspace, the orchestrator walks through the missing version bundles in order, running each bundle's `slow` array **as-is** -- both `global` and `per-workspace` commands, interleaved, preserving their defined order. Global commands in `slow` are idempotent and no-op after their first execution. The workspace version is stamped after each version bundle completes.
 
 ### Real-World Example
 
@@ -192,17 +190,17 @@ For each workspace, the orchestrator walks through the missing version bundles i
 
 **Workspaces**:
 
-- Workspace A: version `1.18.0` (was current, one step behind target)
+- Workspace A: version `1.18.0` (was current, one bundle behind target)
 - Workspace B: version `1.17.0` (straggler -- failed or was skipped during the `1.18.0` upgrade)
-- Workspace C: version `1.18.0` (was current, one step behind target)
+- Workspace C: version `1.18.0` (was current, one bundle behind target)
 
 **Version bundles shipped with `1.20.0`**:
 
 ```typescript
-this.allSteps = {
-  '1.18.0': steps_1180,  // for workspaces on 1.17.0
-  '1.19.0': steps_1190,  // for workspaces on 1.18.0
-  '1.20.0': steps_1200,  // for workspaces on 1.19.0
+this.allBundles = {
+  '1.18.0': bundle_1180,  // for workspaces on 1.17.0
+  '1.19.0': bundle_1190,  // for workspaces on 1.18.0
+  '1.20.0': bundle_1200,  // for workspaces on 1.19.0
 };
 ```
 
@@ -230,38 +228,38 @@ Sorted: A (`1.18.0`), C (`1.18.0`), then B (`1.17.0`).
 
 ```
 > Workspace A (1.18.0 -> 1.20.0)
-  Needs: steps_1190.slow then steps_1200.slow
-  Running steps_1190.slow:
+  Needs: bundle_1190.slow then bundle_1200.slow
+  Running bundle_1190.slow:
     [per-workspace] backfill feature flags    OK
     [global] cleanup temp table               OK (idempotent, first execution)
   Version stamped to 1.19.0
-  Running steps_1200.slow:
+  Running bundle_1200.slow:
     [per-workspace] backfillCommandMenuItems  OK
     [per-workspace] migrateRichTextToText     OK
   Version stamped to 1.20.0
 
 > Workspace C (1.18.0 -> 1.20.0)
-  Needs: steps_1190.slow then steps_1200.slow
-  Running steps_1190.slow:
+  Needs: bundle_1190.slow then bundle_1200.slow
+  Running bundle_1190.slow:
     [per-workspace] backfill feature flags    OK
     [global] cleanup temp table               OK (no-op, idempotent)
   Version stamped to 1.19.0
-  Running steps_1200.slow:
+  Running bundle_1200.slow:
     [per-workspace] backfillCommandMenuItems  OK
     [per-workspace] migrateRichTextToText     OK
   Version stamped to 1.20.0
 
 > Workspace B (1.17.0 -> 1.20.0)
-  Needs: steps_1180.slow then steps_1190.slow then steps_1200.slow
-  Running steps_1180.slow:
+  Needs: bundle_1180.slow then bundle_1190.slow then bundle_1200.slow
+  Running bundle_1180.slow:
     [per-workspace] migrate legacy data       OK
     [per-workspace] backfill new column       OK
   Version stamped to 1.18.0
-  Running steps_1190.slow:
+  Running bundle_1190.slow:
     [per-workspace] backfill feature flags    OK
     [global] cleanup temp table               OK (no-op, idempotent)
   Version stamped to 1.19.0
-  Running steps_1200.slow:
+  Running bundle_1200.slow:
     [per-workspace] backfillCommandMenuItems  OK
     [per-workspace] migrateRichTextToText     OK
   Version stamped to 1.20.0
@@ -269,14 +267,14 @@ Sorted: A (`1.18.0`), C (`1.18.0`), then B (`1.17.0`).
 
 **Key observations**:
 
-- Workspace version is stamped after each version bundle, not at the end. If B fails during `steps_1190.slow`, it stays on `1.18.0` and can be retried later.
-- Global steps in `slow` (like "cleanup temp table") exist because their ordering relative to per-workspace steps matters (e.g. a global cleanup that must happen after a per-workspace backfill). They run once on the first workspace that reaches them, then no-op for subsequent workspaces thanks to idempotency.
+- Workspace version is stamped after each version bundle, not at the end. If B fails during `bundle_1190.slow`, it stays on `1.18.0` and can be retried later.
+- Global commands in `slow` (like "cleanup temp table") exist because their ordering relative to per-workspace commands matters (e.g. a global cleanup that must happen after a per-workspace backfill). They run once on the first workspace that reaches them, then no-op for subsequent workspaces thanks to idempotency.
 - Phase 1 only runs `fast` arrays (global-only, must be quick). It does **not** extract globals from `slow` -- those stay in Phase 2 to preserve ordering.
 - The `1.18.0` version bundle that previously failed for B is retried -- this is the "rescue straggler" behavior.
 
 ### Failure Isolation
 
-If a workspace fails during any slow step, the orchestrator logs the failure and continues to the next workspace. The failed workspace keeps the version stamp of the last completed version bundle. The final report includes per-workspace status (success / failure / skipped / refused).
+If a workspace fails during any slow command, the orchestrator logs the failure and continues to the next workspace. The failed workspace keeps the version stamp of the last completed version bundle. The final report includes per-workspace status (success / failure / skipped / refused).
 
 ### Diagram
 
@@ -289,11 +287,11 @@ flowchart TD
   FastLoop --> SortWs["Sort workspaces by version desc"]
   SortWs --> WsLoop["For each workspace"]
   WsLoop --> DetectGap["Detect version gap: workspace version -> target"]
-  DetectGap --> VersionBundleLoop["For each missing version bundle"]
-  VersionBundleLoop --> RunSlow["Run slow array for this version bundle"]
+  DetectGap --> BundleLoop["For each missing version bundle"]
+  BundleLoop --> RunSlow["Run slow array for this version bundle"]
   RunSlow --> StampVersion["Stamp workspace to this version"]
-  StampVersion --> VersionBundleLoop
-  VersionBundleLoop -->|"failure: log and continue"| WsLoop
+  StampVersion --> BundleLoop
+  BundleLoop -->|"failure: log and continue"| WsLoop
   WsLoop --> Report["Generate upgrade report"]
 ```
 
@@ -313,7 +311,7 @@ On cloud prod, the orchestrator runs with `--force` semantics by default:
 
 ### Single-Workspace Upgrade (`-w`)
 
-When targeting a single workspace, the orchestrator still runs all global steps (`fast` for all intermediate version bundles, and any `global` entries in `slow`) because they affect the shared database. This means global changes "leak" to all other workspaces. This is acceptable because:
+When targeting a single workspace, the orchestrator still runs all global commands (`fast` for all intermediate version bundles, and any `global` entries in `slow`) because they affect the shared database. This means global changes "leak" to all other workspaces. This is acceptable because:
 
 - All commands are idempotent -- when other workspaces are upgraded later, global commands no-op.
 - Global schema changes are forward-compatible by design -- older workspaces continue to work against the new schema.
@@ -324,13 +322,13 @@ The orchestrator logs a clear warning when running in single-workspace mode: glo
 
 Breaking changes in the upgrade history are avoided unless they would break the cross-version upgrade path. When a breaking change is unavoidable:
 
-- The breaking change may make one or more steps in an older version bundle **stale** (e.g. a command that backfills a column that no longer exists after the breaking change).
-- When any step in a version bundle becomes stale, the **entire version must be dropped** from `UPGRADE_COMMAND_SUPPORTED_VERSIONS` -- not just the individual stale step. A workspace on that version needs all of its bundle's steps to upgrade successfully; if even one step is broken, the full upgrade path from that version is invalid.
+- The breaking change may make one or more commands in an older version bundle **stale** (e.g. a command that backfills a column that no longer exists after the breaking change).
+- When any command in a version bundle becomes stale, the **entire version must be dropped** from `UPGRADE_COMMAND_SUPPORTED_VERSIONS` -- not just the individual stale command. A workspace on that version needs all of its bundle's commands to upgrade successfully; if even one command is broken, the full upgrade path from that version is invalid.
 - The entire version bundle (`fast` and `slow`) is removed from the codebase as a unit.
 
 Since the supported range is a contiguous upgrade path, invalidating a version also invalidates **every version below it** -- those workspaces would need to pass through the invalidated version bundle to reach the target.
 
-Example: `steps_1190` has a command that backfills column `X`. In `1.21.0`, a breaking change drops column `X`. That single stale step invalidates the entire `1.19.0` version bundle. But `1.18.0` and `1.17.0` are also invalidated because they depend on the `1.19.0` bundle to reach the target. All three versions and their bundles are removed from `UPGRADE_COMMAND_SUPPORTED_VERSIONS`. The oldest supported source version becomes `1.20.0`.
+Example: `bundle_1190` has a command that backfills column `X`. In `1.21.0`, a breaking change drops column `X`. That single stale command invalidates the entire `1.19.0` version bundle. But `1.18.0` and `1.17.0` are also invalidated because they depend on the `1.19.0` bundle to reach the target. All three versions and their bundles are removed from `UPGRADE_COMMAND_SUPPORTED_VERSIONS`. The oldest supported source version becomes `1.20.0`.
 
 ### Workspace Recap Tooling
 
@@ -349,68 +347,68 @@ This recap is also the foundation for the "report-a-problem" template and the se
 
 ### `workspace_upgrade_history` Table
 
-A new table in the **core schema** (shared, not per-workspace) that records every step execution. This provides persistent audit trail, enables skipping already-completed steps, and feeds the workspace recap tooling and report-a-problem template.
+A new table in the **core schema** (shared, not per-workspace) that records every command execution. This provides persistent audit trail, enables skipping already-completed commands, and feeds the workspace recap tooling and report-a-problem template.
 
 **Columns**:
 
 - `id` (uuid, PK)
-- `workspaceId` (uuid, nullable -- null for global steps)
-- `version` (varchar -- the version bundle this step belongs to, e.g. `1.20.0`)
-- `stepName` (varchar -- unique identifier for the step, e.g. `backfillCommandMenuItems`)
-- `stepType` (varchar -- `global` or `per-workspace`)
+- `workspaceId` (uuid, nullable -- null for global commands)
+- `version` (varchar -- the version bundle this command belongs to, e.g. `1.20.0`)
+- `commandName` (varchar -- unique identifier for the command, e.g. `backfillCommandMenuItems`)
+- `commandType` (varchar -- `global` or `per-workspace`)
 - `status` (varchar -- `started` / `completed` / `failed`)
-- `runByVersion` (varchar -- the `APP_VERSION` of the Twenty instance that executed this step, e.g. `1.20.1`. Useful for debugging: if a step was completed by a buggy version, this tells you which build ran it.)
+- `runByVersion` (varchar -- the `APP_VERSION` of the Twenty instance that executed this command, e.g. `1.20.1`. Useful for debugging: if a command was completed by a buggy version, this tells you which build ran it.)
 - `startedAt` (timestamp)
 - `completedAt` (timestamp, nullable)
-- `error` (text, nullable -- full error string from `UpgradeStepResult.error` on failure, including stack trace)
-- `stepLogs` (text, nullable -- **signal**: the step's own narrative via `StepLogger` callback. Contains progress, warnings, decisions made by the step. Tail-truncated to last 5,000 lines if exceeded; when truncated, a `[TRUNCATED - showing last 5000 of N total lines]` header is prepended. Stored on failure only.)
-- `serverLogs` (text, nullable -- **noise/context**: rolling buffer of the last 500 lines from the global NestJS logger during the step's execution window, all log levels. Contains ORM queries, SQL errors, framework-level context. When the buffer is full, oldest lines are dropped and a `[TRUNCATED - showing last 500 of N total lines]` header is prepended. Stored on failure only.)
-
-**Debugging workflow**: read `stepLogs` first -- it tells you what the step was doing and where it went wrong. Only dig into `serverLogs` if you need deeper system-level context (e.g. the actual SQL query that failed, connection errors, framework exceptions).
+- `error` (text, nullable -- full error string from `UpgradeCommandResult.error` on failure, including stack trace)
+- `commandLogs` (text, nullable -- **signal**: the command's own narrative via its `Logger` instance. Contains progress, warnings, decisions made by the command. Tail-truncated to last 5,000 lines if exceeded; when truncated, a `[TRUNCATED - showing last 5000 of N total lines]` header is prepended. Stored on failure only.)
+- `serverLogs` (text, nullable -- **noise/context**: rolling buffer of the last 500 lines from the global NestJS logger during the command's execution window, all log levels. Contains ORM queries, SQL errors, framework-level context. When the buffer is full, oldest lines are dropped and a `[TRUNCATED - showing last 500 of N total lines]` header is prepended. Stored on failure only.)
 - `createdAt` / `updatedAt` (timestamps)
 
-**Lifecycle**: the orchestrator writes a `started` row before executing a step, then updates it to `completed` or `failed` when it finishes. This means a crash mid-step leaves a `started` row with no `completedAt` -- the orchestrator treats this as "not completed" on re-run.
+**Debugging workflow**: read `commandLogs` first -- it tells you what the command was doing and where it went wrong. Only dig into `serverLogs` if you need deeper system-level context (e.g. the actual SQL query that failed, connection errors, framework exceptions).
+
+**Lifecycle**: the orchestrator writes a `started` row before executing a command, then updates it to `completed` or `failed` when it finishes. This means a crash mid-command leaves a `started` row with no `completedAt` -- the orchestrator treats this as "not completed" on re-run.
 
 ### Skip vs Re-Run Behavior
 
-Two layers control whether a previously completed step is re-run:
+Two layers control whether a previously completed command is re-run:
 
-**1. Per-step configuration (`skipIfCompleted`)**:
+**1. Per-command configuration (`skipIfCompleted`)**:
 
-Each step declares whether it's safe to skip when already recorded as `completed` in the history table:
+Each command declares whether it's safe to skip when already recorded as `completed` in the history table:
 
 ```typescript
 { type: 'per-workspace', command: this.backfillCommandMenuItems, skipIfCompleted: true }
 { type: 'per-workspace', command: this.recomputeDerivedData, skipIfCompleted: false }
 ```
 
-- `skipIfCompleted: true` (default for most steps): if the history table shows this step completed successfully for this workspace (or globally), the orchestrator skips it. Suitable for backfills and one-time migrations.
-- `skipIfCompleted: false`: the step always re-runs regardless of history. Suitable for steps that recompute derived data that may have drifted, or steps where idempotent re-execution is cheap and correctness matters more than speed.
+- `skipIfCompleted: true` (default for most commands): if the history table shows this command completed successfully for this workspace (or globally), the orchestrator skips it. Suitable for backfills and one-time migrations.
+- `skipIfCompleted: false`: the command always re-runs regardless of history. Suitable for commands that recompute derived data that may have drifted, or commands where idempotent re-execution is cheap and correctness matters more than speed.
 
 **2. Global override flag (`--force-rerun`)**:
 
-Overrides all per-step `skipIfCompleted` settings -- every step runs regardless of history. Useful for debugging, or when a previous "successful" run is suspected of leaving inconsistent state.
+Overrides all per-command `skipIfCompleted` settings -- every command runs regardless of history. Useful for debugging, or when a previous "successful" run is suspected of leaving inconsistent state.
 
 **Decision flow**:
 
 ```mermaid
 flowchart TD
-  Step["Step to execute"] --> ForceFlag{"--force-rerun flag?"}
-  ForceFlag -->|yes| Run["Run the step"]
+  Cmd["Command to execute"] --> ForceFlag{"--force-rerun flag?"}
+  ForceFlag -->|yes| Run["Run the command"]
   ForceFlag -->|no| CheckConfig{"skipIfCompleted?"}
   CheckConfig -->|false| Run
   CheckConfig -->|true| CheckHistory{"History shows completed?"}
   CheckHistory -->|no| Run
-  CheckHistory -->|yes| Skip["Skip the step (log as skipped)"]
+  CheckHistory -->|yes| Skip["Skip the command (log as skipped)"]
 ```
 
 ### Impact on the Real-World Example
 
-With the history table, re-running the upgrade after a partial failure becomes much faster. If Workspace B failed during `steps_1190.slow` and the operator re-runs:
+With the history table, re-running the upgrade after a partial failure becomes much faster. If Workspace B failed during `bundle_1190.slow` and the operator re-runs:
 
 - Phase 1 fast commands: all skip (already completed in history)
-- Workspace A and C: all steps skip (already completed)
-- Workspace B: `steps_1180.slow` steps skip (completed), `steps_1190.slow` resumes from the failed step
+- Workspace A and C: all commands skip (already completed)
+- Workspace B: `bundle_1180.slow` commands skip (completed), `bundle_1190.slow` resumes from the failed command
 
 ---
 
@@ -433,8 +431,8 @@ Health check results are included in the upgrade report. Failures are warnings (
 Replace raw stack traces with a structured report, built from the `workspace_upgrade_history` table:
 
 - Per-workspace status: success / failure / skipped (already at target version) / refused (below range).
-- For failures: the step that failed, a human-readable error message, and the full stack trace captured (not dumped to stdout).
-- For skipped steps: reason (already completed in history, or workspace already at target).
+- For failures: the command that failed, a human-readable error message, and the full stack trace captured (not dumped to stdout).
+- For skipped commands: reason (already completed in history, or workspace already at target).
 - Summary: total workspaces, succeeded, failed, skipped.
 
 ### Report-a-Problem Template (follow-up)
@@ -463,12 +461,12 @@ The refactor is designed to be shipped incrementally, phase by phase, without re
 
 ### Phase 1: Command Taxonomy Refactor (start here)
 
-**Goal**: Introduce `GlobalCommand` and `PerWorkspaceCommand` base classes and the `VersionUpgradeSteps` (`fast`/`slow`) format, applied to the current version's upgrade bundle.
+**Goal**: Introduce `GlobalCommand` and `PerWorkspaceCommand` base classes and the `UpgradeVersionBundle` (`fast`/`slow`) format, applied to the current version's upgrade bundle.
 
 **What changes**:
 
 - Create `GlobalCommand` and `PerWorkspaceCommand` abstract base classes.
-- Refactor the current `commands_1200` array into a typed `steps_1200: VersionUpgradeSteps` with `fast` (global-only) and `slow` (interleaved global + per-workspace) arrays.
+- Refactor the current `commands_1200` array into a typed `bundle_1200: UpgradeVersionBundle` with `fast` (global-only) and `slow` (interleaved global + per-workspace) arrays.
 - TypeORM migration becomes a `GlobalCommand` entry in the `fast` array.
 - The orchestrator (`UpgradeCommandOrchestrator`) replaces `UpgradeCommandRunner` and walks `fast` then `slow`, dispatching each entry based on its type.
 - Individual upgrade commands (e.g. `backfillCommandMenuItems`) are migrated to extend `PerWorkspaceCommand`.
@@ -480,7 +478,7 @@ The refactor is designed to be shipped incrementally, phase by phase, without re
 - Version comparison still uses major.minor (patch support comes in Phase 2).
 - Only the current version bundle is refactored; older version entries (e.g. `1.19.0: []`) are left as-is or trivially wrapped.
 
-**Validation**: the upgrade command produces the same outcome as before -- same TypeORM migrations run, same per-workspace steps execute in the same order.
+**Validation**: the upgrade command produces the same outcome as before -- same TypeORM migrations run, same per-workspace commands execute in the same order.
 
 ### Phase 2: Cross-Version Upgrade
 
@@ -520,4 +518,4 @@ The current inheritance chain in `command-runners/` is replaced in Phase 1:
 - `UpgradeCommandRunner` -- Becomes `UpgradeCommandOrchestrator`
 - `UpgradeCommand` -- Stays as the nest-commander entry point, delegates to orchestrator
 
-Individual steps (e.g. `backfillCommandMenuItems`) keep their current granularity but extend either `GlobalCommand` or `PerWorkspaceCommand` explicitly.
+Individual commands (e.g. `backfillCommandMenuItems`) keep their current granularity but extend either `GlobalCommand` or `PerWorkspaceCommand` explicitly.
