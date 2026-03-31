@@ -6,6 +6,7 @@ import { AGENT_CHAT_UNKNOWN_THREAD_ID } from '@/ai/constants/AgentChatUnknownThr
 import { AGENT_CHAT_NEW_THREAD_DRAFT_KEY } from '@/ai/states/agentChatDraftsByThreadIdState';
 import { agentChatFetchedMessagesComponentFamilyState } from '@/ai/states/agentChatFetchedMessagesComponentFamilyState';
 import { agentChatMessagesLoadingState } from '@/ai/states/agentChatMessagesLoadingState';
+import { agentChatQueuedMessagesComponentFamilyState } from '@/ai/states/agentChatQueuedMessagesComponentFamilyState';
 import { currentAIChatThreadState } from '@/ai/states/currentAIChatThreadState';
 import { skipMessagesSkeletonUntilLoadedState } from '@/ai/states/skipMessagesSkeletonUntilLoadedState';
 import { mapDBMessagesToUIMessages } from '@/ai/utils/mapDBMessagesToUIMessages';
@@ -42,6 +43,11 @@ export const AgentChatMessagesFetchEffect = () => {
     { threadId: currentAIChatThread },
   );
 
+  const setAgentChatQueuedMessages = useSetAtomComponentFamilyState(
+    agentChatQueuedMessagesComponentFamilyState,
+    { threadId: currentAIChatThread },
+  );
+
   const handleFirstLoad = useCallback(
     (_data: GetChatMessagesQuery) => {
       setSkipMessagesSkeletonUntilLoaded(false);
@@ -52,9 +58,14 @@ export const AgentChatMessagesFetchEffect = () => {
   const handleDataLoaded = useCallback(
     (data: GetChatMessagesQuery) => {
       const uiMessages = mapDBMessagesToUIMessages(data.chatMessages ?? []);
-      setAgentChatFetchedMessages(uiMessages);
+      setAgentChatFetchedMessages(
+        uiMessages.filter((message) => message.status !== 'queued'),
+      );
+      setAgentChatQueuedMessages(
+        uiMessages.filter((message) => message.status === 'queued'),
+      );
     },
-    [setAgentChatFetchedMessages],
+    [setAgentChatFetchedMessages, setAgentChatQueuedMessages],
   );
 
   const handleLoadingChange = useCallback(

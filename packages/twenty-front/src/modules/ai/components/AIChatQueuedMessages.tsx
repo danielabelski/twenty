@@ -1,14 +1,13 @@
 import { styled } from '@linaria/react';
 
 import { AGENT_CHAT_REFETCH_MESSAGES_EVENT_NAME } from '@/ai/constants/AgentChatRefetchMessagesEventName';
-import { agentChatFetchedMessagesComponentFamilyState } from '@/ai/states/agentChatFetchedMessagesComponentFamilyState';
+import { agentChatQueuedMessagesComponentFamilyState } from '@/ai/states/agentChatQueuedMessagesComponentFamilyState';
 import { currentAIChatThreadState } from '@/ai/states/currentAIChatThreadState';
 import { REST_API_BASE_URL } from '@/apollo/constant/rest-api-base-url';
 import { getTokenPair } from '@/apollo/utils/getTokenPair';
 import { dispatchBrowserEvent } from '@/browser-event/utils/dispatchBrowserEvent';
 import { useAtomComponentFamilyStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentFamilyStateValue';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
-import { useMemo } from 'react';
 import { isDefined } from 'twenty-shared/utils';
 import { IconX } from 'twenty-ui/display';
 import { LightIconButton } from 'twenty-ui/input';
@@ -47,15 +46,9 @@ const StyledQueuedText = styled.span`
 
 export const AIChatQueuedMessages = () => {
   const currentAIChatThread = useAtomStateValue(currentAIChatThreadState);
-  const agentChatFetchedMessages = useAtomComponentFamilyStateValue(
-    agentChatFetchedMessagesComponentFamilyState,
+  const queuedMessages = useAtomComponentFamilyStateValue(
+    agentChatQueuedMessagesComponentFamilyState,
     { threadId: currentAIChatThread },
-  );
-
-  const queuedMessages = useMemo(
-    () =>
-      agentChatFetchedMessages.filter((message) => message.status === 'queued'),
-    [agentChatFetchedMessages],
   );
 
   if (!isDefined(currentAIChatThread) || queuedMessages.length === 0) {

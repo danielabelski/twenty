@@ -2792,6 +2792,7 @@ type AgentMessage {
   role: String!
   status: String!
   parts: [AgentMessagePart!]!
+  processedAt: DateTime
   createdAt: DateTime!
 }
 

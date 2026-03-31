@@ -241,7 +241,8 @@ export const useAgentChat = (
   });
 
   const isStreaming = status === 'streaming';
-  const isLoading = isStreaming || agentChatSelectedFiles.length > 0;
+  const isBusy = isStreaming || status === 'submitted';
+  const isLoading = isBusy || agentChatSelectedFiles.length > 0;
 
   const handleSendMessage = useCallback(async () => {
     const draftKey =
@@ -260,7 +261,7 @@ export const useAgentChat = (
       return;
     }
 
-    if (isStreaming) {
+    if (isBusy) {
       const threadId = store.get(currentAIChatThreadState.atom);
 
       if (!isDefined(threadId) || !isValidUuid(threadId)) {
@@ -340,7 +341,7 @@ export const useAgentChat = (
   }, [
     store,
     isLoading,
-    isStreaming,
+    isBusy,
     ensureThreadIdForSend,
     setAgentChatInput,
     getBrowsingContext,

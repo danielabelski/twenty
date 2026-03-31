@@ -13,9 +13,18 @@ export class AddStatusToAgentMessage1774776000000
     await queryRunner.query(
       `ALTER TABLE "core"."agentMessage" ALTER COLUMN "turnId" DROP NOT NULL`,
     );
+    await queryRunner.query(
+      `ALTER TABLE "core"."agentMessage" ADD COLUMN "processedAt" TIMESTAMPTZ`,
+    );
+    await queryRunner.query(
+      `UPDATE "core"."agentMessage" SET "processedAt" = "createdAt" WHERE "status" = 'sent'`,
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(
+      `ALTER TABLE "core"."agentMessage" DROP COLUMN "processedAt"`,
+    );
     await queryRunner.query(
       `DELETE FROM "core"."agentMessage" WHERE "turnId" IS NULL`,
     );

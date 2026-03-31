@@ -2453,6 +2453,7 @@ export interface AgentMessage {
     role: Scalars['String']
     status: Scalars['String']
     parts: AgentMessagePart[]
+    processedAt?: Scalars['DateTime']
     createdAt: Scalars['DateTime']
     __typename: 'AgentMessage'
 }
@@ -5601,6 +5602,7 @@ export interface AgentMessageGenqlSelection{
     role?: boolean | number
     status?: boolean | number
     parts?: AgentMessagePartGenqlSelection
+    processedAt?: boolean | number
     createdAt?: boolean | number
     __typename?: boolean | number
     __scalar?: boolean | number

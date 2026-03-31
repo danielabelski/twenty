@@ -92,6 +92,7 @@ export class AgentChatService {
       turnId: actualTurnId,
       role: uiMessage.role as AgentMessageRole,
       agentId: agentId ?? null,
+      processedAt: new Date(),
     });
 
     const savedMessage = await this.messageRepository.save(message);
@@ -125,7 +126,7 @@ export class AgentChatService {
 
     return this.messageRepository.find({
       where: { threadId },
-      order: { createdAt: 'ASC' },
+      order: { processedAt: { direction: 'ASC', nulls: 'LAST' } },
       relations: ['parts', 'parts.file'],
     });
   }
@@ -189,7 +190,7 @@ export class AgentChatService {
   ): Promise<void> {
     await this.messageRepository.update(
       { id: messageId, threadId, status: AgentMessageStatus.QUEUED },
-      { status: AgentMessageStatus.SENT },
+      { status: AgentMessageStatus.SENT, processedAt: new Date() },
     );
   }
 

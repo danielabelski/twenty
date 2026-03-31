@@ -29,6 +29,10 @@ export class AgentMessageDTO {
   parts: AgentMessagePartDTO[];
 
   @IsDateString()
+  @Field(() => Date, { nullable: true })
+  processedAt: Date | null;
+
+  @IsDateString()
   @Field()
   createdAt: Date;
 }

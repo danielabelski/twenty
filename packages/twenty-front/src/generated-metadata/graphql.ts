@@ -171,6 +171,7 @@ export type AgentMessage = {
   createdAt: Scalars['DateTime'];
   id: Scalars['UUID'];
   parts: Array<AgentMessagePart>;
+  processedAt?: Maybe<Scalars['DateTime']>;
   role: Scalars['String'];
   status: Scalars['String'];
   threadId: Scalars['UUID'];
