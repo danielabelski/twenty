@@ -409,7 +409,9 @@ export class OAuthService {
     // We validate the token to log that revocation was requested.
     try {
       const payload =
-        await this.applicationTokenService.validateApplicationRefreshToken(token);
+        await this.applicationTokenService.validateApplicationRefreshToken(
+          token,
+        );
 
       this.logger.log(
         `Token revocation requested for application ${payload.applicationId}`,
@@ -483,7 +485,9 @@ export class OAuthService {
       // Try as access token (with signature verification)
       try {
         const payload =
-          await this.applicationTokenService.validateApplicationAccessToken(token);
+          await this.applicationTokenService.validateApplicationAccessToken(
+            token,
+          );
 
         const application = await this.applicationRepository.findOne({
           where: { id: payload.applicationId },

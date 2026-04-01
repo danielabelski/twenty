@@ -150,10 +150,7 @@ export class SigningKeyService implements OnModuleInit {
     });
   }
 
-  getPublicKeyAsJwk(
-    publicKeyPem: string,
-    kid: string,
-  ): Record<string, string> {
+  getPublicKeyAsJwk(publicKeyPem: string, kid: string): Record<string, string> {
     const keyObject = createPublicKey(publicKeyPem);
     const jwk = keyObject.export({ format: 'jwk' });
 

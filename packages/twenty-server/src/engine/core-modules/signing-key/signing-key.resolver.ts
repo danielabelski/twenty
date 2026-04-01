@@ -37,9 +37,7 @@ export class SigningKeyResolver {
 
   @UseGuards(AdminPanelGuard)
   @Mutation(() => SigningKeyEntity)
-  async retireSigningKey(
-    @Args('kid') kid: string,
-  ): Promise<SigningKeyEntity> {
+  async retireSigningKey(@Args('kid') kid: string): Promise<SigningKeyEntity> {
     const result = await this.signingKeyService.retireKey(kid);
 
     if (!result) {

@@ -33,8 +33,7 @@ export class JwtWrapperService {
 
   async sign(payload: JwtPayload, options?: JwtSignOptions): Promise<string> {
     if (this.signingKeyService.isAsymmetricSigningEnabled()) {
-      const signingKey =
-        await this.signingKeyService.getCurrentSigningKey();
+      const signingKey = await this.signingKeyService.getCurrentSigningKey();
 
       if (signingKey) {
         return jwt.sign(payload as object, signingKey.privateKey, {

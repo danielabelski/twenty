@@ -260,10 +260,7 @@ export class ApplicationTokenService {
     };
 
     const token = await this.jwtWrapperService.sign(jwtPayload, {
-      secret: this.jwtWrapperService.generateAppSecret(
-        tokenType,
-        workspaceId,
-      ),
+      secret: this.jwtWrapperService.generateAppSecret(tokenType, workspaceId),
       expiresIn,
     });
 

@@ -93,7 +93,8 @@ export class AdminPanelService {
           workspaceUrls: this.workspaceDomainsService.getWorkspaceUrls({
             subdomain: userWorkspace.workspace.subdomain,
             customDomain: userWorkspace.workspace.customDomain,
-            isCustomDomainEnabled: userWorkspace.workspace.isCustomDomainEnabled,
+            isCustomDomainEnabled:
+              userWorkspace.workspace.isCustomDomainEnabled,
           }),
           users: userWorkspace.workspace.workspaceUsers
             .filter((workspaceUser) => isDefined(workspaceUser.user))
