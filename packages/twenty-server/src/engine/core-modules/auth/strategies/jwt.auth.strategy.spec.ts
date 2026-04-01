@@ -22,6 +22,7 @@ describe('JwtAuthStrategy', () => {
   let permissionsService: any;
   let workspaceCacheService: any;
   let coreEntityCacheService: any;
+  let signingKeyService: any;
 
   const jwt = {
     sub: 'sub-default',
@@ -85,6 +86,10 @@ describe('JwtAuthStrategy', () => {
       ),
     };
 
+    signingKeyService = {
+      getSigningKey: jest.fn(),
+    };
+
     coreEntityCacheService = {
       get: jest.fn(async (keyName: string, entityId: string) => {
         if (keyName === 'workspaceEntity') {
@@ -117,6 +122,7 @@ describe('JwtAuthStrategy', () => {
       permissionsService,
       workspaceCacheService,
       coreEntityCacheService,
+      signingKeyService,
     );
 
   describe('API_KEY validation', () => {

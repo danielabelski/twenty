@@ -129,7 +129,7 @@ describe('RefreshTokenService', () => {
       jest
         .spyOn(jwtWrapperService, 'generateAppSecret')
         .mockReturnValue('mock-secret');
-      jest.spyOn(jwtWrapperService, 'sign').mockReturnValue(mockToken);
+      jest.spyOn(jwtWrapperService, 'sign').mockResolvedValue(mockToken);
       jest
         .spyOn(appTokenRepository, 'create')
         .mockReturnValue({ id: 'new-token-id' } as AppTokenEntity);

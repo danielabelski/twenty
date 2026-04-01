@@ -59,14 +59,16 @@ export class WorkspaceAgnosticTokenService {
       type: JwtTokenTypeEnum.WORKSPACE_AGNOSTIC,
     };
 
+    const token = await this.jwtWrapperService.sign(jwtPayload, {
+      secret: this.jwtWrapperService.generateAppSecret(
+        JwtTokenTypeEnum.WORKSPACE_AGNOSTIC,
+        user.id,
+      ),
+      expiresIn,
+    });
+
     return {
-      token: this.jwtWrapperService.sign(jwtPayload, {
-        secret: this.jwtWrapperService.generateAppSecret(
-          JwtTokenTypeEnum.WORKSPACE_AGNOSTIC,
-          user.id,
-        ),
-        expiresIn,
-      }),
+      token,
       expiresAt,
     };
   }

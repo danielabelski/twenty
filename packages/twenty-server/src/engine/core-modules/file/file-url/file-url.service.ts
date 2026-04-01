@@ -16,7 +16,7 @@ export class FileUrlService {
     private readonly twentyConfigService: TwentyConfigService,
   ) {}
 
-  signFileByIdUrl({
+  async signFileByIdUrl({
     fileId,
     workspaceId,
     fileFolder,
@@ -24,7 +24,7 @@ export class FileUrlService {
     fileId: string;
     workspaceId: string;
     fileFolder: FileFolder;
-  }): string {
+  }): Promise<string> {
     const fileTokenExpiresIn = this.twentyConfigService.get(
       'FILE_TOKEN_EXPIRES_IN',
     );
@@ -41,7 +41,7 @@ export class FileUrlService {
       workspaceId,
     );
 
-    const token = this.jwtWrapperService.sign(payload, {
+    const token = await this.jwtWrapperService.sign(payload, {
       secret,
       expiresIn: fileTokenExpiresIn,
     });

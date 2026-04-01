@@ -55,7 +55,7 @@ describe('LoginTokenService', () => {
         .spyOn(jwtWrapperService, 'generateAppSecret')
         .mockReturnValue(mockSecret);
       jest.spyOn(twentyConfigService, 'get').mockReturnValue(mockExpiresIn);
-      jest.spyOn(jwtWrapperService, 'sign').mockReturnValue(mockToken);
+      jest.spyOn(jwtWrapperService, 'sign').mockResolvedValue(mockToken);
 
       const result = await service.generateLoginToken(
         email,
@@ -99,7 +99,7 @@ describe('LoginTokenService', () => {
         .spyOn(jwtWrapperService, 'generateAppSecret')
         .mockReturnValue(mockSecret);
       jest.spyOn(twentyConfigService, 'get').mockReturnValue('1h');
-      jest.spyOn(jwtWrapperService, 'sign').mockReturnValue(mockToken);
+      jest.spyOn(jwtWrapperService, 'sign').mockResolvedValue(mockToken);
 
       const result = await service.generateLoginToken(
         email,

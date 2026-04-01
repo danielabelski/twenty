@@ -1082,14 +1082,21 @@ export class ConfigVariables {
 
   @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.SERVER_CONFIG,
-    isSensitive: true,
     description:
-      'Comma-separated list of previous APP_SECRET values for key rotation. Tokens signed with these keys will still be accepted during rotation.',
-    isEnvOnly: true,
+      'Enable asymmetric JWT signing with ES256. Requires enterprise license. When enabled, tokens are signed with rotating EC key pairs instead of APP_SECRET.',
+    type: ConfigVariableType.BOOLEAN,
+  })
+  @IsOptional()
+  IS_ASYMMETRIC_SIGNING_ENABLED = false;
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.SERVER_CONFIG,
+    description:
+      'Cron pattern for automatic signing key rotation (default: daily at midnight UTC)',
     type: ConfigVariableType.STRING,
   })
   @IsOptional()
-  APP_SECRET_PREVIOUS_KEYS = '';
+  SIGNING_KEY_ROTATION_CRON_PATTERN = '0 0 * * *';
 
   @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.RATE_LIMITING,

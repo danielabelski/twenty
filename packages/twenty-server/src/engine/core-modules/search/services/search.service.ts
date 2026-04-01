@@ -543,11 +543,11 @@ export class SearchService {
     return imageIdentifierField.name;
   }
 
-  private getImageUrlWithToken(
+  private async getImageUrlWithToken(
     avatarFileId: string,
     fileFolder: FileFolder,
     workspaceId: string,
-  ): string {
+  ): Promise<string> {
     return this.fileUrlService.signFileByIdUrl({
       fileId: avatarFileId,
       workspaceId,
@@ -555,12 +555,12 @@ export class SearchService {
     });
   }
 
-  getImageIdentifierValue(
+  async getImageIdentifierValue(
     record: ObjectRecord,
     flatObjectMetadata: FlatObjectMetadata,
     flatFieldMetadataMaps: FlatEntityMaps<FlatFieldMetadata>,
     workspaceId: string,
-  ): string {
+  ): Promise<string> {
     const imageIdentifierField = this.getImageIdentifierColumn(
       flatObjectMetadata,
       flatFieldMetadataMaps,
@@ -603,7 +603,7 @@ export class SearchService {
 
     return imageIdentifierField &&
       isNonEmptyString(record[imageIdentifierField])
-      ? this.getImageUrlWithToken(
+      ? await this.getImageUrlWithToken(
           record[imageIdentifierField],
           FileFolder.FilesField,
           workspaceId,
@@ -648,7 +648,7 @@ export class SearchService {
     return recordEdges;
   }
 
-  computeSearchObjectResults({
+  async computeSearchObjectResults({
     recordsWithObjectMetadataItems,
     flatFieldMetadataMaps,
     workspaceId,
@@ -660,32 +660,34 @@ export class SearchService {
     workspaceId: string;
     limit: number;
     after?: string;
-  }): SearchResultConnectionDTO {
-    const searchRecords = recordsWithObjectMetadataItems.flatMap(
-      ({ objectMetadataItem, records }) => {
-        return records.map((record) => {
-          return {
-            recordId: record.id,
-            objectNameSingular: objectMetadataItem.nameSingular,
-            objectLabelSingular:
-              objectMetadataItem.standardOverrides?.labelSingular ??
-              objectMetadataItem.labelSingular,
-            label: this.getLabelIdentifierValue(
-              record,
-              objectMetadataItem,
-              flatFieldMetadataMaps,
-            ),
-            imageUrl: this.getImageIdentifierValue(
-              record,
-              objectMetadataItem,
-              flatFieldMetadataMaps,
-              workspaceId,
-            ),
-            tsRankCD: record.tsRankCD,
-            tsRank: record.tsRank,
-          };
-        });
-      },
+  }): Promise<SearchResultConnectionDTO> {
+    const searchRecords = await Promise.all(
+      recordsWithObjectMetadataItems.flatMap(
+        ({ objectMetadataItem, records }) => {
+          return records.map(async (record) => {
+            return {
+              recordId: record.id,
+              objectNameSingular: objectMetadataItem.nameSingular,
+              objectLabelSingular:
+                objectMetadataItem.standardOverrides?.labelSingular ??
+                objectMetadataItem.labelSingular,
+              label: this.getLabelIdentifierValue(
+                record,
+                objectMetadataItem,
+                flatFieldMetadataMaps,
+              ),
+              imageUrl: await this.getImageIdentifierValue(
+                record,
+                objectMetadataItem,
+                flatFieldMetadataMaps,
+                workspaceId,
+              ),
+              tsRankCD: record.tsRankCD,
+              tsRank: record.tsRank,
+            };
+          });
+        },
+      ),
     );
 
     const sortedRecords = this.sortSearchObjectResults(searchRecords).slice(

@@ -55,7 +55,7 @@ describe('TransientTokenService', () => {
 
         return undefined;
       });
-      jest.spyOn(jwtWrapperService, 'sign').mockReturnValue(mockToken);
+      jest.spyOn(jwtWrapperService, 'sign').mockResolvedValue(mockToken);
 
       const result = await service.generateTransientToken({
         workspaceMemberId,

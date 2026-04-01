@@ -19,7 +19,7 @@ const richTextFieldMetadata = [
 ] as FlatFieldMetadata[];
 
 const mockFileUrlService = {
-  signFileByIdUrl: jest.fn().mockReturnValue('signed-path'),
+  signFileByIdUrl: jest.fn().mockResolvedValue('signed-path'),
 } as unknown as FileUrlService;
 
 describe('RichTextFieldQueryResultGetterHandler', () => {

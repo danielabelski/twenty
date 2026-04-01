@@ -71,7 +71,7 @@ describe('WorkspaceAgnosticToken', () => {
 
         return undefined;
       });
-      jest.spyOn(jwtWrapperService, 'sign').mockReturnValue(mockToken);
+      jest.spyOn(jwtWrapperService, 'sign').mockResolvedValue(mockToken);
       jest
         .spyOn(userRepository, 'findOne')
         .mockResolvedValue(mockUser as UserEntity);

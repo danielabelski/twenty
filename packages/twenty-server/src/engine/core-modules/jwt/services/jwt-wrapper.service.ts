@@ -20,6 +20,7 @@ import {
   type JwtPayload,
   JwtTokenTypeEnum,
 } from 'src/engine/core-modules/auth/types/auth-context.type';
+import { SigningKeyService } from 'src/engine/core-modules/signing-key/signing-key.service';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
 
 @Injectable()
@@ -27,10 +28,25 @@ export class JwtWrapperService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly twentyConfigService: TwentyConfigService,
+    private readonly signingKeyService: SigningKeyService,
   ) {}
 
-  sign(payload: JwtPayload, options?: JwtSignOptions): string {
-    // Typescript does not handle well the overloads of the sign method, helping it a little bit
+  async sign(payload: JwtPayload, options?: JwtSignOptions): Promise<string> {
+    if (this.signingKeyService.isAsymmetricSigningEnabled()) {
+      const signingKey =
+        await this.signingKeyService.getCurrentSigningKey();
+
+      if (signingKey) {
+        return jwt.sign(payload as object, signingKey.privateKey, {
+          algorithm: 'ES256',
+          keyid: signingKey.kid,
+          expiresIn: options?.expiresIn,
+          jwtid: options?.jwtid,
+        });
+      }
+    }
+
+    // Fallback: existing HS256 path
     return this.jwtService.sign(payload, options);
   }
 
@@ -47,7 +63,87 @@ export class JwtWrapperService {
     return this.jwtService.decode(payload, options);
   }
 
-  verifyJwtToken(token: string, options?: JwtVerifyOptions) {
+  async verifyJwtToken(token: string, options?: JwtVerifyOptions) {
+    // Check for kid header — if present, use asymmetric verification
+    const decoded = jwt.decode(token, { complete: true });
+
+    if (decoded?.header?.kid) {
+      return this.verifyAsymmetricToken(token, decoded.header.kid);
+    }
+
+    // Fallback: existing HS256 verification path
+    return this.verifySymmetricToken(token, options);
+  }
+
+  generateAppSecret(type: JwtTokenTypeEnum, appSecretBody: string): string {
+    const appSecret = this.twentyConfigService.get('APP_SECRET');
+
+    if (!appSecret) {
+      throw new Error('APP_SECRET is not set');
+    }
+
+    return createHash('sha256')
+      .update(`${appSecret}${appSecretBody}${type}`)
+      .digest('hex');
+  }
+
+  async getVerificationKeyForToken(
+    rawJwtToken: string,
+  ): Promise<string | null> {
+    const decoded = jwt.decode(rawJwtToken, { complete: true });
+
+    if (decoded?.header?.kid) {
+      return this.signingKeyService.getPublicKeyByKid(decoded.header.kid);
+    }
+
+    return null;
+  }
+
+  extractJwtFromRequest(): JwtFromRequestFunction {
+    return (request: ExpressRequest) => {
+      const tokenFromHeader = ExtractJwt.fromAuthHeaderAsBearerToken()(request);
+
+      if (tokenFromHeader) {
+        return tokenFromHeader;
+      }
+
+      return ExtractJwt.fromUrlQueryParameter('token')(request);
+    };
+  }
+
+  private async verifyAsymmetricToken(token: string, kid: string) {
+    const publicKey = await this.signingKeyService.getPublicKeyByKid(kid);
+
+    if (!publicKey) {
+      throw new AuthException(
+        'Unknown signing key.',
+        AuthExceptionCode.UNAUTHENTICATED,
+      );
+    }
+
+    try {
+      return jwt.verify(token, publicKey, { algorithms: ['ES256'] });
+    } catch (error) {
+      if (error instanceof jwt.TokenExpiredError) {
+        throw new AuthException(
+          'Token has expired.',
+          AuthExceptionCode.UNAUTHENTICATED,
+        );
+      }
+      if (error instanceof jwt.JsonWebTokenError) {
+        throw new AuthException(
+          'Token invalid.',
+          AuthExceptionCode.UNAUTHENTICATED,
+        );
+      }
+      throw new AuthException(
+        'Unknown token error.',
+        AuthExceptionCode.INVALID_INPUT,
+      );
+    }
+  }
+
+  private verifySymmetricToken(token: string, options?: JwtVerifyOptions) {
     const payload = this.decode<JwtPayload>(token, {
       json: true,
     });
@@ -116,33 +212,5 @@ export class JwtWrapperService {
         AuthExceptionCode.INVALID_INPUT,
       );
     }
-  }
-
-  generateAppSecret(type: JwtTokenTypeEnum, appSecretBody: string): string {
-    const appSecret = this.twentyConfigService.get('APP_SECRET');
-
-    if (!appSecret) {
-      throw new Error('APP_SECRET is not set');
-    }
-
-    return createHash('sha256')
-      .update(`${appSecret}${appSecretBody}${type}`)
-      .digest('hex');
-  }
-
-  extractJwtFromRequest(): JwtFromRequestFunction {
-    return (request: ExpressRequest) => {
-      // First try to extract token from Authorization header
-      const tokenFromHeader = ExtractJwt.fromAuthHeaderAsBearerToken()(request);
-
-      if (tokenFromHeader) {
-        return tokenFromHeader;
-      }
-
-      // If not found in header, try to extract from URL query parameter
-      // This is for edge cases where we don't control the origin request
-      // (e.g. the REST API playground)
-      return ExtractJwt.fromUrlQueryParameter('token')(request);
-    };
   }
 }

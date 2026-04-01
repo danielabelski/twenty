@@ -9,6 +9,8 @@ import { assertIsDefinedOrThrow, isDefined } from 'twenty-shared/utils';
 import { WorkspaceActivationStatus } from 'twenty-shared/workspace';
 import { Repository } from 'typeorm';
 
+import * as jwt from 'jsonwebtoken';
+
 import { ApplicationEntity } from 'src/engine/core-modules/application/application.entity';
 import {
   AuthException,
@@ -28,6 +30,7 @@ import {
 import { type FlatUserWorkspace } from 'src/engine/core-modules/user-workspace/types/flat-user-workspace.type';
 import { CoreEntityCacheService } from 'src/engine/core-entity-cache/services/core-entity-cache.service';
 import { JwtWrapperService } from 'src/engine/core-modules/jwt/services/jwt-wrapper.service';
+import { SigningKeyService } from 'src/engine/core-modules/signing-key/signing-key.service';
 import { UserWorkspaceEntity } from 'src/engine/core-modules/user-workspace/user-workspace.entity';
 import { PermissionsService } from 'src/engine/metadata-modules/permissions/permissions.service';
 import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
@@ -43,11 +46,26 @@ export class JwtAuthStrategy extends PassportStrategy(Strategy, 'jwt') {
     private readonly permissionsService: PermissionsService,
     private readonly workspaceCacheService: WorkspaceCacheService,
     private readonly coreEntityCacheService: CoreEntityCacheService,
+    private readonly signingKeyService: SigningKeyService,
   ) {
     const jwtFromRequestFunction = jwtWrapperService.extractJwtFromRequest();
     // @ts-expect-error legacy noImplicitAny
     const secretOrKeyProviderFunction = async (_request, rawJwtToken, done) => {
       try {
+        // Check for kid header — asymmetric token verification
+        const decoded = jwt.decode(rawJwtToken, { complete: true });
+
+        if (decoded?.header?.kid) {
+          const publicKey = await signingKeyService.getPublicKeyByKid(
+            decoded.header.kid,
+          );
+
+          if (publicKey) {
+            return done(null, publicKey);
+          }
+        }
+
+        // Fallback: existing HS256 path
         const decodedToken = jwtWrapperService.decode<
           | FileTokenJwtPayloadLegacy
           | AccessTokenJwtPayload
@@ -74,6 +92,7 @@ export class JwtAuthStrategy extends PassportStrategy(Strategy, 'jwt') {
       jwtFromRequest: jwtFromRequestFunction,
       ignoreExpiration: false,
       secretOrKeyProvider: secretOrKeyProviderFunction,
+      algorithms: ['HS256', 'ES256'],
     });
   }
 

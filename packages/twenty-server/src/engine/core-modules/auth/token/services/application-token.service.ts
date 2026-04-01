@@ -58,7 +58,7 @@ export class ApplicationTokenService {
       'APPLICATION_ACCESS_TOKEN_EXPIRES_IN',
     );
 
-    return this.signApplicationToken({
+    return await this.signApplicationToken({
       workspaceId,
       applicationId,
       userWorkspaceId,
@@ -91,7 +91,7 @@ export class ApplicationTokenService {
       'APPLICATION_REFRESH_TOKEN_EXPIRES_IN',
     );
 
-    const applicationAccessToken = this.signApplicationToken({
+    const applicationAccessToken = await this.signApplicationToken({
       workspaceId,
       applicationId,
       userWorkspaceId,
@@ -100,7 +100,7 @@ export class ApplicationTokenService {
       expiresIn: accessTokenExpiresIn,
     });
 
-    const applicationRefreshToken = this.signApplicationToken({
+    const applicationRefreshToken = await this.signApplicationToken({
       workspaceId,
       applicationId,
       userWorkspaceId,
@@ -112,11 +112,11 @@ export class ApplicationTokenService {
     return { applicationAccessToken, applicationRefreshToken };
   }
 
-  validateApplicationRefreshToken(
+  async validateApplicationRefreshToken(
     refreshToken: string,
-  ): ApplicationRefreshTokenJwtPayload {
+  ): Promise<ApplicationRefreshTokenJwtPayload> {
     try {
-      this.jwtWrapperService.verifyJwtToken(refreshToken);
+      await this.jwtWrapperService.verifyJwtToken(refreshToken);
 
       const payload =
         this.jwtWrapperService.decode<ApplicationRefreshTokenJwtPayload>(
@@ -148,11 +148,11 @@ export class ApplicationTokenService {
     }
   }
 
-  validateApplicationAccessToken(
+  async validateApplicationAccessToken(
     token: string,
-  ): ApplicationAccessTokenJwtPayload {
+  ): Promise<ApplicationAccessTokenJwtPayload> {
     try {
-      this.jwtWrapperService.verifyJwtToken(token);
+      await this.jwtWrapperService.verifyJwtToken(token);
 
       const payload =
         this.jwtWrapperService.decode<ApplicationAccessTokenJwtPayload>(token, {
@@ -229,7 +229,7 @@ export class ApplicationTokenService {
     );
   }
 
-  private signApplicationToken({
+  private async signApplicationToken({
     workspaceId,
     applicationId,
     userWorkspaceId,
@@ -245,7 +245,7 @@ export class ApplicationTokenService {
       | JwtTokenTypeEnum.APPLICATION_ACCESS
       | JwtTokenTypeEnum.APPLICATION_REFRESH;
     expiresIn: string;
-  }): AuthToken {
+  }): Promise<AuthToken> {
     const expiresAt = addMilliseconds(new Date().getTime(), ms(expiresIn));
 
     const jwtPayload:
@@ -259,14 +259,16 @@ export class ApplicationTokenService {
       ...(userId ? { userId } : {}),
     };
 
+    const token = await this.jwtWrapperService.sign(jwtPayload, {
+      secret: this.jwtWrapperService.generateAppSecret(
+        tokenType,
+        workspaceId,
+      ),
+      expiresIn,
+    });
+
     return {
-      token: this.jwtWrapperService.sign(jwtPayload, {
-        secret: this.jwtWrapperService.generateAppSecret(
-          tokenType,
-          workspaceId,
-        ),
-        expiresIn,
-      }),
+      token,
       expiresAt,
     };
   }

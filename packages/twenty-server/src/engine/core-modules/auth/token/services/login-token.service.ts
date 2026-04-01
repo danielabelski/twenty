@@ -46,11 +46,13 @@ export class LoginTokenService {
 
     const expiresAt = addMilliseconds(new Date().getTime(), ms(expiresIn));
 
+    const token = await this.jwtWrapperService.sign(jwtPayload, {
+      secret,
+      expiresIn,
+    });
+
     return {
-      token: this.jwtWrapperService.sign(jwtPayload, {
-        secret,
-        expiresIn,
-      }),
+      token,
       expiresAt,
     };
   }

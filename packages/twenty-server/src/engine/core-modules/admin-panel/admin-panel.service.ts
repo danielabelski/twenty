@@ -77,39 +77,41 @@ export class AdminPanelService {
         firstName: targetUser.firstName,
         lastName: targetUser.lastName,
       },
-      workspaces: targetUser.userWorkspaces.map((userWorkspace) => ({
-        id: userWorkspace.workspace.id,
-        name: userWorkspace.workspace.displayName ?? '',
-        totalUsers: userWorkspace.workspace.workspaceUsers.length,
-        logo: isDefined(userWorkspace.workspace.logoFileId)
-          ? this.fileUrlService.signFileByIdUrl({
-              fileId: userWorkspace.workspace.logoFileId,
-              workspaceId: userWorkspace.workspace.id,
-              fileFolder: FileFolder.CorePicture,
-            })
-          : undefined,
-        allowImpersonation: userWorkspace.workspace.allowImpersonation,
-        workspaceUrls: this.workspaceDomainsService.getWorkspaceUrls({
-          subdomain: userWorkspace.workspace.subdomain,
-          customDomain: userWorkspace.workspace.customDomain,
-          isCustomDomainEnabled: userWorkspace.workspace.isCustomDomainEnabled,
-        }),
-        users: userWorkspace.workspace.workspaceUsers
-          .filter((workspaceUser) => isDefined(workspaceUser.user))
-          .map((workspaceUser) => ({
-            id: workspaceUser.user.id,
-            email: workspaceUser.user.email,
-            firstName: workspaceUser.user.firstName,
-            lastName: workspaceUser.user.lastName,
-          })),
-        featureFlags: allFeatureFlagKeys.map((key) => ({
-          key,
-          value:
-            userWorkspace.workspace.featureFlags?.find(
-              (flag) => flag.key === key,
-            )?.value ?? false,
-        })) as FeatureFlagEntity[],
-      })),
+      workspaces: await Promise.all(
+        targetUser.userWorkspaces.map(async (userWorkspace) => ({
+          id: userWorkspace.workspace.id,
+          name: userWorkspace.workspace.displayName ?? '',
+          totalUsers: userWorkspace.workspace.workspaceUsers.length,
+          logo: isDefined(userWorkspace.workspace.logoFileId)
+            ? await this.fileUrlService.signFileByIdUrl({
+                fileId: userWorkspace.workspace.logoFileId,
+                workspaceId: userWorkspace.workspace.id,
+                fileFolder: FileFolder.CorePicture,
+              })
+            : undefined,
+          allowImpersonation: userWorkspace.workspace.allowImpersonation,
+          workspaceUrls: this.workspaceDomainsService.getWorkspaceUrls({
+            subdomain: userWorkspace.workspace.subdomain,
+            customDomain: userWorkspace.workspace.customDomain,
+            isCustomDomainEnabled: userWorkspace.workspace.isCustomDomainEnabled,
+          }),
+          users: userWorkspace.workspace.workspaceUsers
+            .filter((workspaceUser) => isDefined(workspaceUser.user))
+            .map((workspaceUser) => ({
+              id: workspaceUser.user.id,
+              email: workspaceUser.user.email,
+              firstName: workspaceUser.user.firstName,
+              lastName: workspaceUser.user.lastName,
+            })),
+          featureFlags: allFeatureFlagKeys.map((key) => ({
+            key,
+            value:
+              userWorkspace.workspace.featureFlags?.find(
+                (flag) => flag.key === key,
+              )?.value ?? false,
+          })) as FeatureFlagEntity[],
+        })),
+      ),
     };
   }
 

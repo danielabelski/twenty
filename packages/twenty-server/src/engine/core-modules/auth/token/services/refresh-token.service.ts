@@ -151,19 +151,21 @@ export class RefreshTokenService {
 
     await this.appTokenRepository.save(refreshToken);
 
+    const token = await this.jwtWrapperService.sign(
+      {
+        ...payload,
+        sub: payload.userId,
+        type: JwtTokenTypeEnum.REFRESH,
+      },
+      {
+        secret,
+        expiresIn,
+        jwtid: refreshToken.id,
+      },
+    );
+
     return {
-      token: this.jwtWrapperService.sign(
-        {
-          ...payload,
-          sub: payload.userId,
-          type: JwtTokenTypeEnum.REFRESH,
-        },
-        {
-          secret,
-          expiresIn,
-          jwtid: refreshToken.id,
-        },
-      ),
+      token,
       expiresAt,
     };
   }

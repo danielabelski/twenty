@@ -19,6 +19,7 @@ import { SettingsSSOIdentitiesProvidersListCard } from '@/settings/security/comp
 import { SettingsSecurityAuthBypassOptionsList } from '@/settings/security/components/SettingsSecurityAuthBypassOptionsList';
 import { SettingsSecurityAuthProvidersOptionsList } from '@/settings/security/components/SettingsSecurityAuthProvidersOptionsList';
 import { SettingsSecurityEditableProfileFields } from '@/settings/security/components/SettingsSecurityEditableProfileFields';
+import { SettingsSigningKeysCard } from '@/settings/security/components/SettingsSigningKeysCard';
 import { SSOIdentitiesProvidersState } from '@/settings/security/states/SSOIdentitiesProvidersState';
 import { ToggleImpersonate } from '@/settings/workspace/components/ToggleImpersonate';
 import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
@@ -299,6 +300,7 @@ export const SettingsSecurity = () => {
               />
             )}
           </Section>
+          <SettingsSigningKeysCard />
           <Section>
             <H2Title
               title={t`Other`}

@@ -319,7 +319,7 @@ export class WorkspaceInvitationService {
           workspace: {
             name: workspace.displayName,
             logo: isDefined(workspace.logoFileId)
-              ? this.fileUrlService.signFileByIdUrl({
+              ? await this.fileUrlService.signFileByIdUrl({
                   fileId: workspace.logoFileId,
                   workspaceId: workspace.id,
                   fileFolder: FileFolder.CorePicture,
