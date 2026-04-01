@@ -219,9 +219,6 @@ export const useAgentChat = (
     onBrowserEvent: handleStop,
   });
 
-  // TODO: implement retry by re-sending last user message to /message.
-  // The retry button in AIChatErrorMessage is hidden until this is ready.
-
   return {
     handleSendMessage,
     handleStop,
