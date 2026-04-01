@@ -8,9 +8,9 @@ export const useDeleteQueuedMessage = () => {
   const { authenticatedFetch } = useAuthenticatedAgentChatFetch();
 
   const deleteQueuedMessage = useCallback(
-    async (threadId: string, messageId: string) => {
+    async (messageId: string) => {
       const response = await authenticatedFetch(
-        `/agent-chat/${threadId}/queue/${messageId}`,
+        `/agent-chat/queue/${messageId}`,
         { method: 'DELETE' },
       );
 

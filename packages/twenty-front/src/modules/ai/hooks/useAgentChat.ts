@@ -163,7 +163,6 @@ export const useAgentChat = (
 
       dispatchBrowserEvent(AGENT_CHAT_REFETCH_MESSAGES_EVENT_NAME);
 
-      // Handle pending thread ID for first send
       setPendingThreadIdAfterFirstSend((pendingId) => {
         if (isDefined(pendingId)) {
           setCurrentAIChatThread(pendingId);
@@ -172,7 +171,6 @@ export const useAgentChat = (
         return null;
       });
     } catch {
-      // Remove the optimistic message on failure
       const latestMessages = store.get(
         agentChatMessagesComponentFamilyState.atomFamily(atomKey),
       );

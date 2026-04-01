@@ -67,9 +67,7 @@ export const AIChatQueuedMessages = () => {
             <StyledQueuedText>{displayText}</StyledQueuedText>
             <LightIconButton
               Icon={IconX}
-              onClick={() =>
-                deleteQueuedMessage(currentAIChatThread, message.id)
-              }
+              onClick={() => deleteQueuedMessage(message.id)}
               size="small"
             />
           </StyledQueuedItem>
