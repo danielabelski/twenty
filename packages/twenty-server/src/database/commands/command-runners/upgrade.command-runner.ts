@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import chalk from 'chalk';
 import { SemVer } from 'semver';
 import { isDefined } from 'twenty-shared/utils';
-import { Repository } from 'typeorm';
+import { MigrationInterface, Repository } from 'typeorm';
 
 import {
   ActiveOrSuspendedWorkspacesMigrationCommandOptions,
@@ -26,10 +26,13 @@ import {
   compareVersionMajorAndMinor,
 } from 'src/utils/version/compare-version-minor-and-major';
 
-export type VersionCommands = (
-  | WorkspacesMigrationCommandRunner
-  | ActiveOrSuspendedWorkspacesMigrationCommandRunner
-)[];
+export type VersionCommands = {
+  instanceCommands: MigrationInterface[];
+  perWorkspaceCommands: (
+    | WorkspacesMigrationCommandRunner
+    | ActiveOrSuspendedWorkspacesMigrationCommandRunner
+  )[];
+};
 export type AllCommands = Record<UpgradeCommandVersion, VersionCommands>;
 
 export abstract class UpgradeCommandRunner extends ActiveOrSuspendedWorkspacesMigrationCommandRunner {
@@ -84,7 +87,8 @@ export abstract class UpgradeCommandRunner extends ActiveOrSuspendedWorkspacesMi
       'Initialized upgrade context with:',
       `- currentVersion (migrating to): ${currentAppVersion}`,
       `- fromWorkspaceVersion: ${previousVersion}`,
-      `- ${this.commands.length} commands`,
+      `- ${this.commands.instanceCommands.length} instance commands`,
+      `- ${this.commands.perWorkspaceCommands.length} per workspace commands`,
     ];
 
     this.logger.log(chalk.blue(message.join('\n   ')));
@@ -144,7 +148,20 @@ If any workspaces are not on the previous minor version, roll back to that versi
       return;
     }
 
-    await this.coreMigrationRunnerService.run();
+    for (const command of this.commands.instanceCommands) {
+      const migrationName = command.constructor.name;
+      const result =
+        await this.coreMigrationRunnerService.runSingleMigration(migrationName);
+
+      if (result.status === 'fail' && result.error !== 'already-executed') {
+        this.logger.error(
+          `Core migration ${migrationName} failed with error: ${result.error}`,
+        );
+
+        return;
+      }
+    }
+
     await super.runMigrationCommand(passedParams, options);
   }
 
@@ -171,7 +188,7 @@ If any workspaces are not on the previous minor version, roll back to that versi
         );
       }
       case 'equal': {
-        for (const command of this.commands) {
+        for (const command of this.commands.perWorkspaceCommands) {
           await command.runOnWorkspace(args);
         }
 

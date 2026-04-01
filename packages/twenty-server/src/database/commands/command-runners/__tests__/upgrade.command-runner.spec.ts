@@ -320,7 +320,9 @@ describe('UpgradeCommandRunner', () => {
 
         expect(failReport.length).toBe(0);
         expect(successReport.length).toBe(1);
-        expect(coreMigrationRunnerService.run).toHaveBeenCalledTimes(1);
+        expect(
+          coreMigrationRunnerService.runAllPendingMigrations,
+        ).toHaveBeenCalledTimes(1);
         const { workspaceId } = successReport[0];
 
         expect(workspaceId).toBe('workspace_0');
