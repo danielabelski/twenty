@@ -1720,12 +1720,12 @@ enum FeatureFlagKey {
   IS_UNIQUE_INDEXES_ENABLED
   IS_JSON_FILTER_ENABLED
   IS_AI_ENABLED
+  IS_COMMAND_MENU_ITEM_ENABLED
   IS_MARKETPLACE_ENABLED
   IS_RECORD_PAGE_LAYOUT_EDITING_ENABLED
   IS_PUBLIC_DOMAIN_ENABLED
   IS_EMAILING_DOMAIN_ENABLED
   IS_JUNCTION_RELATIONS_ENABLED
-  IS_COMMAND_MENU_ITEM_ENABLED
   IS_DRAFT_EMAIL_ENABLED
   IS_USAGE_ANALYTICS_ENABLED
   IS_RICH_TEXT_V1_MIGRATED
@@ -3768,8 +3768,13 @@ input UpsertFieldsWidgetGroupInput {
 }
 
 input UpsertFieldsWidgetFieldInput {
-  """The id of the view field"""
-  viewFieldId: UUID!
+  """The id of the view field. Required if fieldMetadataId is not provided."""
+  viewFieldId: UUID
+
+  """
+  The id of the field metadata. Used to create a new view field when viewFieldId is not provided.
+  """
+  fieldMetadataId: UUID
   isVisible: Boolean!
   position: Float!
 }
