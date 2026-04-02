@@ -68,9 +68,7 @@ export class WorkspaceIteratorService {
         : await this.fetchWorkspaceIds(options);
 
     if (options.dryRun) {
-      this.logger.log(
-        chalk.yellow('Dry run mode: No changes will be applied'),
-      );
+      this.logger.log(chalk.yellow('Dry run mode: No changes will be applied'));
     }
 
     for (const [index, workspaceId] of workspaceIdsToProcess.entries()) {

@@ -4,7 +4,7 @@ import chalk from 'chalk';
 import { Option } from 'nest-commander';
 import { SemVer } from 'semver';
 import { isDefined } from 'twenty-shared/utils';
-import { MigrationInterface, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 
 import { MigrationCommandRunner } from 'src/database/commands/command-runners/migration.command-runner';
 import {
@@ -28,13 +28,10 @@ import {
   compareVersionMajorAndMinor,
 } from 'src/utils/version/compare-version-minor-and-major';
 
-export type VersionCommands = {
-  instanceCommands: MigrationInterface[];
-  perWorkspaceCommands: (
-    | WorkspacesMigrationCommandRunner
-    | ActiveOrSuspendedWorkspacesMigrationCommandRunner
-  )[];
-};
+export type VersionCommands = (
+  | WorkspacesMigrationCommandRunner
+  | ActiveOrSuspendedWorkspacesMigrationCommandRunner
+)[];
 export type AllCommands = Record<UpgradeCommandVersion, VersionCommands>;
 
 export type UpgradeCommandOptions = WorkspacesMigrationCommandOptions;
@@ -134,8 +131,7 @@ export abstract class UpgradeCommandRunner extends MigrationCommandRunner {
           'Initialized upgrade context with:',
           `- currentVersion (migrating to): ${currentAppVersion}`,
           `- fromWorkspaceVersion: ${previousVersion}`,
-          `- ${this.commands.instanceCommands.length} instance commands`,
-          `- ${this.commands.perWorkspaceCommands.length} per workspace commands`,
+          `- ${this.commands.length} commands`,
         ].join('\n   '),
       ),
     );
@@ -205,20 +201,8 @@ If any workspaces are not on the previous minor version, roll back to that versi
       return;
     }
 
-    // 3. Run instance commands (TypeORM core migrations, once per instance)
-    for (const migration of this.commands.instanceCommands) {
-      const migrationName = migration.constructor.name;
-      const result =
-        await this.coreMigrationRunnerService.runSingleMigration(migrationName);
-
-      if (result.status === 'fail' && result.error !== 'already-executed') {
-        this.logger.error(
-          `Core migration ${migrationName} failed with error: ${result.error}`,
-        );
-
-        return;
-      }
-    }
+    // 3. Run core migrations
+    await this.coreMigrationRunnerService.run();
 
     // 4. Run per-workspace commands
     const iteratorReport = await this.workspaceIteratorService.iterate(
@@ -261,7 +245,7 @@ If any workspaces are not on the previous minor version, roll back to that versi
         );
       }
       case 'equal': {
-        for (const command of this.commands.perWorkspaceCommands) {
+        for (const command of this.commands) {
           await command.runOnWorkspace({
             options,
             workspaceId,

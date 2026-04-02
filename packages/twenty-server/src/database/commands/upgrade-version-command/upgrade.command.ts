@@ -79,40 +79,34 @@ export class UpgradeCommand extends UpgradeCommandRunner {
       workspaceIteratorService,
     );
 
-    const commands_1200: VersionCommands = {
-      instanceCommands: [],
-      perWorkspaceCommands: [
-        this.identifyPermissionFlagMetadataCommand,
-        this
-          .makePermissionFlagUniversalIdentifierAndApplicationIdNotNullableMigrationCommand,
-        this.identifyObjectPermissionMetadataCommand,
-        this
-          .makeObjectPermissionUniversalIdentifierAndApplicationIdNotNullableMigrationCommand,
-        this.identifyFieldPermissionMetadataCommand,
-        this
-          .makeFieldPermissionUniversalIdentifierAndApplicationIdNotNullableMigrationCommand,
-        this.backfillNavigationMenuItemTypeCommand,
-        this.migrateRichTextToTextCommand,
-        this.deleteOrphanNavigationMenuItemsCommand,
-        this.backfillCommandMenuItemsCommand,
-        this.seedCliApplicationRegistrationCommand,
-        this.migrateMessagingInfrastructureToMetadataCommand,
-        this.backfillSelectFieldOptionIdsCommand,
-        this.updateStandardIndexViewNamesCommand,
-        this.makeWorkflowSearchableCommand,
-      ],
-    };
+    const commands_1200: VersionCommands = [
+      this.identifyPermissionFlagMetadataCommand,
+      this
+        .makePermissionFlagUniversalIdentifierAndApplicationIdNotNullableMigrationCommand,
+      this.identifyObjectPermissionMetadataCommand,
+      this
+        .makeObjectPermissionUniversalIdentifierAndApplicationIdNotNullableMigrationCommand,
+      this.identifyFieldPermissionMetadataCommand,
+      this
+        .makeFieldPermissionUniversalIdentifierAndApplicationIdNotNullableMigrationCommand,
+      this.backfillNavigationMenuItemTypeCommand,
+      this.migrateRichTextToTextCommand,
+      this.deleteOrphanNavigationMenuItemsCommand,
+      this.backfillCommandMenuItemsCommand,
+      this.seedCliApplicationRegistrationCommand,
+      this.migrateMessagingInfrastructureToMetadataCommand,
+      this.backfillSelectFieldOptionIdsCommand,
+      this.updateStandardIndexViewNamesCommand,
+      this.makeWorkflowSearchableCommand,
+    ];
 
-    const commands_1210: VersionCommands = {
-      instanceCommands: [],
-      perWorkspaceCommands: [
-        this.backfillDatasourceToWorkspaceCommand,
-        this.backfillPageLayoutsAndFieldsWidgetViewFieldsCommand,
-      ],
-    };
+    const commands_1210: VersionCommands = [
+      this.backfillDatasourceToWorkspaceCommand,
+      this.backfillPageLayoutsAndFieldsWidgetViewFieldsCommand,
+    ];
 
     this.allCommands = {
-      '1.19.0': { instanceCommands: [], perWorkspaceCommands: [] },
+      '1.19.0': [],
       '1.20.0': commands_1200,
       '1.21.0': commands_1210,
     };

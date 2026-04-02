@@ -70,6 +70,6 @@ export class RunTypeormMigrationCommand extends CommandRunner {
       }
     }
 
-    await this.coreMigrationRunnerService.runAllPendingMigrations();
+    await this.coreMigrationRunnerService.run();
   }
 }

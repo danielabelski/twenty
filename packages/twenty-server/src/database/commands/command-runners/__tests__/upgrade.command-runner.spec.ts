@@ -31,10 +31,7 @@ const PREVIOUS_VERSION =
 
 class BasicUpgradeCommandRunner extends UpgradeCommandRunner {
   allCommands = Object.fromEntries(
-    UPGRADE_COMMAND_SUPPORTED_VERSIONS.map((version) => [
-      version,
-      { instanceCommands: [], perWorkspaceCommands: [] },
-    ]),
+    UPGRADE_COMMAND_SUPPORTED_VERSIONS.map((version) => [version, []]),
   ) as unknown as AllCommands;
 }
 
