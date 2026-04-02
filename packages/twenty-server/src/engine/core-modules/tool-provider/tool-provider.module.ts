@@ -11,8 +11,6 @@ import { LogicFunctionToolProvider } from 'src/engine/core-modules/tool-provider
 import { MetadataToolProvider } from 'src/engine/core-modules/tool-provider/providers/metadata-tool.provider';
 import { NativeModelToolProvider } from 'src/engine/core-modules/tool-provider/providers/native-model-tool.provider';
 import { ViewFieldToolProvider } from 'src/engine/core-modules/tool-provider/providers/view-field-tool.provider';
-import { ViewFilterToolProvider } from 'src/engine/core-modules/tool-provider/providers/view-filter-tool.provider';
-import { ViewSortToolProvider } from 'src/engine/core-modules/tool-provider/providers/view-sort-tool.provider';
 import { ViewToolProvider } from 'src/engine/core-modules/tool-provider/providers/view-tool.provider';
 import { WorkflowToolProvider } from 'src/engine/core-modules/tool-provider/providers/workflow-tool.provider';
 import { ToolExecutorService } from 'src/engine/core-modules/tool-provider/services/tool-executor.service';
@@ -70,8 +68,6 @@ import { ToolRegistryService } from './services/tool-registry.service';
     NativeModelToolProvider,
     LogicFunctionToolProvider,
     ViewFieldToolProvider,
-    ViewFilterToolProvider,
-    ViewSortToolProvider,
     ViewToolProvider,
     WorkflowToolProvider,
     {
@@ -85,8 +81,6 @@ import { ToolRegistryService } from './services/tool-registry.service';
         metadataProvider: MetadataToolProvider,
         logicFunctionProvider: LogicFunctionToolProvider,
         viewFieldProvider: ViewFieldToolProvider,
-        viewFilterProvider: ViewFilterToolProvider,
-        viewSortProvider: ViewSortToolProvider,
         viewProvider: ViewToolProvider,
         workflowProvider: WorkflowToolProvider,
       ) => [
@@ -96,8 +90,6 @@ import { ToolRegistryService } from './services/tool-registry.service';
         metadataProvider,
         logicFunctionProvider,
         viewFieldProvider,
-        viewFilterProvider,
-        viewSortProvider,
         viewProvider,
         workflowProvider,
       ],
@@ -108,8 +100,6 @@ import { ToolRegistryService } from './services/tool-registry.service';
         MetadataToolProvider,
         LogicFunctionToolProvider,
         ViewFieldToolProvider,
-        ViewFilterToolProvider,
-        ViewSortToolProvider,
         ViewToolProvider,
         WorkflowToolProvider,
       ],

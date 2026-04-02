@@ -7,7 +7,6 @@ import { FlatNavigationMenuItemModule } from 'src/engine/metadata-modules/flat-n
 import { NavigationMenuItemGraphqlApiExceptionInterceptor } from 'src/engine/metadata-modules/navigation-menu-item/interceptors/navigation-menu-item-graphql-api-exception.interceptor';
 import { NavigationMenuItemDeletionJob } from 'src/engine/metadata-modules/navigation-menu-item/jobs/navigation-menu-item-deletion.job';
 import { NavigationMenuItemDeletionListener } from 'src/engine/metadata-modules/navigation-menu-item/listeners/navigation-menu-item-deletion.listener';
-import { NavigationMenuItemObjectDeactivationListener } from 'src/engine/metadata-modules/navigation-menu-item/listeners/navigation-menu-item-object-deactivation.listener';
 import { NavigationMenuItemResolver } from 'src/engine/metadata-modules/navigation-menu-item/navigation-menu-item.resolver';
 import { NavigationMenuItemService } from 'src/engine/metadata-modules/navigation-menu-item/navigation-menu-item.service';
 import { NavigationMenuItemAccessService } from 'src/engine/metadata-modules/navigation-menu-item/services/navigation-menu-item-access.service';
@@ -31,7 +30,6 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
     NavigationMenuItemAccessService,
     NavigationMenuItemDeletionService,
     NavigationMenuItemDeletionListener,
-    NavigationMenuItemObjectDeactivationListener,
     NavigationMenuItemDeletionJob,
     NavigationMenuItemResolver,
     NavigationMenuItemRecordIdentifierService,

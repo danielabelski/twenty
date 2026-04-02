@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 
-import { NavigationMenuItemType } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 
 import { ApplicationService } from 'src/engine/core-modules/application/application.service';
@@ -22,14 +21,6 @@ const isNavigationMenuItemForDeletedView = (
   item: FlatNavigationMenuItem,
   deletedIdsSet: Set<string>,
 ): boolean => isDefined(item.viewId) && deletedIdsSet.has(item.viewId);
-
-const isNavigationMenuItemForDeactivatedObject = (
-  item: FlatNavigationMenuItem,
-  deactivatedObjectMetadataIdsSet: Set<string>,
-): boolean =>
-  item.type === NavigationMenuItemType.OBJECT &&
-  isDefined(item.targetObjectMetadataId) &&
-  deactivatedObjectMetadataIdsSet.has(item.targetObjectMetadataId);
 
 @Injectable()
 export class NavigationMenuItemDeletionService {
@@ -100,75 +91,6 @@ export class NavigationMenuItemDeletionService {
       throw new WorkspaceMigrationBuilderException(
         validateAndBuildResult,
         'Multiple validation errors occurred while deleting navigation menu items for deleted records',
-      );
-    }
-  }
-
-  async deleteNavigationMenuItemsForDeactivatedObjects(
-    deactivatedObjectMetadataIds: string[],
-    workspaceId: string,
-  ): Promise<void> {
-    const { workspaceCustomFlatApplication } =
-      await this.applicationService.findWorkspaceTwentyStandardAndCustomApplicationOrThrow(
-        { workspaceId },
-      );
-
-    const { flatNavigationMenuItemMaps } =
-      await this.workspaceManyOrAllFlatEntityMapsCacheService.getOrRecomputeManyOrAllFlatEntityMaps(
-        {
-          workspaceId,
-          flatMapsKeys: ['flatNavigationMenuItemMaps'],
-        },
-      );
-
-    const deactivatedObjectMetadataIdsSet = new Set(
-      deactivatedObjectMetadataIds,
-    );
-
-    const navigationMenuItemsToDelete = Object.values(
-      flatNavigationMenuItemMaps.byUniversalIdentifier,
-    ).filter(
-      (item): item is NonNullable<typeof item> =>
-        isDefined(item) &&
-        isNavigationMenuItemForDeactivatedObject(
-          item,
-          deactivatedObjectMetadataIdsSet,
-        ),
-    );
-
-    if (navigationMenuItemsToDelete.length === 0) {
-      return;
-    }
-
-    const flatNavigationMenuItemsToDelete = navigationMenuItemsToDelete.map(
-      (item) =>
-        fromDeleteNavigationMenuItemInputToFlatNavigationMenuItemOrThrow({
-          flatNavigationMenuItemMaps,
-          navigationMenuItemId: item.id,
-        }),
-    );
-
-    const validateAndBuildResult =
-      await this.workspaceMigrationValidateBuildAndRunService.validateBuildAndRunWorkspaceMigration(
-        {
-          allFlatEntityOperationByMetadataName: {
-            navigationMenuItem: {
-              flatEntityToCreate: [],
-              flatEntityToDelete: flatNavigationMenuItemsToDelete,
-              flatEntityToUpdate: [],
-            },
-          },
-          workspaceId,
-          isSystemBuild: false,
-          applicationUniversalIdentifier:
-            workspaceCustomFlatApplication.universalIdentifier,
-        },
-      );
-
-    if (validateAndBuildResult.status === 'fail') {
-      throw new WorkspaceMigrationBuilderException(
-        validateAndBuildResult,
-        'Multiple validation errors occurred while deleting navigation menu items for deactivated objects',
       );
     }
   }
