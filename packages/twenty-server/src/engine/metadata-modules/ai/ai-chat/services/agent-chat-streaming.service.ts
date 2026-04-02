@@ -53,7 +53,7 @@ export class AgentChatStreamingService {
     text,
     browsingContext,
     modelId,
-  }: StreamAgentChatOptions): Promise<{ streamId: string }> {
+  }: StreamAgentChatOptions): Promise<{ streamId: string; messageId: string }> {
     const thread = await this.threadRepository.findOne({
       where: {
         id: threadId,
@@ -104,7 +104,7 @@ export class AgentChatStreamingService {
       activeStreamId: streamId,
     });
 
-    return { streamId };
+    return { streamId, messageId: savedUserMessage.id };
   }
 
   async flushNextQueuedMessage(

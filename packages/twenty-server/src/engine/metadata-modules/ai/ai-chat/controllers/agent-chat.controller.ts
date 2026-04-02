@@ -139,7 +139,7 @@ export class AgentChatController {
       text: body.text,
     });
 
-    return { messageId: threadId, queued: false, streamId: result.streamId };
+    return { messageId: result.messageId, queued: false, streamId: result.streamId };
   }
 
   @Delete(':threadId/stream')
