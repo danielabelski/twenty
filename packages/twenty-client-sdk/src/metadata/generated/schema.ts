@@ -1422,7 +1422,7 @@ export interface PublicFeatureFlag {
     __typename: 'PublicFeatureFlag'
 }
 
-export type FeatureFlagKey = 'IS_UNIQUE_INDEXES_ENABLED' | 'IS_JSON_FILTER_ENABLED' | 'IS_AI_ENABLED' | 'IS_MARKETPLACE_ENABLED' | 'IS_RECORD_PAGE_LAYOUT_EDITING_ENABLED' | 'IS_PUBLIC_DOMAIN_ENABLED' | 'IS_EMAILING_DOMAIN_ENABLED' | 'IS_JUNCTION_RELATIONS_ENABLED' | 'IS_COMMAND_MENU_ITEM_ENABLED' | 'IS_DRAFT_EMAIL_ENABLED' | 'IS_USAGE_ANALYTICS_ENABLED' | 'IS_RICH_TEXT_V1_MIGRATED' | 'IS_DIRECT_GRAPHQL_EXECUTION_ENABLED' | 'IS_RECORD_PAGE_LAYOUT_GLOBAL_EDITION_ENABLED' | 'IS_CONNECTED_ACCOUNT_MIGRATED' | 'IS_GRAPHQL_QUERY_TIMING_ENABLED' | 'IS_RECORD_TABLE_WIDGET_ENABLED' | 'IS_DATASOURCE_MIGRATED'
+export type FeatureFlagKey = 'IS_UNIQUE_INDEXES_ENABLED' | 'IS_JSON_FILTER_ENABLED' | 'IS_AI_ENABLED' | 'IS_COMMAND_MENU_ITEM_ENABLED' | 'IS_MARKETPLACE_ENABLED' | 'IS_RECORD_PAGE_LAYOUT_EDITING_ENABLED' | 'IS_PUBLIC_DOMAIN_ENABLED' | 'IS_EMAILING_DOMAIN_ENABLED' | 'IS_JUNCTION_RELATIONS_ENABLED' | 'IS_DRAFT_EMAIL_ENABLED' | 'IS_USAGE_ANALYTICS_ENABLED' | 'IS_RICH_TEXT_V1_MIGRATED' | 'IS_DIRECT_GRAPHQL_EXECUTION_ENABLED' | 'IS_RECORD_PAGE_LAYOUT_GLOBAL_EDITION_ENABLED' | 'IS_CONNECTED_ACCOUNT_MIGRATED' | 'IS_GRAPHQL_QUERY_TIMING_ENABLED' | 'IS_RECORD_TABLE_WIDGET_ENABLED' | 'IS_DATASOURCE_MIGRATED'
 
 export interface ClientConfig {
     appVersion?: Scalars['String']
@@ -2477,6 +2477,13 @@ export interface ChatStreamCatchupChunks {
     __typename: 'ChatStreamCatchupChunks'
 }
 
+export interface SendChatMessageResult {
+    messageId: Scalars['String']
+    queued: Scalars['Boolean']
+    streamId?: Scalars['String']
+    __typename: 'SendChatMessageResult'
+}
+
 export interface AgentChatEvent {
     threadId: Scalars['String']
     event: Scalars['JSON']
@@ -2914,6 +2921,9 @@ export interface Mutation {
     updateWebhook: Webhook
     deleteWebhook: Webhook
     createChatThread: AgentChatThread
+    sendChatMessage: SendChatMessageResult
+    stopAgentChatStream: Scalars['Boolean']
+    deleteQueuedChatMessage: Scalars['Boolean']
     createSkill: Skill
     updateSkill: Skill
     deleteSkill: Skill
@@ -5644,6 +5654,14 @@ export interface ChatStreamCatchupChunksGenqlSelection{
     __scalar?: boolean | number
 }
 
+export interface SendChatMessageResultGenqlSelection{
+    messageId?: boolean | number
+    queued?: boolean | number
+    streamId?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
 export interface AgentChatEventGenqlSelection{
     threadId?: boolean | number
     event?: boolean | number
@@ -6112,6 +6130,9 @@ export interface MutationGenqlSelection{
     updateWebhook?: (WebhookGenqlSelection & { __args: {input: UpdateWebhookInput} })
     deleteWebhook?: (WebhookGenqlSelection & { __args: {id: Scalars['UUID']} })
     createChatThread?: AgentChatThreadGenqlSelection
+    sendChatMessage?: (SendChatMessageResultGenqlSelection & { __args: {threadId: Scalars['UUID'], text: Scalars['String'], messageId: Scalars['UUID'], browsingContext?: (Scalars['JSON'] | null), modelId?: (Scalars['String'] | null)} })
+    stopAgentChatStream?: { __args: {threadId: Scalars['UUID']} }
+    deleteQueuedChatMessage?: { __args: {messageId: Scalars['UUID']} }
     createSkill?: (SkillGenqlSelection & { __args: {input: CreateSkillInput} })
     updateSkill?: (SkillGenqlSelection & { __args: {input: UpdateSkillInput} })
     deleteSkill?: (SkillGenqlSelection & { __args: {id: Scalars['UUID']} })
@@ -8465,6 +8486,14 @@ export interface LogicFunctionLogsInput {applicationId?: (Scalars['UUID'] | null
     
 
 
+    const SendChatMessageResult_possibleTypes: string[] = ['SendChatMessageResult']
+    export const isSendChatMessageResult = (obj?: { __typename?: any } | null): obj is SendChatMessageResult => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isSendChatMessageResult"')
+      return SendChatMessageResult_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
     const AgentChatEvent_possibleTypes: string[] = ['AgentChatEvent']
     export const isAgentChatEvent = (obj?: { __typename?: any } | null): obj is AgentChatEvent => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isAgentChatEvent"')
@@ -8999,12 +9028,12 @@ export const enumFeatureFlagKey = {
    IS_UNIQUE_INDEXES_ENABLED: 'IS_UNIQUE_INDEXES_ENABLED' as const,
    IS_JSON_FILTER_ENABLED: 'IS_JSON_FILTER_ENABLED' as const,
    IS_AI_ENABLED: 'IS_AI_ENABLED' as const,
+   IS_COMMAND_MENU_ITEM_ENABLED: 'IS_COMMAND_MENU_ITEM_ENABLED' as const,
    IS_MARKETPLACE_ENABLED: 'IS_MARKETPLACE_ENABLED' as const,
    IS_RECORD_PAGE_LAYOUT_EDITING_ENABLED: 'IS_RECORD_PAGE_LAYOUT_EDITING_ENABLED' as const,
    IS_PUBLIC_DOMAIN_ENABLED: 'IS_PUBLIC_DOMAIN_ENABLED' as const,
    IS_EMAILING_DOMAIN_ENABLED: 'IS_EMAILING_DOMAIN_ENABLED' as const,
    IS_JUNCTION_RELATIONS_ENABLED: 'IS_JUNCTION_RELATIONS_ENABLED' as const,
-   IS_COMMAND_MENU_ITEM_ENABLED: 'IS_COMMAND_MENU_ITEM_ENABLED' as const,
    IS_DRAFT_EMAIL_ENABLED: 'IS_DRAFT_EMAIL_ENABLED' as const,
    IS_USAGE_ANALYTICS_ENABLED: 'IS_USAGE_ANALYTICS_ENABLED' as const,
    IS_RICH_TEXT_V1_MIGRATED: 'IS_RICH_TEXT_V1_MIGRATED' as const,
