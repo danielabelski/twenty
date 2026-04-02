@@ -14,6 +14,7 @@ import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system
 
 export type WorkspaceIteratorOptions = {
   workspaceIds?: string[];
+  activationStatuses?: WorkspaceActivationStatus[];
   startFromWorkspaceId?: string;
   workspaceCountLimit?: number;
   dryRun?: boolean;
@@ -35,6 +36,11 @@ export type WorkspaceIteratorReport = {
     workspaceId: string;
   }[];
 };
+
+const DEFAULT_ACTIVATION_STATUSES = [
+  WorkspaceActivationStatus.ACTIVE,
+  WorkspaceActivationStatus.SUSPENDED,
+];
 
 @Injectable()
 export class WorkspaceIteratorService {
@@ -59,7 +65,7 @@ export class WorkspaceIteratorService {
     const workspaceIdsToProcess =
       options.workspaceIds && options.workspaceIds.length > 0
         ? options.workspaceIds
-        : await this.fetchActiveOrSuspendedWorkspaceIds(options);
+        : await this.fetchWorkspaceIds(options);
 
     if (options.dryRun) {
       this.logger.log(
@@ -69,7 +75,7 @@ export class WorkspaceIteratorService {
 
     for (const [index, workspaceId] of workspaceIdsToProcess.entries()) {
       this.logger.log(
-        `Upgrading workspace ${workspaceId} ${index + 1}/${workspaceIdsToProcess.length}`,
+        `Running on workspace ${workspaceId} ${index + 1}/${workspaceIdsToProcess.length}`,
       );
 
       try {
@@ -115,16 +121,16 @@ export class WorkspaceIteratorService {
     return report;
   }
 
-  private async fetchActiveOrSuspendedWorkspaceIds(
+  private async fetchWorkspaceIds(
     options: WorkspaceIteratorOptions,
   ): Promise<string[]> {
+    const activationStatuses =
+      options.activationStatuses ?? DEFAULT_ACTIVATION_STATUSES;
+
     const workspaces = await this.workspaceRepository.find({
       select: ['id'],
       where: {
-        activationStatus: In([
-          WorkspaceActivationStatus.ACTIVE,
-          WorkspaceActivationStatus.SUSPENDED,
-        ]),
+        activationStatus: In(activationStatuses),
         ...(options.startFromWorkspaceId
           ? { id: MoreThanOrEqual(options.startFromWorkspaceId) }
           : {}),

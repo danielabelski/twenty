@@ -1,15 +1,12 @@
-import chalk from 'chalk';
 import { Option } from 'nest-commander';
-import { isDefined } from 'twenty-shared/utils';
 import { WorkspaceActivationStatus } from 'twenty-shared/workspace';
-import { In, MoreThanOrEqual, type Repository } from 'typeorm';
 
 import { MigrationCommandRunner } from 'src/database/commands/command-runners/migration.command-runner';
-import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
-import { type DataSourceService } from 'src/engine/metadata-modules/data-source/data-source.service';
+import {
+  type WorkspaceIteratorReport,
+  WorkspaceIteratorService,
+} from 'src/database/commands/command-runners/workspace-iterator.service';
 import { GlobalWorkspaceDataSource } from 'src/engine/twenty-orm/global-workspace-datasource/global-workspace-datasource';
-import { type GlobalWorkspaceOrmManager } from 'src/engine/twenty-orm/global-workspace-datasource/global-workspace-orm.manager';
-import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
 
 export type WorkspacesMigrationCommandOptions = {
   workspaceIds: string[];
@@ -27,15 +24,7 @@ export type RunOnWorkspaceArgs = {
   total: number;
 };
 
-export type WorkspaceMigrationReport = {
-  fail: {
-    workspaceId: string;
-    error: Error;
-  }[];
-  success: {
-    workspaceId: string;
-  }[];
-};
+export type WorkspaceMigrationReport = WorkspaceIteratorReport;
 
 export abstract class WorkspacesMigrationCommandRunner<
   Options extends
@@ -50,9 +39,7 @@ export abstract class WorkspacesMigrationCommandRunner<
   };
 
   constructor(
-    protected readonly workspaceRepository: Repository<WorkspaceEntity>,
-    protected readonly globalWorkspaceOrmManager: GlobalWorkspaceOrmManager,
-    protected readonly dataSourceService: DataSourceService,
+    protected readonly workspaceIteratorService: WorkspaceIteratorService,
     protected readonly activationStatuses: WorkspaceActivationStatus[],
   ) {
     super();
@@ -102,86 +89,30 @@ export abstract class WorkspacesMigrationCommandRunner<
     return this.workspaceIds;
   }
 
-  protected async fetchWorkspaceIds(): Promise<string[]> {
-    const workspaces = await this.workspaceRepository.find({
-      select: ['id'],
-      where: {
-        activationStatus: In(this.activationStatuses),
-        ...(this.startFromWorkspaceId
-          ? { id: MoreThanOrEqual(this.startFromWorkspaceId) }
-          : {}),
-      },
-      order: {
-        id: 'ASC',
-      },
-      take: this.workspaceCountLimit,
-    });
-
-    return workspaces.map((workspace) => workspace.id);
-  }
-
   override async runMigrationCommand(
     _passedParams: string[],
     options: Options,
   ) {
-    const workspaceIdsToProcess =
-      this.workspaceIds.size > 0
-        ? Array.from(this.workspaceIds)
-        : await this.fetchWorkspaceIds();
-
-    if (options.dryRun) {
-      this.logger.log(chalk.yellow('Dry run mode: No changes will be applied'));
-    }
-
-    for (const [index, workspaceId] of workspaceIdsToProcess.entries()) {
-      this.logger.log(
-        `Upgrading workspace ${workspaceId} ${index + 1}/${workspaceIdsToProcess.length}`,
-      );
-
-      try {
-        const authContext = buildSystemAuthContext(workspaceId);
-
-        await this.globalWorkspaceOrmManager.executeInWorkspaceContext(
-          async () => {
-            const workspaceHasDataSource =
-              await this.dataSourceService.getLastDataSourceMetadataFromWorkspaceId(
-                workspaceId,
-              );
-
-            const dataSource = isDefined(workspaceHasDataSource)
-              ? await this.globalWorkspaceOrmManager.getGlobalWorkspaceDataSource()
-              : undefined;
-
-            await this.runOnWorkspace({
-              options,
-              workspaceId,
-              dataSource,
-              index: index,
-              total: workspaceIdsToProcess.length,
-            });
-          },
-          authContext,
-        );
-
-        this.migrationReport.success.push({
-          workspaceId,
+    this.migrationReport = await this.workspaceIteratorService.iterate(
+      {
+        workspaceIds:
+          this.workspaceIds.size > 0
+            ? Array.from(this.workspaceIds)
+            : undefined,
+        activationStatuses: this.activationStatuses,
+        startFromWorkspaceId: this.startFromWorkspaceId,
+        workspaceCountLimit: this.workspaceCountLimit,
+        dryRun: options.dryRun,
+      },
+      async (context) => {
+        await this.runOnWorkspace({
+          options,
+          workspaceId: context.workspaceId,
+          dataSource: context.dataSource,
+          index: context.index,
+          total: context.total,
         });
-      } catch (error) {
-        this.migrationReport.fail.push({
-          error,
-          workspaceId,
-        });
-        this.logger.warn(
-          chalk.red(`Error in workspace ${workspaceId}: ${error.message}`),
-        );
-      }
-    }
-
-    this.migrationReport.fail.forEach(({ error, workspaceId }) =>
-      this.logger.error(
-        `Error in workspace ${workspaceId}: ${error.message}`,
-        error.stack,
-      ),
+      },
     );
   }
 
