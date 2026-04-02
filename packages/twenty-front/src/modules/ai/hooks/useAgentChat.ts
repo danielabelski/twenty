@@ -1,4 +1,4 @@
-import { useApolloClient } from '@apollo/client';
+import { useApolloClient } from '@apollo/client/react';
 import { useStore } from 'jotai';
 import { useCallback, useState } from 'react';
 import { type ExtendedUIMessage } from 'twenty-shared/ai';
