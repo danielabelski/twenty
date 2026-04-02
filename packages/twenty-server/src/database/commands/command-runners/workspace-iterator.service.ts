@@ -101,11 +101,8 @@ export class WorkspaceIteratorService {
         );
 
         report.success.push({ workspaceId });
-      } catch (error) {
-        report.fail.push({ error, workspaceId });
-        this.logger.warn(
-          chalk.red(`Error in workspace ${workspaceId}: ${error.message}`),
-        );
+      } catch (error: unknown) {
+        report.fail.push({ error: error as Error, workspaceId });
       }
     }
 

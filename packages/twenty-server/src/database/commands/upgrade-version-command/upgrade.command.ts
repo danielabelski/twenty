@@ -71,7 +71,6 @@ export class UpgradeCommand extends UpgradeCommandRunner {
   ) {
     super(
       workspaceRepository,
-      twentyConfigService,
       coreEngineVersionService,
       workspaceVersionService,
       coreMigrationRunnerService,
