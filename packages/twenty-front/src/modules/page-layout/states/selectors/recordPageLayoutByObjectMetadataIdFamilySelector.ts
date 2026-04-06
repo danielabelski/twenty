@@ -14,10 +14,32 @@ export const recordPageLayoutByObjectMetadataIdFamilySelector =
       ({ get }) => {
         const pageLayouts = get(pageLayoutsWithRelationsSelector);
 
-        return pageLayouts.find(
+        const matchingLayouts = pageLayouts.filter(
           (pageLayout) =>
             pageLayout.type === PageLayoutType.RECORD_PAGE &&
             pageLayout.objectMetadataId === objectMetadataId,
         );
+
+        if (matchingLayouts.length === 0) {
+          return undefined;
+        }
+
+        if (matchingLayouts.length === 1) {
+          return matchingLayouts[0];
+        }
+
+        // Merge tabs from all matching layouts (e.g. multiple SDK apps
+        // defining page layouts for the same object) into the first layout.
+        const [baseLayout, ...otherLayouts] = matchingLayouts;
+
+        const mergedTabs = [
+          ...baseLayout.tabs,
+          ...otherLayouts.flatMap((layout) => layout.tabs),
+        ];
+
+        return {
+          ...baseLayout,
+          tabs: mergedTabs,
+        };
       },
   });
