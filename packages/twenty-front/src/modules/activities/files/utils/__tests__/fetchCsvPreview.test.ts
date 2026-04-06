@@ -1,9 +1,19 @@
 import { fetchCsvPreview } from '@/activities/files/utils/fetchCsvPreview';
 
 const mockFetch = (text: string) => {
+  const encoder = new TextEncoder();
+  const encoded = encoder.encode(text);
+  const stream = new ReadableStream({
+    start(controller) {
+      controller.enqueue(encoded);
+      controller.close();
+    },
+  });
+
   global.fetch = jest.fn(() =>
     Promise.resolve({
       text: () => Promise.resolve(text),
+      body: stream,
     } as unknown as Response),
   );
 };
