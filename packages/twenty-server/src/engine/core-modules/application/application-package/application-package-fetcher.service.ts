@@ -150,6 +150,15 @@ export class ApplicationPackageFetcherService implements OnModuleInit {
       };
     } catch (error) {
       await this.cleanupExtractedDir(workDir);
+
+      if (error instanceof ApplicationException) {
+        throw error;
+      }
+
+      this.logger.error(
+        `Failed to resolve npm package ${packageName}@${targetVersion ?? 'latest'}: ${error}`,
+      );
+
       throw new ApplicationException(
         `Failed to resolve npm package ${packageName}: ${error}`,
         ApplicationExceptionCode.PACKAGE_RESOLUTION_FAILED,
@@ -318,8 +327,20 @@ export class ApplicationPackageFetcherService implements OnModuleInit {
           ? (error as { stderr: string }).stderr
           : undefined;
 
+      const stdout =
+        isDefined(error) &&
+        typeof error === 'object' &&
+        'stdout' in error &&
+        typeof (error as { stdout: unknown }).stdout === 'string'
+          ? (error as { stdout: string }).stdout
+          : undefined;
+
+      // Yarn writes some errors (e.g. package-not-found) to stdout, not stderr.
+      // Use non-empty stderr first, then stdout, then fall back to error.message.
       const message =
-        stderr ?? (error instanceof Error ? error.message : String(error));
+        (stderr || undefined) ??
+        (stdout || undefined) ??
+        (error instanceof Error ? error.message : String(error));
 
       throw new ApplicationException(
         `yarn install failed: ${message}`,
