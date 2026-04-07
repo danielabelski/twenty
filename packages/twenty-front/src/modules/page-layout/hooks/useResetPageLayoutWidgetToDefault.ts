@@ -1,5 +1,6 @@
-import { useInvalidateMetadataStore } from '@/metadata-store/hooks/useInvalidateMetadataStore';
+import { useExitLayoutCustomizationMode } from '@/layout-customization/hooks/useExitLayoutCustomizationMode';
 import { useMetadataErrorHandler } from '@/metadata-error-handler/hooks/useMetadataErrorHandler';
+import { useInvalidateMetadataStore } from '@/metadata-store/hooks/useInvalidateMetadataStore';
 import { useSetIsPageLayoutInEditMode } from '@/page-layout/hooks/useSetIsPageLayoutInEditMode';
 import { PageLayoutComponentInstanceContext } from '@/page-layout/states/contexts/PageLayoutComponentInstanceContext';
 import { fieldsWidgetEditorModeDraftComponentState } from '@/page-layout/states/fieldsWidgetEditorModeDraftComponentState';
@@ -10,12 +11,12 @@ import { fieldsWidgetUngroupedFieldsDraftComponentState } from '@/page-layout/st
 import { fieldsWidgetUngroupedFieldsPersistedComponentState } from '@/page-layout/states/fieldsWidgetUngroupedFieldsPersistedComponentState';
 import { hasInitializedFieldsWidgetGroupsDraftComponentState } from '@/page-layout/states/hasInitializedFieldsWidgetGroupsDraftComponentState';
 import { pageLayoutIsInitializedComponentState } from '@/page-layout/states/pageLayoutIsInitializedComponentState';
-import { useExitLayoutCustomizationMode } from '@/layout-customization/hooks/useExitLayoutCustomizationMode';
+import { useSidePanelMenu } from '@/side-panel/hooks/useSidePanelMenu';
 import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
 import { useAvailableComponentInstanceIdOrThrow } from '@/ui/utilities/state/component-state/hooks/useAvailableComponentInstanceIdOrThrow';
 import { useAtomComponentStateCallbackState } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateCallbackState';
-import { useMutation } from '@apollo/client/react';
 import { CombinedGraphQLErrors } from '@apollo/client/errors';
+import { useMutation } from '@apollo/client/react';
 import { t } from '@lingui/core/macro';
 import { useStore } from 'jotai';
 import { useCallback } from 'react';
@@ -38,6 +39,8 @@ export const useResetPageLayoutWidgetToDefault = (
   const { invalidateMetadataStore } = useInvalidateMetadataStore();
   const { setIsPageLayoutInEditMode } =
     useSetIsPageLayoutInEditMode(pageLayoutId);
+  const { closeSidePanelMenu } = useSidePanelMenu();
+  const { invalidateMetadataStore } = useInvalidateMetadataStore();
 
   const store = useStore();
 
@@ -120,6 +123,7 @@ export const useResetPageLayoutWidgetToDefault = (
         clearWidgetDraftState(widgetId);
         setIsPageLayoutInEditMode(false);
         store.set(pageLayoutIsInitializedState, false);
+        closeSidePanelMenu();
         invalidateMetadataStore();
       } catch (error) {
         if (CombinedGraphQLErrors.is(error)) {
@@ -137,6 +141,8 @@ export const useResetPageLayoutWidgetToDefault = (
       exitLayoutCustomizationMode,
       clearWidgetDraftState,
       setIsPageLayoutInEditMode,
+      closeSidePanelMenu,
+      clearWidgetDraftState,
       invalidateMetadataStore,
       handleMetadataError,
       enqueueErrorSnackBar,
