@@ -131,8 +131,7 @@ export class ImapSmtpCaldavService {
     });
 
     try {
-      await client.listCalendars();
-      await client.validateSyncCollectionSupport();
+      await client.listCalendarsAndValidateSync();
     } catch (error) {
       this.logger.error(
         `CALDAV connection failed: ${error.message}`,

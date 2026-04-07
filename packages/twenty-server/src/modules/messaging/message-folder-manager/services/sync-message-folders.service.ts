@@ -154,12 +154,12 @@ export class SyncMessageFoldersService {
         }
 
         if (foldersToCreate.length > 0) {
-          for (const folderToCreate of foldersToCreate) {
-            await this.messageFolderRepository.save({
+          await this.messageFolderRepository.save(
+            foldersToCreate.map((folderToCreate) => ({
               ...folderToCreate,
               workspaceId,
-            });
-          }
+            })),
+          );
         }
 
         const createdFolders =

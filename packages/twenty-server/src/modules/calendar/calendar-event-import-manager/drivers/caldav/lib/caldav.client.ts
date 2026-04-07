@@ -108,16 +108,24 @@ export class CalDAVClient {
     });
   }
 
+  private async fetchDAVCalendars(): Promise<
+    (Omit<DAVCalendar, 'displayName'> & {
+      displayName?: string | Record<string, unknown>;
+    })[]
+  > {
+    const account = await this.getAccount();
+
+    return (await fetchCalendars({
+      account,
+      headers: this.headers,
+    })) as (Omit<DAVCalendar, 'displayName'> & {
+      displayName?: string | Record<string, unknown>;
+    })[];
+  }
+
   async listCalendars(): Promise<SimpleCalendar[]> {
     try {
-      const account = await this.getAccount();
-
-      const calendars = (await fetchCalendars({
-        account,
-        headers: this.headers,
-      })) as (Omit<DAVCalendar, 'displayName'> & {
-        displayName?: string | Record<string, unknown>;
-      })[];
+      const calendars = await this.fetchDAVCalendars();
 
       return calendars.reduce<SimpleCalendar[]>((result, calendar) => {
         if (!calendar.components?.includes('VEVENT')) return result;
@@ -146,13 +154,48 @@ export class CalDAVClient {
   }
 
   async validateSyncCollectionSupport(): Promise<void> {
-    const account = await this.getAccount();
+    const calendars = await this.fetchDAVCalendars();
 
-    const calendars = await fetchCalendars({
-      account,
-      headers: this.headers,
-    });
+    this.assertSyncCollectionSupported(calendars);
+  }
 
+  async listCalendarsAndValidateSync(): Promise<SimpleCalendar[]> {
+    try {
+      const calendars = await this.fetchDAVCalendars();
+
+      this.assertSyncCollectionSupported(calendars);
+
+      return calendars.reduce<SimpleCalendar[]>((result, calendar) => {
+        if (!calendar.components?.includes('VEVENT')) return result;
+
+        result.push({
+          id: calendar.url,
+          url: calendar.url,
+          name:
+            typeof calendar.displayName === 'string'
+              ? calendar.displayName
+              : 'Unnamed Calendar',
+          isPrimary: false,
+        });
+
+        return result;
+      }, []);
+    } catch (error) {
+      this.logger.error(
+        `Error in ${CalDavGetEventsService.name} - getCalendarEvents`,
+        error.code,
+        error,
+      );
+
+      throw error;
+    }
+  }
+
+  private assertSyncCollectionSupported(
+    calendars: (Omit<DAVCalendar, 'displayName'> & {
+      displayName?: string | Record<string, unknown>;
+    })[],
+  ): void {
     const eventCalendar = calendars.find((calendar) =>
       calendar.components?.includes('VEVENT'),
     );

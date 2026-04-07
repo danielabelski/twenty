@@ -129,15 +129,21 @@ describe('SyncMessageFoldersService', () => {
     mockMessageFolderRepository = {
       delete: jest.fn(),
       update: jest.fn().mockResolvedValue(undefined),
-      save: jest.fn().mockImplementation(async (folder) => {
-        createdFolderRecords.push({
-          ...folder,
-          id: `new-folder-${createdFolderRecords.length}-${Math.random().toString(36).substring(7)}`,
-          isSynced: false,
-          syncCursor: null,
-          pendingSyncAction: MessageFolderPendingSyncAction.NONE,
-          externalId: folder.externalId as string,
-        });
+      save: jest.fn().mockImplementation(async (folderOrFolders) => {
+        const folders = Array.isArray(folderOrFolders)
+          ? folderOrFolders
+          : [folderOrFolders];
+
+        for (const folder of folders) {
+          createdFolderRecords.push({
+            ...folder,
+            id: `new-folder-${createdFolderRecords.length}-${Math.random().toString(36).substring(7)}`,
+            isSynced: false,
+            syncCursor: null,
+            pendingSyncAction: MessageFolderPendingSyncAction.NONE,
+            externalId: folder.externalId as string,
+          });
+        }
       }),
       find: jest.fn().mockImplementation(async ({ where }) => {
         if (!where?.externalId) {
@@ -227,22 +233,22 @@ describe('SyncMessageFoldersService', () => {
         });
 
         expect(mockMessageFolderRepository.save).toHaveBeenCalledWith(
-          expect.objectContaining({
-            workspaceId,
-            name: 'INBOX',
-            externalId: 'inbox-ext',
-            messageChannelId: 'channel-123',
-            isSentFolder: false,
-          }),
-        );
-        expect(mockMessageFolderRepository.save).toHaveBeenCalledWith(
-          expect.objectContaining({
-            workspaceId,
-            name: 'Sent',
-            externalId: 'sent-ext',
-            messageChannelId: 'channel-123',
-            isSentFolder: true,
-          }),
+          expect.arrayContaining([
+            expect.objectContaining({
+              workspaceId,
+              name: 'INBOX',
+              externalId: 'inbox-ext',
+              messageChannelId: 'channel-123',
+              isSentFolder: false,
+            }),
+            expect.objectContaining({
+              workspaceId,
+              name: 'Sent',
+              externalId: 'sent-ext',
+              messageChannelId: 'channel-123',
+              isSentFolder: true,
+            }),
+          ]),
         );
         expect(result).toHaveLength(2);
       });
@@ -274,11 +280,13 @@ describe('SyncMessageFoldersService', () => {
         });
 
         expect(mockMessageFolderRepository.save).toHaveBeenCalledWith(
-          expect.objectContaining({
-            workspaceId,
-            name: 'Projects',
-            parentFolderId: 'parent-folder-id',
-          }),
+          expect.arrayContaining([
+            expect.objectContaining({
+              workspaceId,
+              name: 'Projects',
+              parentFolderId: 'parent-folder-id',
+            }),
+          ]),
         );
       });
     });
@@ -508,10 +516,12 @@ describe('SyncMessageFoldersService', () => {
           expect.objectContaining({ name: 'New Name' }),
         );
         expect(mockMessageFolderRepository.save).toHaveBeenCalledWith(
-          expect.objectContaining({
-            workspaceId,
-            externalId: 'new-ext',
-          }),
+          expect.arrayContaining([
+            expect.objectContaining({
+              workspaceId,
+              externalId: 'new-ext',
+            }),
+          ]),
         );
         expect(result).toHaveLength(4);
         expect(result).toContainEqual(
