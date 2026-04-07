@@ -305,12 +305,6 @@ export const turnRecordFilterIntoRecordGqlOperationFilter = ({
             ? resolvedFilterValue
             : null;
 
-        if (!isDefined(parsedRelativeDateFilterValue)) {
-          throw new Error(
-            `Cannot parse relative date filter : "${recordFilter.value}"`,
-          );
-        }
-
         const defaultDateRange = resolveDateTimeFilter({
           value: `PAST_1_DAY;;${filterValueDependencies.timeZone}`,
           operand: RecordFilterOperand.IS_RELATIVE,
@@ -321,6 +315,12 @@ export const turnRecordFilterIntoRecordGqlOperationFilter = ({
           !isDefined(defaultDateRange?.end)
         ) {
           throw new Error('Failed to resolve default date range');
+        }
+
+        if (!isDefined(parsedRelativeDateFilterValue)) {
+          console.warn(
+            `Cannot parse relative date filter : "${recordFilter.value}", falling back to default range`,
+          );
         }
 
         const start =
