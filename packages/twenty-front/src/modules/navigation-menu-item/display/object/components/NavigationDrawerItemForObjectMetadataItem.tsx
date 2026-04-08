@@ -126,10 +126,11 @@ export const NavigationDrawerItemForObjectMetadataItem = ({
         objectMetadataItem.nameSingular,
       );
 
-  const isActive = isAtomForCurrentObject
-    ? activeNavigationItem.navItemId === navItemId ||
-      isRecordMatchingCurrentPage
-    : isActiveByUrl;
+  const isActive =
+    isAtomForCurrentObject && isDefined(navItemId)
+      ? activeNavigationItem.navItemId === navItemId ||
+        isRecordMatchingCurrentPage
+      : isActiveByUrl;
 
   const handleBeforeNavigation = () => {
     if (isDefined(navItemId)) {
