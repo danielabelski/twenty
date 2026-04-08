@@ -22,6 +22,7 @@ export const NavigationDrawerSubItem = ({
   triggerEvent,
   variant,
   navigationState,
+  onBeforeNavigation,
 }: NavigationDrawerSubItemProps) => {
   return (
     <NavigationDrawerItem
@@ -42,6 +43,7 @@ export const NavigationDrawerSubItem = ({
       triggerEvent={triggerEvent}
       variant={variant}
       navigationState={navigationState}
+      onBeforeNavigation={onBeforeNavigation}
     />
   );
 };

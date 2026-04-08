@@ -3,6 +3,7 @@ import { NavigationMenuItemType } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 import { type NavigationMenuItem } from '~/generated-metadata/graphql';
 
+import { activeNavigationItemState } from '@/navigation-menu-item/common/states/activeNavigationItemState';
 import { getNavigationMenuItemColor } from '@/navigation-menu-item/common/utils/getNavigationMenuItemColor';
 import { NavigationMenuItemIcon } from '@/navigation-menu-item/display/components/NavigationMenuItemIcon';
 import type { EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
@@ -16,6 +17,7 @@ import { objectMetadataItemsSelector } from '@/object-metadata/states/objectMeta
 import { NavigationDrawerSubItem } from '@/ui/navigation/navigation-drawer/components/NavigationDrawerSubItem';
 import { getNavigationSubItemLeftAdornment } from '@/ui/navigation/navigation-drawer/utils/getNavigationSubItemLeftAdornment';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
+import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
 import { viewsSelector } from '@/views/states/selectors/viewsSelector';
 
 type NavigationMenuItemFolderSubItemProps = {
@@ -79,6 +81,17 @@ export const NavigationMenuItemFolderSubItem = ({
     (navigationMenuItem.type === NavigationMenuItemType.LINK ||
       isDefined(objectMetadataItem));
 
+  const setActiveNavigationItem = useSetAtomState(activeNavigationItemState);
+
+  const handleBeforeNavigation = () => {
+    if (isDefined(objectNameSingular)) {
+      setActiveNavigationItem({
+        navItemId: navigationMenuItem.id,
+        objectNameSingular,
+      });
+    }
+  };
+
   const handleClick =
     onClick ??
     (isEditable
@@ -108,7 +121,7 @@ export const NavigationMenuItemFolderSubItem = ({
         objectMetadataItem ?? undefined,
       )}
       to={isDragging || handleClick ? undefined : computedLink}
-      navigationState={{ activeNavItemId: navigationMenuItem.id }}
+      onBeforeNavigation={handleBeforeNavigation}
       onClick={handleClick}
       active={index === selectedNavigationMenuItemIndex}
       isSelectedInEditMode={isEditHighlightedInNavigationMenu}

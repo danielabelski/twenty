@@ -5,9 +5,12 @@ import { isDefined } from 'twenty-shared/utils';
 import { useIsMobile } from 'twenty-ui/utilities';
 import { type NavigationMenuItem } from '~/generated-metadata/graphql';
 
+import { activeNavigationItemState } from '@/navigation-menu-item/common/states/activeNavigationItemState';
 import { currentNavigationMenuItemFolderIdState } from '@/navigation-menu-item/common/states/currentNavigationMenuItemFolderIdState';
 import { openNavigationMenuItemFolderIdsState } from '@/navigation-menu-item/common/states/openNavigationMenuItemFolderIdsState';
 import { isLocationMatchingNavigationMenuItem } from '@/navigation-menu-item/common/utils/isLocationMatchingNavigationMenuItem';
+import { matchesRecordShowPathForObject } from '@/navigation-menu-item/common/utils/matchesRecordShowPathForObject';
+import { getObjectMetadataForNavigationMenuItem } from '@/navigation-menu-item/display/object/utils/getObjectMetadataForNavigationMenuItem';
 import { getNavigationMenuItemComputedLink } from '@/navigation-menu-item/display/utils/getNavigationMenuItemComputedLink';
 import { objectMetadataItemsSelector } from '@/object-metadata/states/objectMetadataItemsSelector';
 import { useAtomState } from '@/ui/utilities/state/jotai/hooks/useAtomState';
@@ -78,11 +81,38 @@ export const useNavigationMenuItemFolderOpenState = ({
     }
   };
 
-  const activeNavItemId = location.state?.activeNavItemId as string | undefined;
+  const activeNavigationItem = useAtomStateValue(activeNavigationItemState);
 
-  const explicitMatchIndex = isDefined(activeNavItemId)
-    ? navigationMenuItems.findIndex((item) => item.id === activeNavItemId)
+  const explicitMatchIndex = isDefined(activeNavigationItem)
+    ? navigationMenuItems.findIndex(
+        (item) => item.id === activeNavigationItem.navItemId,
+      )
     : -1;
+
+  const isAtomRelevantToFolder =
+    isDefined(activeNavigationItem) &&
+    navigationMenuItems.some((item) => {
+      const objectMetadataItem = getObjectMetadataForNavigationMenuItem(
+        item,
+        objectMetadataItems,
+        views,
+      );
+      return (
+        isDefined(objectMetadataItem) &&
+        objectMetadataItem.nameSingular ===
+          activeNavigationItem.objectNameSingular
+      );
+    });
+
+  const recordMatchIndex = navigationMenuItems.findIndex((item) => {
+    if (item.type !== NavigationMenuItemType.RECORD) return false;
+    const computedLink = getNavigationMenuItemComputedLink(
+      item,
+      objectMetadataItems,
+      views,
+    );
+    return computedLink === currentPath;
+  });
 
   const urlMatchIndex = navigationMenuItems.findIndex((item) => {
     const computedLink = getNavigationMenuItemComputedLink(
@@ -91,16 +121,39 @@ export const useNavigationMenuItemFolderOpenState = ({
       views,
     );
 
-    return isLocationMatchingNavigationMenuItem(
-      currentPath,
-      currentViewPath,
-      item.type,
-      computedLink,
-    );
+    if (
+      isLocationMatchingNavigationMenuItem(
+        currentPath,
+        currentViewPath,
+        item.type,
+        computedLink,
+      )
+    ) {
+      return true;
+    }
+
+    if (item.type === NavigationMenuItemType.OBJECT) {
+      const objectMetadataItem = getObjectMetadataForNavigationMenuItem(
+        item,
+        objectMetadataItems,
+        views,
+      );
+      if (isDefined(objectMetadataItem)) {
+        return matchesRecordShowPathForObject(
+          currentPath,
+          objectMetadataItem.nameSingular,
+        );
+      }
+    }
+
+    return false;
   });
 
-  const selectedNavigationMenuItemIndex =
-    explicitMatchIndex !== -1 ? explicitMatchIndex : urlMatchIndex;
+  const selectedNavigationMenuItemIndex = isAtomRelevantToFolder
+    ? explicitMatchIndex !== -1
+      ? explicitMatchIndex
+      : recordMatchIndex
+    : urlMatchIndex;
 
   return {
     isOpen,

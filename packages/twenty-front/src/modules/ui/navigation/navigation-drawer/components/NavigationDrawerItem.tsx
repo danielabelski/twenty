@@ -63,6 +63,7 @@ export type NavigationDrawerItemProps = {
   isSelectedInEditMode?: boolean;
   variant?: 'default' | 'tertiary';
   navigationState?: Record<string, unknown>;
+  onBeforeNavigation?: () => void;
 };
 
 type StyledItemProps = Pick<
@@ -270,6 +271,7 @@ export const NavigationDrawerItem = ({
   isSelectedInEditMode = false,
   variant = 'default',
   navigationState,
+  onBeforeNavigation: onBeforeNavigationProp,
 }: NavigationDrawerItemProps) => {
   const { theme } = useContext(ThemeContext);
   const isMobile = useIsMobile();
@@ -289,10 +291,11 @@ export const NavigationDrawerItem = ({
   const showBreadcrumb = indentationLevel === 2;
   const showStyledSpacer = isDefined(modifier) || isDefined(rightOptions);
 
-  const handleMobileNavigation = () => {
+  const handleBeforeNavigation = () => {
     if (isMobile && !preventCollapseOnMobile) {
       setIsNavigationDrawerExpanded(false);
     }
+    onBeforeNavigationProp?.();
   };
 
   const isExternalLink =
@@ -300,7 +303,7 @@ export const NavigationDrawerItem = ({
   const isInternalLink = isDefined(to) && !isExternalLink;
 
   const handleExternalLinkClick = () => {
-    handleMobileNavigation();
+    handleBeforeNavigation();
     if (isDefined(to)) {
       window.open(to, '_blank', 'noopener,noreferrer');
     }
@@ -313,7 +316,7 @@ export const NavigationDrawerItem = ({
     to: isExternalLink ? undefined : to,
     navigationState,
     onClick: isExternalLink ? (onClick ?? handleExternalLinkClick) : onClick,
-    onBeforeNavigation: handleMobileNavigation,
+    onBeforeNavigation: handleBeforeNavigation,
     triggerEvent,
   });
 
