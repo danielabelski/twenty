@@ -18,6 +18,7 @@ import { isEmailingDomainsEnabledState } from '@/client-config/states/isEmailing
 import { isEmailVerificationRequiredState } from '@/client-config/states/isEmailVerificationRequiredState';
 import { isGoogleCalendarEnabledState } from '@/client-config/states/isGoogleCalendarEnabledState';
 import { isGoogleMessagingEnabledState } from '@/client-config/states/isGoogleMessagingEnabledState';
+import { isEmailForwardingEnabledState } from '@/client-config/states/isEmailForwardingEnabledState';
 import { isImapSmtpCaldavEnabledState } from '@/client-config/states/isImapSmtpCaldavEnabledState';
 import { isMicrosoftCalendarEnabledState } from '@/client-config/states/isMicrosoftCalendarEnabledState';
 import { isMicrosoftMessagingEnabledState } from '@/client-config/states/isMicrosoftMessagingEnabledState';
@@ -102,6 +103,9 @@ export const useClientConfig = (): UseClientConfigResult => {
 
   const setIsImapSmtpCaldavEnabled = useSetAtomState(
     isImapSmtpCaldavEnabledState,
+  );
+  const setIsEmailForwardingEnabled = useSetAtomState(
+    isEmailForwardingEnabledState,
   );
   const setIsEmailingDomainsEnabled = useSetAtomState(
     isEmailingDomainsEnabledState,
@@ -195,6 +199,9 @@ export const useClientConfig = (): UseClientConfigResult => {
 
       setCalendarBookingPageId(clientConfig?.calendarBookingPageId ?? null);
       setIsImapSmtpCaldavEnabled(clientConfig?.isImapSmtpCaldavEnabled);
+      setIsEmailForwardingEnabled(
+        clientConfig?.isEmailForwardingEnabled ?? false,
+      );
       setIsEmailingDomainsEnabled(clientConfig?.isEmailingDomainsEnabled);
       setAllowRequestsToTwentyIcons(clientConfig?.allowRequestsToTwentyIcons);
       setIsCloudflareIntegrationEnabled(
@@ -233,6 +240,7 @@ export const useClientConfig = (): UseClientConfigResult => {
     setIsDeveloperDefaultSignInPrefilled,
     setIsEmailVerificationRequired,
     setIsImapSmtpCaldavEnabled,
+    setIsEmailForwardingEnabled,
     setIsMultiWorkspaceEnabled,
     setIsEmailingDomainsEnabled,
     setIsClickHouseConfigured,

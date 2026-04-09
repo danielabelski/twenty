@@ -1,3 +1,4 @@
+import { isEmailForwardingEnabledState } from '@/client-config/states/isEmailForwardingEnabledState';
 import { isGoogleCalendarEnabledState } from '@/client-config/states/isGoogleCalendarEnabledState';
 import { isGoogleMessagingEnabledState } from '@/client-config/states/isGoogleMessagingEnabledState';
 import { isImapSmtpCaldavEnabledState } from '@/client-config/states/isImapSmtpCaldavEnabledState';
@@ -58,6 +59,10 @@ export const SettingsAccountsListEmptyStateCard = () => {
     isImapSmtpCaldavEnabledState,
   );
 
+  const isEmailForwardingEnabled = useAtomStateValue(
+    isEmailForwardingEnabledState,
+  );
+
   const handleCreateEmailForwardingChannel = useCallback(async () => {
     try {
       const result = await createEmailForwardingChannel();
@@ -106,12 +111,14 @@ export const SettingsAccountsListEmptyStateCard = () => {
           </UndecoratedLink>
         )}
 
-        <SettingsCard
-          Icon={<IconMail size={theme.icon.size.md} />}
-          title={t`Add Email Forwarding`}
-          disabled={isCreatingForwarding}
-          onClick={handleCreateEmailForwardingChannel}
-        />
+        {isEmailForwardingEnabled && (
+          <SettingsCard
+            Icon={<IconMail size={theme.icon.size.md} />}
+            title={t`Add Email Forwarding`}
+            disabled={isCreatingForwarding}
+            onClick={handleCreateEmailForwardingChannel}
+          />
+        )}
       </StyledCardsContainer>
 
       {forwardingAddress && (

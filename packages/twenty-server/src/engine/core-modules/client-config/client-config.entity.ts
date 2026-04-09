@@ -301,6 +301,9 @@ export class ClientConfig {
   isImapSmtpCaldavEnabled: boolean;
 
   @Field(() => Boolean)
+  isEmailForwardingEnabled: boolean;
+
+  @Field(() => Boolean)
   allowRequestsToTwentyIcons: boolean;
 
   @Field(() => String, { nullable: true })
