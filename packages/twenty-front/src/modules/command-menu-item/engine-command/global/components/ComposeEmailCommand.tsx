@@ -1,21 +1,14 @@
 import { useFirstConnectedAccount } from '@/activities/emails/hooks/useFirstConnectedAccount';
 import { useResolveDefaultEmailRecipient } from '@/activities/emails/hooks/useResolveDefaultEmailRecipient';
 import { getPrimaryEmailFromRecord } from '@/activities/emails/utils/getPrimaryEmailFromRecord';
+import { MAX_EMAIL_RECIPIENTS } from '@/activities/emails/constants/EmailRecipientLimits';
 import { HeadlessEngineCommandWrapperEffect } from '@/command-menu-item/engine-command/components/HeadlessEngineCommandWrapperEffect';
 import { useHeadlessCommandContextApi } from '@/command-menu-item/engine-command/hooks/useHeadlessCommandContextApi';
-import { type ObjectRecord } from '@/object-record/types/ObjectRecord';
+import { useFindManyRecords } from '@/object-record/hooks/useFindManyRecords';
 import { useOpenComposeEmailInSidePanel } from '@/side-panel/hooks/useOpenComposeEmailInSidePanel';
 import { CoreObjectNameSingular, SettingsPath } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 import { useNavigateSettings } from '~/hooks/useNavigateSettings';
-
-// Resolves the default `to` for a bulk Person selection by reading the primary
-// email from each selected record (if loaded into the record store) and joining
-// them with commas. Records without an email are skipped.
-const buildBulkPersonRecipientList = (
-  selectedRecords: ObjectRecord[],
-): string =>
-  selectedRecords.map(getPrimaryEmailFromRecord).filter(isDefined).join(', ');
 
 export const ComposeEmailCommand = () => {
   const { connectedAccountId, loading: accountLoading } =
@@ -23,18 +16,39 @@ export const ComposeEmailCommand = () => {
   const { openComposeEmailInSidePanel } = useOpenComposeEmailInSidePanel();
   const navigateSettings = useNavigateSettings();
 
-  const { objectMetadataItem, selectedRecords } =
-    useHeadlessCommandContextApi();
+  const {
+    objectMetadataItem,
+    selectedRecords,
+    graphqlFilter,
+    targetedRecordsRule,
+  } = useHeadlessCommandContextApi();
 
   const objectNameSingular = objectMetadataItem?.nameSingular ?? null;
-  const isPersonBulk =
-    objectNameSingular === CoreObjectNameSingular.Person &&
-    selectedRecords.length > 1;
+  const isPerson = objectNameSingular === CoreObjectNameSingular.Person;
 
-  // For single-record selection we use the shared resolver (which handles the
-  // per-object-type fetching). For bulk Person we read from the selected
-  // records directly. For global invocations we leave the recipient empty.
-  const singleSelectedRecordId = !isPersonBulk
+  // Bulk means more than one record is selected *or* the user is in
+  // exclusion/"select all" mode where selectedRecords is empty but the
+  // graphqlFilter encodes the full target set.
+  const isBulkPerson =
+    isPerson &&
+    (selectedRecords.length > 1 || targetedRecordsRule.mode === 'exclusion');
+
+  // For bulk Person selections we fetch emails directly from the server so
+  // we always have the data regardless of which columns are visible in the
+  // current view. Capped at MAX_EMAIL_RECIPIENTS since the backend will
+  // reject anything above that anyway.
+  const { records: bulkPersonRecords, loading: bulkLoading } =
+    useFindManyRecords({
+      objectNameSingular: CoreObjectNameSingular.Person,
+      filter: graphqlFilter ?? undefined,
+      recordGqlFields: { id: true, emails: { primaryEmail: true } },
+      limit: MAX_EMAIL_RECIPIENTS,
+      skip: !isBulkPerson,
+    });
+
+  // For single-record selection we use the shared resolver which handles
+  // the per-object-type fetching (Person, Company, Opportunity).
+  const singleSelectedRecordId = !isBulkPerson
     ? (selectedRecords[0]?.id ?? null)
     : null;
 
@@ -44,8 +58,11 @@ export const ComposeEmailCommand = () => {
       recordId: singleSelectedRecordId,
     });
 
-  const defaultTo = isPersonBulk
-    ? buildBulkPersonRecipientList(selectedRecords)
+  const defaultTo = isBulkPerson
+    ? bulkPersonRecords
+        .map(getPrimaryEmailFromRecord)
+        .filter(isDefined)
+        .join(', ')
     : singleDefaultTo;
 
   const handleExecute = () => {
@@ -61,10 +78,10 @@ export const ComposeEmailCommand = () => {
     });
   };
 
+  const ready =
+    !accountLoading && (isBulkPerson ? !bulkLoading : !recipientLoading);
+
   return (
-    <HeadlessEngineCommandWrapperEffect
-      execute={handleExecute}
-      ready={!accountLoading && !recipientLoading}
-    />
+    <HeadlessEngineCommandWrapperEffect execute={handleExecute} ready={ready} />
   );
 };
