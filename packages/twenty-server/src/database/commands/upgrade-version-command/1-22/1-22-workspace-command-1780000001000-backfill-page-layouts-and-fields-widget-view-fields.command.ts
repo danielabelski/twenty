@@ -12,10 +12,10 @@ import { v4 } from 'uuid';
 import { ActiveOrSuspendedWorkspaceCommandRunner } from 'src/database/commands/command-runners/active-or-suspended-workspace.command-runner';
 import { WorkspaceIteratorService } from 'src/database/commands/command-runners/workspace-iterator.service';
 import { type RunOnWorkspaceArgs } from 'src/database/commands/command-runners/workspace.command-runner';
-import { RegisteredWorkspaceCommand } from 'src/engine/core-modules/upgrade/decorators/registered-workspace-command.decorator';
 import { ApplicationService } from 'src/engine/core-modules/application/application.service';
 import { type FlatApplication } from 'src/engine/core-modules/application/types/flat-application.type';
 import { FeatureFlagService } from 'src/engine/core-modules/feature-flag/services/feature-flag.service';
+import { RegisteredWorkspaceCommand } from 'src/engine/core-modules/upgrade/decorators/registered-workspace-command.decorator';
 import { type FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
 import { type FlatObjectMetadata } from 'src/engine/metadata-modules/flat-object-metadata/types/flat-object-metadata.type';
 import { type FlatPageLayoutTab } from 'src/engine/metadata-modules/flat-page-layout-tab/types/flat-page-layout-tab.type';
@@ -82,9 +82,9 @@ const isRelationTargetAvailable = (
   return true;
 };
 
-@RegisteredWorkspaceCommand('1.21.0', 1775500005000)
+@RegisteredWorkspaceCommand('1.22.0', 1780000001000)
 @Command({
-  name: 'upgrade:1-21:backfill-page-layouts-and-fields-widget-view-fields',
+  name: 'upgrade:1-22:backfill-page-layouts-and-fields-widget-view-fields',
   description:
     'Backfill RECORD_PAGE page layouts, sync FIELDS_WIDGET view fields, create FIELD widgets, and enable IS_RECORD_PAGE_LAYOUT_EDITING_ENABLED',
 })
@@ -779,6 +779,7 @@ export class BackfillPageLayoutsAndFieldsWidgetViewFieldsCommand extends ActiveO
           deletedAt: null,
           conditionalDisplay: null,
           overrides: null,
+          universalOverrides: null,
         };
 
         widgetsToCreate.push(widget);
