@@ -1,9 +1,7 @@
 import { isNonEmptyString } from '@sniptt/guards';
 
-import { type ObjectRecord } from '@/object-record/types/ObjectRecord';
-
 export const getPrimaryEmailFromRecord = (
-  record: ObjectRecord,
+  record: Record<string, unknown>,
 ): string | null => {
   const emails = record.emails;
 

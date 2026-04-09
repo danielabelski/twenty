@@ -1,11 +1,6 @@
 import { getPrimaryEmailFromRecord } from '@/activities/emails/utils/getPrimaryEmailFromRecord';
-import { type ObjectRecord } from '@/object-record/types/ObjectRecord';
 
-const makeRecord = (emails: unknown): ObjectRecord =>
-  ({
-    id: 'test-id',
-    emails,
-  }) as unknown as ObjectRecord;
+const makeRecord = (emails: unknown): Record<string, unknown> => ({ emails });
 
 describe('getPrimaryEmailFromRecord', () => {
   it('should return the primary email when present', () => {

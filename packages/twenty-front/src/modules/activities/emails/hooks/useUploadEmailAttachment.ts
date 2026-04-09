@@ -7,26 +7,16 @@ import { MAX_ATTACHMENT_SIZE } from '@/advanced-text-editor/utils/maxAttachmentS
 import { UPLOAD_EMAIL_ATTACHMENT_FILE } from '@/file/graphql/mutations/uploadEmailAttachmentFile';
 import { formatFileSize } from '@/file/utils/formatFileSize';
 import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
+import {
+  type UploadEmailAttachmentFileMutation,
+  type UploadEmailAttachmentFileMutationVariables,
+} from '~/generated-metadata/graphql';
 import { logError } from '~/utils/logError';
-
-type UploadEmailAttachmentFileResponse = {
-  uploadEmailAttachmentFile: {
-    id: string;
-    path: string;
-    size: number;
-    createdAt: string;
-    url: string;
-  };
-};
-
-type UploadEmailAttachmentFileVariables = {
-  file: File;
-};
 
 export const useUploadEmailAttachment = () => {
   const [uploadEmailAttachmentFileMutation] = useMutation<
-    UploadEmailAttachmentFileResponse,
-    UploadEmailAttachmentFileVariables
+    UploadEmailAttachmentFileMutation,
+    UploadEmailAttachmentFileMutationVariables
   >(UPLOAD_EMAIL_ATTACHMENT_FILE);
   const { enqueueSuccessSnackBar, enqueueErrorSnackBar } = useSnackBar();
   const { t } = useLingui();
