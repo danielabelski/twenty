@@ -78,9 +78,17 @@ export const resolveFolderSelectedNavigationMenuItemIndex = ({
     }),
   );
 
+  let selectedIndex: number;
+
   if (!isActiveNavigationItemObjectInFolder) {
-    return urlMatchIndex;
+    selectedIndex = urlMatchIndex;
+  } else if (explicitMatchIndex !== -1) {
+    selectedIndex = explicitMatchIndex;
+  } else if (recordMatchIndex !== -1) {
+    selectedIndex = recordMatchIndex;
+  } else {
+    selectedIndex = urlMatchIndex;
   }
 
-  return explicitMatchIndex !== -1 ? explicitMatchIndex : recordMatchIndex;
+  return selectedIndex;
 };
