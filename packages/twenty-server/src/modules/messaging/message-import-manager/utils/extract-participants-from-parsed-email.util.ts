@@ -13,6 +13,9 @@ export const extractParticipantsFromParsedEmail = (parsed: ParsedEmail) => {
   ] as const;
 
   return addressFields.flatMap(({ field, role }) =>
-    formatAddressObjectAsParticipants(extractAddressesFromParsedEmail(field), role),
+    formatAddressObjectAsParticipants(
+      extractAddressesFromParsedEmail(field),
+      role,
+    ),
   );
 };

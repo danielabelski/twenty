@@ -1,8 +1,6 @@
 import { type Email as ParsedEmail } from 'postal-mime';
 
-export const extractThreadIdFromParsedEmail = (
-  parsed: ParsedEmail,
-): string => {
+export const extractThreadIdFromParsedEmail = (parsed: ParsedEmail): string => {
   const references = parsed.references;
 
   if (typeof references === 'string' && references.trim()) {
