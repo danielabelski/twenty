@@ -253,7 +253,9 @@ describe('ApplyMessagesVisibilityRestrictionsService', () => {
       userId: 'user-id',
     });
 
-    mockConnectedAccountRepository.find.mockResolvedValue([{ id: '1' }]);
+    mockConnectedAccountRepository.find.mockResolvedValue([
+      { id: '1', messageChannels: [{ id: 'messageChannelId' }] },
+    ]);
 
     const result = await service.applyMessagesVisibilityRestrictions(
       messages,
@@ -338,9 +340,7 @@ describe('ApplyMessagesVisibilityRestrictionsService', () => {
       userId: 'user-id',
     });
 
-    mockConnectedAccountRepository.find
-      .mockResolvedValueOnce([]) // request for message 3
-      .mockResolvedValueOnce([]); // request for message 2
+    mockConnectedAccountRepository.find.mockResolvedValue([]);
 
     const result = await service.applyMessagesVisibilityRestrictions(
       messages,
@@ -385,9 +385,7 @@ describe('ApplyMessagesVisibilityRestrictionsService', () => {
       id: 'workspace-member-id',
     });
 
-    mockConnectedAccountRepository.find
-      .mockResolvedValueOnce([]) // request for message 3
-      .mockResolvedValueOnce([]); // request for message 2
+    mockConnectedAccountRepository.find.mockResolvedValue([]);
 
     const result = await service.applyMessagesVisibilityRestrictions(
       messages,
