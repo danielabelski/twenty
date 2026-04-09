@@ -3,10 +3,8 @@ import { isGoogleMessagingEnabledState } from '@/client-config/states/isGoogleMe
 import { isImapSmtpCaldavEnabledState } from '@/client-config/states/isImapSmtpCaldavEnabledState';
 import { isMicrosoftCalendarEnabledState } from '@/client-config/states/isMicrosoftCalendarEnabledState';
 import { isMicrosoftMessagingEnabledState } from '@/client-config/states/isMicrosoftMessagingEnabledState';
-import {
-  EMAIL_FORWARDING_MODAL_ID,
-  SettingsAccountsEmailForwardingModal,
-} from '@/settings/accounts/components/SettingsAccountsEmailForwardingModal';
+import { SettingsAccountsEmailForwardingModal } from '@/settings/accounts/components/SettingsAccountsEmailForwardingModal';
+import { EMAIL_FORWARDING_MODAL_ID } from '@/settings/accounts/constants/EmailForwardingModalId';
 import { useCreateEmailForwardingChannel } from '@/settings/accounts/hooks/useCreateEmailForwardingChannel';
 import { useTriggerApisOAuth } from '@/settings/accounts/hooks/useTriggerApiOAuth';
 import { SettingsCard } from '@/settings/components/SettingsCard';
@@ -103,7 +101,7 @@ export const SettingsAccountsListEmptyStateCard = () => {
           >
             <SettingsCard
               Icon={<IconAt size={theme.icon.size.md} />}
-              title={t`Connect Account`}
+              title={t`Connect via IMAP/SMTP`}
             />
           </UndecoratedLink>
         )}
@@ -111,7 +109,6 @@ export const SettingsAccountsListEmptyStateCard = () => {
         <SettingsCard
           Icon={<IconMail size={theme.icon.size.md} />}
           title={t`Add Email Forwarding`}
-          description={t`Receive emails from a shared mailbox or Google Group`}
           disabled={isCreatingForwarding}
           onClick={handleCreateEmailForwardingChannel}
         />

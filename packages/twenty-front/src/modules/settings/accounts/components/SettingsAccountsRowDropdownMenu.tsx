@@ -55,7 +55,6 @@ export const SettingsAccountsRowDropdownMenu = ({
   const isEmailForwarding =
     account.provider === ConnectedAccountProvider.EMAIL_FORWARDING;
 
-  // Forwarding channels are immediately active and never need setup.
   const hasPendingConfiguration =
     !isEmailForwarding &&
     (account.messageChannels.some(

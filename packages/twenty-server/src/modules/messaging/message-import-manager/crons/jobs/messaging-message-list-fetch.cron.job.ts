@@ -50,9 +50,6 @@ export class MessagingMessageListFetchCronJob {
       try {
         const now = new Date().toISOString();
 
-        // Email forwarding channels are driven by the S3 poll cron, not by
-        // this "fetch from provider" path — skip them explicitly so their
-        // syncStage never transitions into MESSAGE_LIST_FETCH_SCHEDULED.
         const [messageChannels] = await this.coreDataSource.query(
           `UPDATE core."messageChannel" SET "syncStage" = '${MessageChannelSyncStage.MESSAGE_LIST_FETCH_SCHEDULED}', "syncStageStartedAt" = COALESCE("syncStageStartedAt", '${now}')
            WHERE "workspaceId" = '${activeWorkspace.id}' AND "isSyncEnabled" = true AND "syncStage" = '${MessageChannelSyncStage.MESSAGE_LIST_FETCH_PENDING}' AND "type" != '${MessageChannelType.EMAIL_FORWARDING}' RETURNING *`,

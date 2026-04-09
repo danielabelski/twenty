@@ -1,3 +1,4 @@
+import { EMAIL_FORWARDING_MODAL_ID } from '@/settings/accounts/constants/EmailForwardingModalId';
 import { ModalStatefulWrapper } from '@/ui/layout/modal/components/ModalStatefulWrapper';
 import { useModal } from '@/ui/layout/modal/hooks/useModal';
 import { styled } from '@linaria/react';
@@ -6,8 +7,6 @@ import { IconCopy, IconMail } from 'twenty-ui/display';
 import { Button } from 'twenty-ui/input';
 import { themeCssVariables } from 'twenty-ui/theme-constants';
 import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
-
-export const EMAIL_FORWARDING_MODAL_ID = 'email-forwarding-address-modal';
 
 const StyledModalContent = styled.div`
   display: flex;

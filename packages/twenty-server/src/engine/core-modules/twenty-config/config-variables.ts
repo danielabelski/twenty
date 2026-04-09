@@ -1634,25 +1634,7 @@ export class ConfigVariables {
   @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.AWS_SES_SETTINGS,
     description:
-      'S3 bucket where SES inbound action writes raw messages. Required to enable email forwarding channels.',
-    type: ConfigVariableType.STRING,
-  })
-  @IsOptional()
-  INBOUND_EMAIL_S3_BUCKET: string;
-
-  @ConfigVariablesMetadata({
-    group: ConfigVariablesGroup.AWS_SES_SETTINGS,
-    description:
-      'Region for the inbound-email S3 bucket. Defaults to AWS_SES_REGION when unset.',
-    type: ConfigVariableType.STRING,
-  })
-  @IsOptional()
-  INBOUND_EMAIL_S3_REGION: string;
-
-  @ConfigVariablesMetadata({
-    group: ConfigVariablesGroup.AWS_SES_SETTINGS,
-    description:
-      'Maximum number of S3 keys listed per poll of the inbound-email bucket.',
+      'Maximum number of S3 keys listed per poll of the inbound-email folder.',
     type: ConfigVariableType.NUMBER,
   })
   @CastToPositiveNumber()

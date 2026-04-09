@@ -11,19 +11,9 @@ import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system
 import { InboundEmailParserService } from 'src/modules/messaging/message-import-manager/drivers/inbound-email/services/inbound-email-parser.service';
 import { InboundEmailS3ClientProvider } from 'src/modules/messaging/message-import-manager/drivers/inbound-email/providers/inbound-email-s3-client.provider';
 import { InboundEmailStorageService } from 'src/modules/messaging/message-import-manager/drivers/inbound-email/services/inbound-email-storage.service';
+import { type InboundEmailImportOutcome } from 'src/modules/messaging/message-import-manager/drivers/inbound-email/types/inbound-email-import-outcome.type';
 import { extractEnvelopeRecipient } from 'src/modules/messaging/message-import-manager/drivers/inbound-email/utils/extract-envelope-recipient.util';
 import { MessagingSaveMessagesAndEnqueueContactCreationService } from 'src/modules/messaging/message-import-manager/services/messaging-save-messages-and-enqueue-contact-creation.service';
-
-export type InboundEmailImportOutcome =
-  | { kind: 'imported'; workspaceId: string; messageChannelId: string }
-  | { kind: 'unmatched'; recipient: string | null }
-  | { kind: 'loop_dropped'; workspaceId: string }
-  | { kind: 'unconfigured' }
-  | { kind: 'parse_failed'; error: string }
-  | { kind: 'persist_failed'; error: string };
-
-// Orchestrates the "pull one S3 object, import it" cycle. Kept independent
-// of BullMQ so it can be unit-tested directly; the job is a thin shell.
 @Injectable()
 export class InboundEmailImportService {
   private readonly logger = new Logger(InboundEmailImportService.name);

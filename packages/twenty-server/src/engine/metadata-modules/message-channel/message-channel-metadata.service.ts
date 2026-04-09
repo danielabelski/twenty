@@ -16,6 +16,7 @@ import {
   MessageChannelVisibility,
 } from 'twenty-shared/types';
 
+import { StorageDriverType } from 'src/engine/core-modules/file-storage/interfaces/file-storage.interface';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
 import { ConnectedAccountMetadataService } from 'src/engine/metadata-modules/connected-account/connected-account-metadata.service';
 import { CreateEmailForwardingChannelOutput } from 'src/engine/metadata-modules/message-channel/dtos/create-email-forwarding-channel.output';
@@ -25,10 +26,8 @@ import {
   MessageChannelException,
   MessageChannelExceptionCode,
 } from 'src/engine/metadata-modules/message-channel/message-channel.exception';
-import {
-  INBOUND_EMAIL_LOCAL_PART_PREFIX,
-  INBOUND_EMAIL_LOCAL_PART_RANDOM_BYTES,
-} from 'src/modules/messaging/message-import-manager/drivers/inbound-email/constants/inbound-email.constants';
+import { INBOUND_EMAIL_LOCAL_PART_PREFIX } from 'src/modules/messaging/message-import-manager/drivers/inbound-email/constants/inbound-email-local-part-prefix.constant';
+import { INBOUND_EMAIL_LOCAL_PART_RANDOM_BYTES } from 'src/modules/messaging/message-import-manager/drivers/inbound-email/constants/inbound-email-local-part-random-bytes.constant';
 
 @Injectable()
 export class MessageChannelMetadataService {
@@ -196,41 +195,16 @@ export class MessageChannelMetadataService {
     const inboundEmailDomain = this.twentyConfigService.get(
       'INBOUND_EMAIL_DOMAIN',
     );
-    const inboundEmailBucket = this.twentyConfigService.get(
-      'INBOUND_EMAIL_S3_BUCKET',
-    );
-    const inboundEmailRegion =
-      this.twentyConfigService.get('INBOUND_EMAIL_S3_REGION') ||
-      this.twentyConfigService.get('AWS_SES_REGION');
+    const storageType = this.twentyConfigService.get('STORAGE_TYPE');
 
     if (
       !isNonEmptyString(inboundEmailDomain) ||
-      !isNonEmptyString(inboundEmailBucket) ||
-      !isNonEmptyString(inboundEmailRegion)
+      storageType !== StorageDriverType.S_3
     ) {
       throw new MessageChannelException(
-        'Email forwarding is not configured: INBOUND_EMAIL_DOMAIN, INBOUND_EMAIL_S3_BUCKET, and a region (INBOUND_EMAIL_S3_REGION or AWS_SES_REGION) must all be set',
+        'Email forwarding is not configured: INBOUND_EMAIL_DOMAIN must be set and STORAGE_TYPE must be S3',
         MessageChannelExceptionCode.EMAIL_FORWARDING_NOT_CONFIGURED,
       );
-    }
-
-    const existingChannel = await this.repository.findOne({
-      where: {
-        workspaceId,
-        type: MessageChannelType.EMAIL_FORWARDING,
-        connectedAccountId: In(
-          await this.connectedAccountMetadataService
-            .getUserConnectedAccountIds({ userWorkspaceId, workspaceId })
-            .then((ids) => (ids.length > 0 ? ids : ['__none__'])),
-        ),
-      },
-    });
-
-    if (existingChannel) {
-      return {
-        messageChannel: existingChannel,
-        forwardingAddress: existingChannel.handle,
-      };
     }
 
     const localPart =
@@ -254,10 +228,6 @@ export class MessageChannelMetadataService {
       connectedAccountId: connectedAccount.id,
       type: MessageChannelType.EMAIL_FORWARDING,
       visibility: MessageChannelVisibility.SHARE_EVERYTHING,
-      // Forwarding channels are ready immediately — they don't go through the
-      // mailbox sync state machine. MESSAGE_LIST_FETCH_PENDING + ACTIVE tells
-      // the UI "this channel is working" while the S3 poll cron (which
-      // explicitly skips EMAIL_FORWARDING) won't touch it.
       syncStage: MessageChannelSyncStage.MESSAGE_LIST_FETCH_PENDING,
       syncStatus: MessageChannelSyncStatus.ACTIVE,
       isSyncEnabled: true,

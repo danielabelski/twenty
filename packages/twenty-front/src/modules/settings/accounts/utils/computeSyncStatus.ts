@@ -14,8 +14,6 @@ export const computeSyncStatus = (
     Partial<Pick<MessageChannel, 'type'>>,
   calendarChannel?: Pick<CalendarChannel, 'syncStatus' | 'syncStage'>,
 ): SyncStatus => {
-  // Forwarding channels are immediately active — they're driven by S3
-  // polling, not the mailbox sync state machine.
   if (messageChannel?.type === MessageChannelType.EMAIL_FORWARDING) {
     return SyncStatus.SYNCED;
   }

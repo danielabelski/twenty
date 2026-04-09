@@ -60,8 +60,6 @@ export class ChannelSyncService {
     const authContext = buildSystemAuthContext(workspaceId);
 
     await this.globalWorkspaceOrmManager.executeInWorkspaceContext(async () => {
-      // Forwarding channels are driven by the S3 poll cron and should never
-      // enter the standard mailbox sync state machine.
       const messageChannels = await this.messageChannelRepository.find({
         where: {
           connectedAccountId,

@@ -3,12 +3,9 @@ import { Injectable, Logger } from '@nestjs/common';
 import { S3Client, type S3ClientConfig } from '@aws-sdk/client-s3';
 import { isNonEmptyString } from '@sniptt/guards';
 
+import { StorageDriverType } from 'src/engine/core-modules/file-storage/interfaces/file-storage.interface';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
 
-// Lazy S3 client: constructed on first call so the server boots cleanly in
-// workspaces that don't enable email forwarding. Credentials are reused from
-// the AWS_SES_* config block — SES inbound action already writes to this
-// bucket, so the same principal can read it.
 @Injectable()
 export class InboundEmailS3ClientProvider {
   private readonly logger = new Logger(InboundEmailS3ClientProvider.name);
@@ -17,18 +14,18 @@ export class InboundEmailS3ClientProvider {
   constructor(private readonly twentyConfigService: TwentyConfigService) {}
 
   isConfigured(): boolean {
-    const bucket = this.twentyConfigService.get('INBOUND_EMAIL_S3_BUCKET');
+    const storageType = this.twentyConfigService.get('STORAGE_TYPE');
     const domain = this.twentyConfigService.get('INBOUND_EMAIL_DOMAIN');
 
-    return isNonEmptyString(bucket) && isNonEmptyString(domain);
+    return storageType === StorageDriverType.S_3 && isNonEmptyString(domain);
   }
 
   getBucket(): string {
-    const bucket = this.twentyConfigService.get('INBOUND_EMAIL_S3_BUCKET');
+    const bucket = this.twentyConfigService.get('STORAGE_S3_NAME');
 
     if (!isNonEmptyString(bucket)) {
       throw new Error(
-        'INBOUND_EMAIL_S3_BUCKET is not configured; email forwarding is disabled.',
+        'STORAGE_S3_NAME is not configured; email forwarding requires S3 storage.',
       );
     }
 
@@ -52,34 +49,28 @@ export class InboundEmailS3ClientProvider {
       return this.s3Client;
     }
 
-    const region =
-      this.twentyConfigService.get('INBOUND_EMAIL_S3_REGION') ||
-      this.twentyConfigService.get('AWS_SES_REGION');
+    const region = this.twentyConfigService.get('STORAGE_S3_REGION');
 
     if (!isNonEmptyString(region)) {
-      throw new Error(
-        'INBOUND_EMAIL_S3_REGION or AWS_SES_REGION must be set to use email forwarding.',
-      );
+      throw new Error('STORAGE_S3_REGION must be set to use email forwarding.');
     }
 
     const config: S3ClientConfig = { region };
 
-    const accessKeyId = this.twentyConfigService.get('AWS_SES_ACCESS_KEY_ID');
-    const secretAccessKey = this.twentyConfigService.get(
-      'AWS_SES_SECRET_ACCESS_KEY',
-    );
-    const sessionToken = this.twentyConfigService.get('AWS_SES_SESSION_TOKEN');
+    const endpoint = this.twentyConfigService.get('STORAGE_S3_ENDPOINT');
 
-    if (
-      isNonEmptyString(accessKeyId) &&
-      isNonEmptyString(secretAccessKey) &&
-      isNonEmptyString(sessionToken)
-    ) {
-      config.credentials = { accessKeyId, secretAccessKey, sessionToken };
-    } else if (
-      isNonEmptyString(accessKeyId) &&
-      isNonEmptyString(secretAccessKey)
-    ) {
+    if (isNonEmptyString(endpoint)) {
+      config.endpoint = endpoint;
+    }
+
+    const accessKeyId = this.twentyConfigService.get(
+      'STORAGE_S3_ACCESS_KEY_ID',
+    );
+    const secretAccessKey = this.twentyConfigService.get(
+      'STORAGE_S3_SECRET_ACCESS_KEY',
+    );
+
+    if (isNonEmptyString(accessKeyId) && isNonEmptyString(secretAccessKey)) {
       config.credentials = { accessKeyId, secretAccessKey };
     }
 

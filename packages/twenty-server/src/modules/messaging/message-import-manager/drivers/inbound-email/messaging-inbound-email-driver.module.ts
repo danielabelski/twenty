@@ -9,10 +9,6 @@ import { InboundEmailS3ClientProvider } from 'src/modules/messaging/message-impo
 import { InboundEmailParserService } from 'src/modules/messaging/message-import-manager/drivers/inbound-email/services/inbound-email-parser.service';
 import { InboundEmailStorageService } from 'src/modules/messaging/message-import-manager/drivers/inbound-email/services/inbound-email-storage.service';
 
-// Thin driver module that provides the low-level primitives for inbound
-// email: S3 client, storage (list/get/move), and MIME parser. The import
-// orchestration service lives in MessagingImportManagerModule so it can
-// reuse the save-messages pipeline without a circular import.
 @Module({
   imports: [
     TwentyConfigModule,

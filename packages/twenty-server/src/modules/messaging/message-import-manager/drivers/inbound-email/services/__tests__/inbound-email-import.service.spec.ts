@@ -6,10 +6,8 @@ import { type GlobalWorkspaceOrmManager } from 'src/engine/twenty-orm/global-wor
 import { type InboundEmailParserService } from 'src/modules/messaging/message-import-manager/drivers/inbound-email/services/inbound-email-parser.service';
 import { type InboundEmailS3ClientProvider } from 'src/modules/messaging/message-import-manager/drivers/inbound-email/providers/inbound-email-s3-client.provider';
 import { type InboundEmailStorageService } from 'src/modules/messaging/message-import-manager/drivers/inbound-email/services/inbound-email-storage.service';
-import {
-  InboundEmailImportService,
-  type InboundEmailImportOutcome,
-} from 'src/modules/messaging/message-import-manager/drivers/inbound-email/services/inbound-email-import.service';
+import { InboundEmailImportService } from 'src/modules/messaging/message-import-manager/drivers/inbound-email/services/inbound-email-import.service';
+import { type InboundEmailImportOutcome } from 'src/modules/messaging/message-import-manager/drivers/inbound-email/types/inbound-email-import-outcome.type';
 import { type MessagingSaveMessagesAndEnqueueContactCreationService } from 'src/modules/messaging/message-import-manager/services/messaging-save-messages-and-enqueue-contact-creation.service';
 import { MessageChannelType } from 'twenty-shared/types';
 

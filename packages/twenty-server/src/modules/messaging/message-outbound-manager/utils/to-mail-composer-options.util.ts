@@ -1,4 +1,4 @@
-import { X_TWENTY_ORIGIN_HEADER } from 'src/modules/messaging/message-import-manager/drivers/inbound-email/constants/inbound-email.constants';
+import { X_TWENTY_ORIGIN_HEADER } from 'src/modules/messaging/message-import-manager/drivers/inbound-email/constants/x-twenty-origin-header.constant';
 import { type SendMessageInput } from 'src/modules/messaging/message-outbound-manager/types/send-message-input.type';
 
 export const toMailComposerOptions = (

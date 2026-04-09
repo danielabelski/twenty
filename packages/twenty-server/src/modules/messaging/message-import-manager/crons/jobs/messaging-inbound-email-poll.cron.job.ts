@@ -10,15 +10,9 @@ import { MessageQueueService } from 'src/engine/core-modules/message-queue/servi
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
 import { InboundEmailS3ClientProvider } from 'src/modules/messaging/message-import-manager/drivers/inbound-email/providers/inbound-email-s3-client.provider';
 import { InboundEmailStorageService } from 'src/modules/messaging/message-import-manager/drivers/inbound-email/services/inbound-email-storage.service';
-import {
-  MessagingInboundEmailImportJob,
-  type MessagingInboundEmailImportJobData,
-} from 'src/modules/messaging/message-import-manager/jobs/messaging-inbound-email-import.job';
+import { type MessagingInboundEmailImportJobData } from 'src/modules/messaging/message-import-manager/jobs/messaging-inbound-email-import-job-data.type';
+import { MessagingInboundEmailImportJob } from 'src/modules/messaging/message-import-manager/jobs/messaging-inbound-email-import.job';
 
-// BullMQ cron patterns are minute-based at the finest; every minute is
-// fine for a forwarding inbox since SES writes are eventually consistent
-// anyway. Single-leader election comes from BullMQ's repeatable-job dedupe,
-// so multiple workers can run this cron safely.
 export const MESSAGING_INBOUND_EMAIL_POLL_CRON_PATTERN = '* * * * *';
 
 @Processor(MessageQueue.cronQueue)

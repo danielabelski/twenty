@@ -8,13 +8,9 @@ import {
 } from '@aws-sdk/client-s3';
 import { Readable } from 'stream';
 
-import { INBOUND_EMAIL_S3_PREFIXES } from 'src/modules/messaging/message-import-manager/drivers/inbound-email/constants/inbound-email.constants';
+import { INBOUND_EMAIL_S3_PREFIXES } from 'src/modules/messaging/message-import-manager/drivers/inbound-email/constants/inbound-email-s3-prefixes.constant';
 import { InboundEmailS3ClientProvider } from 'src/modules/messaging/message-import-manager/drivers/inbound-email/providers/inbound-email-s3-client.provider';
 
-// Thin wrapper around S3 that implements the "bucket-as-queue" pattern:
-// listIncoming => pull work, getRawMessage => download, moveTo* => ack.
-// Archive destinations are date-partitioned so operators can browse the
-// bucket by day when triaging failures.
 @Injectable()
 export class InboundEmailStorageService {
   private readonly logger = new Logger(InboundEmailStorageService.name);
@@ -55,8 +51,6 @@ export class InboundEmailStorageService {
       throw new Error(`S3 object ${key} has no body`);
     }
 
-    // AWS SDK v3 returns Body as a stream in Node; collect it to a Buffer so
-    // postal-mime can parse it in one shot.
     const stream = response.Body as Readable;
     const chunks: Buffer[] = [];
 

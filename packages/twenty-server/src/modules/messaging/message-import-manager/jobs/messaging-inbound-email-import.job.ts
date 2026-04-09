@@ -4,14 +4,8 @@ import { Process } from 'src/engine/core-modules/message-queue/decorators/proces
 import { Processor } from 'src/engine/core-modules/message-queue/decorators/processor.decorator';
 import { MessageQueue } from 'src/engine/core-modules/message-queue/message-queue.constants';
 import { InboundEmailImportService } from 'src/modules/messaging/message-import-manager/drivers/inbound-email/services/inbound-email-import.service';
+import { type MessagingInboundEmailImportJobData } from 'src/modules/messaging/message-import-manager/jobs/messaging-inbound-email-import-job-data.type';
 
-export type MessagingInboundEmailImportJobData = {
-  s3Key: string;
-};
-
-// One job per S3 object. Keeping the unit of work small means a single bad
-// message can be retried or moved to `failed/` without blocking the rest
-// of the queue, and lets BullMQ do the per-message dedupe/backoff we want.
 @Processor({
   queueName: MessageQueue.messagingQueue,
   scope: Scope.REQUEST,
