@@ -195,10 +195,20 @@ export class MessageChannelMetadataService {
     const inboundEmailDomain = this.twentyConfigService.get(
       'INBOUND_EMAIL_DOMAIN',
     );
+    const inboundEmailBucket = this.twentyConfigService.get(
+      'INBOUND_EMAIL_S3_BUCKET',
+    );
+    const inboundEmailRegion =
+      this.twentyConfigService.get('INBOUND_EMAIL_S3_REGION') ||
+      this.twentyConfigService.get('AWS_SES_REGION');
 
-    if (!isNonEmptyString(inboundEmailDomain)) {
+    if (
+      !isNonEmptyString(inboundEmailDomain) ||
+      !isNonEmptyString(inboundEmailBucket) ||
+      !isNonEmptyString(inboundEmailRegion)
+    ) {
       throw new MessageChannelException(
-        'Email forwarding is not configured: INBOUND_EMAIL_DOMAIN is not set',
+        'Email forwarding is not configured: INBOUND_EMAIL_DOMAIN, INBOUND_EMAIL_S3_BUCKET, and a region (INBOUND_EMAIL_S3_REGION or AWS_SES_REGION) must all be set',
         MessageChannelExceptionCode.EMAIL_FORWARDING_NOT_CONFIGURED,
       );
     }
