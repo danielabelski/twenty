@@ -110,7 +110,7 @@ export class InboundEmailStorageService {
     }
   }
 
-  buildArchiveKey(sourceKey: string, destinationPrefix: string): string {
+  private buildArchiveKey(sourceKey: string, destinationPrefix: string): string {
     const bareKey = sourceKey.startsWith(INBOUND_EMAIL_S3_PREFIXES.incoming)
       ? sourceKey.slice(INBOUND_EMAIL_S3_PREFIXES.incoming.length)
       : sourceKey;

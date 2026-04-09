@@ -60,6 +60,7 @@ export class MessagingInboundEmailPollCronJob {
         await this.messageQueueService.add<MessagingInboundEmailImportJobData>(
           MessagingInboundEmailImportJob.name,
           { s3Key },
+          { id: `inbound-email:${s3Key}` },
         );
       }
     } catch (error) {

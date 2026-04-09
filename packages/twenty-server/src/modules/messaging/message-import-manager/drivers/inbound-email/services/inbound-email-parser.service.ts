@@ -98,7 +98,7 @@ export class InboundEmailParserService {
       return parsed.messageId.trim();
     }
 
-    return `thread-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+    return `thread-${crypto.randomUUID()}`;
   }
 
   private extractParticipants(parsed: ParsedEmail) {
