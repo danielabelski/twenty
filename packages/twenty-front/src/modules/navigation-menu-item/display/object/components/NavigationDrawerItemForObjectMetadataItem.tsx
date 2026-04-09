@@ -98,18 +98,19 @@ export const NavigationDrawerItemForObjectMetadataItem = ({
   const activeNavigationItem = useAtomStateValue(activeNavigationItemState);
   const setActiveNavigationItem = useSetAtomState(activeNavigationItemState);
 
-  const isOnRecordShowPage = matchesRecordShowPathForObject(
+  const isOnObjectRecordShowPage = matchesRecordShowPathForObject(
     currentPath,
     objectMetadataItem.nameSingular,
   );
 
-  const isOnIndexPage =
+  const isOnObjectIndexPage =
     currentPath ===
     getAppPath(AppPath.RecordIndexPage, {
       objectNamePlural: objectMetadataItem.namePlural,
     });
 
-  const isCurrentPathMatchingObject = isOnIndexPage || isOnRecordShowPage;
+  const isCurrentPathMatchingObject =
+    isOnObjectIndexPage || isOnObjectRecordShowPage;
 
   const shouldUseExplicitActiveItem =
     isDefined(activeNavigationItem) &&
@@ -131,7 +132,7 @@ export const NavigationDrawerItemForObjectMetadataItem = ({
 
   const isActiveByUrl =
     matchesNavigationMenuItemLink ||
-    (isObject && isOnRecordShowPage) ||
+    (isObject && isOnObjectRecordShowPage) ||
     (!hasCustomLink && isCurrentPathMatchingObject);
 
   const isActive =
