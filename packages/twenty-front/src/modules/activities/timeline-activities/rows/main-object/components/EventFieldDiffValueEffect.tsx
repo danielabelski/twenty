@@ -3,7 +3,7 @@ import { useContext, useEffect } from 'react';
 import { TimelineActivityContext } from '@/activities/timeline-activities/contexts/TimelineActivityContext';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
-import { type FieldFilesValue } from '@/object-record/record-field/ui/types/FieldMetadata';
+import { isFieldFilesValue } from '@/object-record/record-field/ui/types/guards/isFieldFilesValue';
 import { recordStoreFamilyState } from '@/object-record/record-store/states/recordStoreFamilyState';
 import { useAtomFamilyStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomFamilyStateValue';
 import { useSetAtomFamilyState } from '@/ui/utilities/state/jotai/hooks/useSetAtomFamilyState';
@@ -37,16 +37,15 @@ export const EventFieldDiffValueEffect = ({
     if (
       fieldMetadataItem.type === FieldMetadataType.FILES &&
       isDefined(recordStore) &&
-      Array.isArray(diffRecord)
+      isFieldFilesValue(diffRecord)
     ) {
-      const currentFiles = Array.isArray(recordStore[fieldMetadataItem.name])
-        ? (recordStore[fieldMetadataItem.name] as FieldFilesValue[])
-        : [];
+      const storeValue = recordStore[fieldMetadataItem.name];
+      const currentFiles = isFieldFilesValue(storeValue) ? storeValue : [];
       const currentFileMap = new Map(
         currentFiles.map((file) => [file.fileId, file]),
       );
 
-      fieldValue = (diffRecord as FieldFilesValue[]).map((file) => {
+      fieldValue = diffRecord.map((file) => {
         const currentFile = currentFileMap.get(file.fileId);
         if (isDefined(currentFile)) {
           return { ...file, url: currentFile.url };

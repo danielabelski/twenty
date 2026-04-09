@@ -20,35 +20,35 @@ import { FormUuidFieldInput } from '@/object-record/record-field/ui/form-types/c
 import { type VariablePickerComponent } from '@/object-record/record-field/ui/form-types/types/VariablePickerComponent';
 import { type FieldDefinition } from '@/object-record/record-field/ui/types/FieldDefinition';
 import {
-  type FieldAddressValue,
   type FieldArrayValue,
-  type FieldEmailsValue,
-  type FieldFullNameValue,
-  type FieldLinksValue,
   type FieldMetadata,
   type FieldMultiSelectValue,
-  type FieldPhonesValue,
   type FieldRelationToOneValue,
   type FieldRelationValue,
-  type FieldRichTextValue,
   type FormFieldCurrencyValue,
 } from '@/object-record/record-field/ui/types/FieldMetadata';
 import { isFieldAddress } from '@/object-record/record-field/ui/types/guards/isFieldAddress';
+import { isFieldAddressValue } from '@/object-record/record-field/ui/types/guards/isFieldAddressValue';
 import { isFieldArray } from '@/object-record/record-field/ui/types/guards/isFieldArray';
 import { isFieldBoolean } from '@/object-record/record-field/ui/types/guards/isFieldBoolean';
 import { isFieldCurrency } from '@/object-record/record-field/ui/types/guards/isFieldCurrency';
 import { isFieldDate } from '@/object-record/record-field/ui/types/guards/isFieldDate';
 import { isFieldDateTime } from '@/object-record/record-field/ui/types/guards/isFieldDateTime';
 import { isFieldEmails } from '@/object-record/record-field/ui/types/guards/isFieldEmails';
+import { isFieldEmailsValue } from '@/object-record/record-field/ui/types/guards/isFieldEmailsValue';
 import { isFieldFiles } from '@/object-record/record-field/ui/types/guards/isFieldFiles';
 import { isFieldFullName } from '@/object-record/record-field/ui/types/guards/isFieldFullName';
+import { isFieldFullNameValue } from '@/object-record/record-field/ui/types/guards/isFieldFullNameValue';
 import { isFieldLinks } from '@/object-record/record-field/ui/types/guards/isFieldLinks';
+import { isFieldLinksValue } from '@/object-record/record-field/ui/types/guards/isFieldLinksValue';
 import { isFieldMultiSelect } from '@/object-record/record-field/ui/types/guards/isFieldMultiSelect';
 import { isFieldNumber } from '@/object-record/record-field/ui/types/guards/isFieldNumber';
 import { isFieldPhones } from '@/object-record/record-field/ui/types/guards/isFieldPhones';
+import { isFieldPhonesValue } from '@/object-record/record-field/ui/types/guards/isFieldPhonesValue';
 import { isFieldRawJson } from '@/object-record/record-field/ui/types/guards/isFieldRawJson';
 import { isFieldRelationManyToOne } from '@/object-record/record-field/ui/types/guards/isFieldRelationManyToOne';
 import { isFieldRichText } from '@/object-record/record-field/ui/types/guards/isFieldRichText';
+import { isFieldRichTextValue } from '@/object-record/record-field/ui/types/guards/isFieldRichTextValue';
 import { isFieldSelect } from '@/object-record/record-field/ui/types/guards/isFieldSelect';
 import { isFieldText } from '@/object-record/record-field/ui/types/guards/isFieldText';
 import { isFieldUuid } from '@/object-record/record-field/ui/types/guards/isFieldUuid';
@@ -120,7 +120,9 @@ export const FormFieldInput = ({
   ) : isFieldFullName(field) ? (
     <FormFullNameFieldInput
       label={field.label}
-      defaultValue={defaultValue as FieldFullNameValue | undefined}
+      defaultValue={
+        isFieldFullNameValue(defaultValue) ? defaultValue : undefined
+      }
       onChange={onChange}
       VariablePicker={VariablePicker}
       readonly={readonly}
@@ -128,7 +130,9 @@ export const FormFieldInput = ({
   ) : isFieldAddress(field) ? (
     <FormAddressFieldInput
       label={field.label}
-      defaultValue={defaultValue as FieldAddressValue | undefined}
+      defaultValue={
+        isFieldAddressValue(defaultValue) ? defaultValue : undefined
+      }
       onChange={onChange}
       VariablePicker={VariablePicker}
       readonly={readonly}
@@ -136,7 +140,7 @@ export const FormFieldInput = ({
   ) : isFieldLinks(field) ? (
     <FormLinksFieldInput
       label={field.label}
-      defaultValue={defaultValue as FieldLinksValue | undefined}
+      defaultValue={isFieldLinksValue(defaultValue) ? defaultValue : undefined}
       onChange={onChange}
       VariablePicker={VariablePicker}
       readonly={readonly}
@@ -144,7 +148,7 @@ export const FormFieldInput = ({
   ) : isFieldEmails(field) ? (
     <FormEmailsFieldInput
       label={field.label}
-      defaultValue={defaultValue as FieldEmailsValue | undefined}
+      defaultValue={isFieldEmailsValue(defaultValue) ? defaultValue : undefined}
       onChange={onChange}
       VariablePicker={VariablePicker}
       readonly={readonly}
@@ -161,7 +165,7 @@ export const FormFieldInput = ({
   ) : isFieldPhones(field) ? (
     <FormPhoneFieldInput
       label={field.label}
-      defaultValue={defaultValue as FieldPhonesValue | undefined}
+      defaultValue={isFieldPhonesValue(defaultValue) ? defaultValue : undefined}
       onChange={onChange}
       VariablePicker={VariablePicker}
       readonly={readonly}
@@ -223,7 +227,9 @@ export const FormFieldInput = ({
   ) : isFieldRichText(field) ? (
     <FormRichTextFieldInput
       label={field.label}
-      defaultValue={defaultValue as FieldRichTextValue | undefined}
+      defaultValue={
+        isFieldRichTextValue(defaultValue) ? defaultValue : undefined
+      }
       onChange={onChange}
       VariablePicker={VariablePicker}
       readonly={readonly}

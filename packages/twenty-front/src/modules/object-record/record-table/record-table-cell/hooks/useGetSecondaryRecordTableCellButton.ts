@@ -5,8 +5,11 @@ import {
   type FieldPhonesValue,
 } from '@/object-record/record-field/ui/types/FieldMetadata';
 import { isFieldEmails } from '@/object-record/record-field/ui/types/guards/isFieldEmails';
+import { isFieldEmailsValue } from '@/object-record/record-field/ui/types/guards/isFieldEmailsValue';
 import { isFieldLinks } from '@/object-record/record-field/ui/types/guards/isFieldLinks';
+import { isFieldLinksValue } from '@/object-record/record-field/ui/types/guards/isFieldLinksValue';
 import { isFieldPhones } from '@/object-record/record-field/ui/types/guards/isFieldPhones';
+import { isFieldPhonesValue } from '@/object-record/record-field/ui/types/guards/isFieldPhonesValue';
 import { useRecordFieldValue } from '@/object-record/record-store/hooks/useRecordFieldValue';
 import { t } from '@lingui/core/macro';
 import { useContext } from 'react';
@@ -44,9 +47,9 @@ export const useGetSecondaryRecordTableCellButton = () => {
   let openLinkOnClick: () => void = () => {};
   let copyOnClick: () => void = () => {};
 
-  if (isFieldPhones(fieldDefinition)) {
+  if (isFieldPhones(fieldDefinition) && isFieldPhonesValue(fieldValue)) {
     const { primaryPhoneCallingCode = '', primaryPhoneNumber = '' } =
-      fieldValue as FieldPhonesValue;
+      fieldValue;
     const phoneNumber = `${primaryPhoneCallingCode}${primaryPhoneNumber}`;
     openLinkOnClick = () => {
       window.open(`tel:${phoneNumber}`, '_blank');
@@ -56,8 +59,8 @@ export const useGetSecondaryRecordTableCellButton = () => {
     };
   }
 
-  if (isFieldEmails(fieldDefinition)) {
-    const email = (fieldValue as FieldEmailsValue).primaryEmail ?? '';
+  if (isFieldEmails(fieldDefinition) && isFieldEmailsValue(fieldValue)) {
+    const email = fieldValue.primaryEmail ?? '';
     openLinkOnClick = () => {
       window.open(`mailto:${email}`, '_blank');
     };
@@ -66,8 +69,8 @@ export const useGetSecondaryRecordTableCellButton = () => {
     };
   }
 
-  if (isFieldLinks(fieldDefinition)) {
-    const url = (fieldValue as FieldLinksValue).primaryLinkUrl ?? '';
+  if (isFieldLinks(fieldDefinition) && isFieldLinksValue(fieldValue)) {
+    const url = fieldValue.primaryLinkUrl ?? '';
     openLinkOnClick = () => {
       window.open(ensureAbsoluteUrl(url), '_blank');
     };

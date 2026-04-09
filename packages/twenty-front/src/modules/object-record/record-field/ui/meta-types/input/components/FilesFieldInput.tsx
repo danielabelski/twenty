@@ -9,7 +9,10 @@ import { MULTI_ITEM_FIELD_INPUT_DROPDOWN_ID_PREFIX } from '@/object-record/recor
 import { uploadMultipleFiles } from '@/object-record/record-field/ui/meta-types/utils/uploadMultipleFiles';
 import { recordFieldInputIsFieldInErrorComponentState } from '@/object-record/record-field/ui/states/recordFieldInputIsFieldInErrorComponentState';
 import { type FieldFilesValue } from '@/object-record/record-field/ui/types/FieldMetadata';
-import { filesSchema } from '@/object-record/record-field/ui/types/guards/isFieldFilesValue';
+import {
+  filesSchema,
+  isFieldFilesValue,
+} from '@/object-record/record-field/ui/types/guards/isFieldFilesValue';
 import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
 import { filePreviewState } from '@/ui/field/display/states/filePreviewState';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
@@ -49,7 +52,7 @@ export const FilesFieldInput = () => {
   );
 
   const files = useMemo(
-    () => (draftValue ?? []) as FieldFilesValue[],
+    () => (isFieldFilesValue(draftValue) ? draftValue : []),
     [draftValue],
   );
 

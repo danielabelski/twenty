@@ -2,7 +2,7 @@ import { useFileUpload } from '@/file-upload/hooks/useFileUpload';
 import { useUploadFilesFieldFile } from '@/object-record/record-field/ui/meta-types/hooks/useUploadFilesFieldFile';
 import { uploadMultipleFiles } from '@/object-record/record-field/ui/meta-types/utils/uploadMultipleFiles';
 import { filesFieldUploadState } from '@/object-record/record-field/ui/states/filesFieldUploadState';
-import { type FieldFilesValue } from '@/object-record/record-field/ui/types/FieldMetadata';
+import { isFieldFilesValue } from '@/object-record/record-field/ui/types/guards/isFieldFilesValue';
 import { recordStoreFamilySelector } from '@/object-record/record-store/states/selectors/recordStoreFamilySelector';
 import { RECORD_TABLE_CELL_INPUT_ID_PREFIX } from '@/object-record/record-table/constants/RecordTableCellInputIdPrefix';
 import { RecordTableComponentInstanceContext } from '@/object-record/record-table/states/context/RecordTableComponentInstanceContext';
@@ -59,12 +59,15 @@ export const useOpenFilesFieldInput = () => {
         };
       };
     }) => {
-      const fieldValue = store.get(
+      const storeFieldValue = store.get(
         recordStoreFamilySelector.selectorFamily({
           recordId,
           fieldName,
         }),
-      ) as FieldFilesValue[];
+      );
+      const fieldValue = isFieldFilesValue(storeFieldValue)
+        ? storeFieldValue
+        : undefined;
 
       const instanceId = getRecordFieldInputInstanceId({
         recordId,

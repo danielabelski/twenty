@@ -1,7 +1,6 @@
 import { t } from '@lingui/core/macro';
 import { isNonEmptyString } from '@sniptt/guards';
 
-import { type FieldCurrencyValue } from '@/object-record/record-field/ui/types/FieldMetadata';
 import { CurrencyInput } from '@/ui/field/input/components/CurrencyInput';
 import { CurrencyCode } from 'twenty-shared/constants';
 
@@ -28,9 +27,9 @@ export const CurrencyFieldInput = () => {
     RecordFieldComponentInstanceContext,
   );
 
-  const defaultCurrencyCodeWithoutSQLQuotes = (
-    defaultValue as FieldCurrencyValue
-  )?.currencyCode?.replace(/'/g, '') as CurrencyCode;
+  const defaultCurrencyCodeWithoutSQLQuotes = isFieldCurrencyValue(defaultValue)
+    ? (defaultValue.currencyCode?.replace(/'/g, '') as CurrencyCode)
+    : undefined;
 
   const defaultCurrencyCodeIsNotEmpty = isNonEmptyString(
     defaultCurrencyCodeWithoutSQLQuotes,
