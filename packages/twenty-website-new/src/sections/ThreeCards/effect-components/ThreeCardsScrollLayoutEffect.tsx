@@ -2,34 +2,28 @@
 
 import { useEffect } from 'react';
 
-import type { HeadingCardType } from '@/sections/Helped/types/HeadingCard';
 import {
-  applyHelpedSceneLayout,
-  type HelpedSceneLayoutRefs,
-} from '@/sections/Helped/utils/helped-scene-layout';
+  applyThreeCardsScrollLayout,
+  type ThreeCardsScrollLayoutRefs,
+} from '@/sections/ThreeCards/utils/three-cards-scroll-layout';
 
-type HelpedSceneScrollLayoutEffectProps = HelpedSceneLayoutRefs & {
-  cards: HeadingCardType[];
+type ThreeCardsScrollLayoutEffectProps = ThreeCardsScrollLayoutRefs & {
+  cardCount: number;
 };
 
-export function HelpedSceneScrollLayoutEffect({
+export function ThreeCardsScrollLayoutEffect({
+  cardCount,
   cardRefs,
-  cards,
-  innerRef,
-  sectionRef,
-}: HelpedSceneScrollLayoutEffectProps) {
+  gridRef,
+}: ThreeCardsScrollLayoutEffectProps) {
   useEffect(() => {
-    const refs: HelpedSceneLayoutRefs = {
-      cardRefs,
-      innerRef,
-      sectionRef,
-    };
+    const refs: ThreeCardsScrollLayoutRefs = { cardRefs, gridRef };
 
     let rafId: number | null = null;
 
     const flushLayout = () => {
       rafId = null;
-      applyHelpedSceneLayout(refs, cards);
+      applyThreeCardsScrollLayout(refs, cardCount);
     };
 
     const scheduleLayout = () => {
@@ -39,7 +33,7 @@ export function HelpedSceneScrollLayoutEffect({
       rafId = window.requestAnimationFrame(flushLayout);
     };
 
-    applyHelpedSceneLayout(refs, cards);
+    applyThreeCardsScrollLayout(refs, cardCount);
     window.addEventListener('scroll', scheduleLayout, { passive: true });
     window.addEventListener('resize', scheduleLayout);
     return () => {
@@ -49,7 +43,7 @@ export function HelpedSceneScrollLayoutEffect({
         window.cancelAnimationFrame(rafId);
       }
     };
-  }, [cardRefs, cards, innerRef, sectionRef]);
+  }, [cardCount, cardRefs, gridRef]);
 
   return null;
 }
