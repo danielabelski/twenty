@@ -1,9 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
-  Get,
-  Header,
   HttpCode,
   HttpStatus,
   Post,
@@ -29,39 +26,14 @@ import { AuthUserWorkspaceId } from 'src/engine/decorators/auth/auth-user-worksp
 import { AuthUser } from 'src/engine/decorators/auth/auth-user.decorator';
 import { AuthWorkspace } from 'src/engine/decorators/auth/auth-workspace.decorator';
 import { NoPermissionGuard } from 'src/engine/guards/no-permission.guard';
-import { PublicEndpointGuard } from 'src/engine/guards/public-endpoint.guard';
 import { WorkspaceAuthGuard } from 'src/engine/guards/workspace-auth.guard';
 
 @Controller('mcp')
+@UseGuards(McpAuthGuard, WorkspaceAuthGuard, NoPermissionGuard)
 @UseFilters(RestApiExceptionFilter)
 export class McpCoreController {
   constructor(private readonly mcpProtocolService: McpProtocolService) {}
 
-  @UseGuards(PublicEndpointGuard, NoPermissionGuard)
-  @Get()
-  @Header('Allow', 'POST')
-  @HttpCode(HttpStatus.METHOD_NOT_ALLOWED)
-  handleUnsupportedGet() {
-    return {
-      error: 'Method Not Allowed',
-      message:
-        'This MCP endpoint supports JSON-RPC over POST only. SSE streaming is not supported on GET /mcp.',
-    };
-  }
-
-  @UseGuards(PublicEndpointGuard, NoPermissionGuard)
-  @Delete()
-  @Header('Allow', 'POST')
-  @HttpCode(HttpStatus.METHOD_NOT_ALLOWED)
-  handleUnsupportedDelete() {
-    return {
-      error: 'Method Not Allowed',
-      message:
-        'This MCP endpoint does not support session termination over DELETE /mcp',
-    };
-  }
-
-  @UseGuards(McpAuthGuard, WorkspaceAuthGuard, NoPermissionGuard)
   @Post()
   @HttpCode(HttpStatus.OK)
   @UsePipes(

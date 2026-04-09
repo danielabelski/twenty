@@ -19,21 +19,29 @@ describe('MCP Controller (integration)', () => {
       .send(JSON.stringify(body));
   };
 
-  it('should return 405 for GET /mcp', async () => {
+  it('should return 405 with JSON-RPC error for GET /mcp', async () => {
     await request(baseUrl)
       .get(endpoint)
       .expect(405)
       .expect((res) => {
         expect(res.headers.allow).toBe('POST');
+        expect(res.body.jsonrpc).toBe('2.0');
+        expect(res.body.error).toBeDefined();
+        expect(res.body.error.code).toBe(-32600);
+        expect(res.body.id).toBeNull();
       });
   });
 
-  it('should return 405 for DELETE /mcp', async () => {
+  it('should return 405 with JSON-RPC error for DELETE /mcp', async () => {
     await request(baseUrl)
       .delete(endpoint)
       .expect(405)
       .expect((res) => {
         expect(res.headers.allow).toBe('POST');
+        expect(res.body.jsonrpc).toBe('2.0');
+        expect(res.body.error).toBeDefined();
+        expect(res.body.error.code).toBe(-32600);
+        expect(res.body.id).toBeNull();
       });
   });
 
@@ -57,7 +65,7 @@ describe('MCP Controller (integration)', () => {
         expect(res.body.id).toBe(123);
         expect(res.body.jsonrpc).toBe('2.0');
         expect(res.body.result).toBeDefined();
-        expect(res.body.result.protocolVersion).toBe('2025-03-26');
+        expect(res.body.result.protocolVersion).toBe('2024-11-05');
         expect(res.body.result.capabilities).toBeDefined();
         expect(res.body.result.serverInfo).toBeDefined();
         expect(res.body.result.serverInfo.name).toBe('Twenty MCP Server');
