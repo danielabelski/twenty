@@ -171,6 +171,12 @@ packages/
 Use existing helpers from `twenty-shared` instead of manual type guards:
 - `isDefined()`, `isNonEmptyString()`, `isNonEmptyArray()`
 
+### Field Value Validation
+- **Use Zod-based guards** (`isField*Value`) to validate composite field values — never use manual `typeof` / `instanceof` / null checks
+- Existing Zod guards live in `packages/twenty-front/src/modules/object-record/record-field/ui/types/guards/` (e.g. `isFieldEmailsValue`, `isFieldPhonesValue`, `isFieldLinksValue`, `isFieldAddressValue`, `isFieldFullNameValue`, etc.)
+- Avoid `as FieldXValue` type assertions — validate with the guard first, then access properties safely
+- When writing new code that handles emails, phones, links, addresses, or other composite field types, always import and use the corresponding `isField*Value` guard instead of writing manual checks like `typeof x === 'object'` or `x !== null`
+
 ## Development Workflow
 
 IMPORTANT: Use Context7 for code generation, setup or configuration steps, or library/API documentation. Automatically use the Context7 MCP tools to resolve library IDs and get library docs without waiting for explicit requests.
