@@ -1,15 +1,15 @@
-import { getFileType } from '@/activities/files/utils/getFileType';
-import { useFileCategoryColors } from '@/file/hooks/useFileCategoryColors';
-import { IconMapping } from '@/file/utils/fileIconMappings';
 import { styled } from '@linaria/react';
 import { useContext } from 'react';
-import { type WorkflowAttachment } from 'twenty-shared/workflow';
 import { AvatarOrIcon } from 'twenty-ui/components';
 import { IconX } from 'twenty-ui/display';
 import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
 
-type WorkflowAttachmentChipProps = {
-  file: WorkflowAttachment;
+import { getFileType } from '@/activities/files/utils/getFileType';
+import { useFileCategoryColors } from '@/file/hooks/useFileCategoryColors';
+import { IconMapping } from '@/file/utils/fileIconMappings';
+
+type AttachmentChipProps = {
+  file: { id: string; name: string };
   onRemove: () => void;
   readonly?: boolean;
 };
@@ -59,16 +59,25 @@ const StyledDelete = styled.button`
   }
 `;
 
-export const WorkflowAttachmentChip = ({
+export const AttachmentChip = ({
   file,
   onRemove,
   readonly = false,
-}: WorkflowAttachmentChipProps) => {
+}: AttachmentChipProps) => {
   const { theme } = useContext(ThemeContext);
   const iconColors = useFileCategoryColors();
 
+  const handleChipClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+  };
+
+  const handleRemoveClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    onRemove();
+  };
+
   return (
-    <StyledChip data-chip deletable={!readonly}>
+    <StyledChip deletable={!readonly} onClick={handleChipClick}>
       <AvatarOrIcon
         Icon={IconMapping[getFileType(file.name)]}
         IconBackgroundColor={iconColors[getFileType(file.name)]}
@@ -76,7 +85,7 @@ export const WorkflowAttachmentChip = ({
       <StyledLabel title={file.name}>{file.name}</StyledLabel>
 
       {!readonly && (
-        <StyledDelete onClick={onRemove}>
+        <StyledDelete onClick={handleRemoveClick}>
           <IconX size={theme.icon.size.sm} stroke={theme.icon.stroke.sm} />
         </StyledDelete>
       )}
