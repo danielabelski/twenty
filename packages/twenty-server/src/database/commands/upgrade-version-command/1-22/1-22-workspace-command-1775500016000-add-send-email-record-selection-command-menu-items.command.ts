@@ -17,9 +17,9 @@ const SEND_EMAIL_RECORD_SELECTION_UNIVERSAL_IDENTIFIERS = [
   STANDARD_COMMAND_MENU_ITEMS.composeEmailToOpportunity.universalIdentifier,
 ];
 
-@RegisteredWorkspaceCommand('1.21.0', 1775500016000)
+@RegisteredWorkspaceCommand('1.22.0', 1775500016000)
 @Command({
-  name: 'upgrade:1-21:add-send-email-record-selection-command-menu-items',
+  name: 'upgrade:1-22:add-send-email-record-selection-command-menu-items',
   description:
     'Add the per-object Send Email command menu items (Person, Company, Opportunity) to existing workspaces',
 })

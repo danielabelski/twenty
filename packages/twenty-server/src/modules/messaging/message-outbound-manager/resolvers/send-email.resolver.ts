@@ -11,6 +11,7 @@ import { FileFolder } from 'twenty-shared/types';
 
 import { MetadataResolver } from 'src/engine/api/graphql/graphql-config/decorators/metadata-resolver.decorator';
 import { AuthGraphqlApiExceptionFilter } from 'src/engine/core-modules/auth/filters/auth-graphql-api-exception.filter';
+import { FileEmailAttachmentService } from 'src/engine/core-modules/file/file-email-attachment/services/file-email-attachment.service';
 import { ResolverValidationPipe } from 'src/engine/core-modules/graphql/pipes/resolver-validation.pipe';
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { EmailComposerService } from 'src/engine/core-modules/tool/tools/email-tool/email-composer.service';
@@ -33,6 +34,7 @@ export class SendEmailResolver {
   constructor(
     private readonly connectedAccountMetadataService: ConnectedAccountMetadataService,
     private readonly emailComposerService: EmailComposerService,
+    private readonly fileEmailAttachmentService: FileEmailAttachmentService,
     private readonly sendEmailService: SendEmailService,
   ) {}
 
@@ -82,6 +84,15 @@ export class SendEmailResolver {
         data,
         workspace.id,
       );
+
+      const attachmentFileIds = (input.files ?? []).map((file) => file.id);
+
+      if (attachmentFileIds.length > 0) {
+        await this.fileEmailAttachmentService.deleteFiles({
+          fileIds: attachmentFileIds,
+          workspaceId: workspace.id,
+        });
+      }
 
       return { success: true };
     } catch (error) {

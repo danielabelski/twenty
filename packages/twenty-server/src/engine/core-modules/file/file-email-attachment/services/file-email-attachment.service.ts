@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
 import { isNonEmptyString } from '@sniptt/guards';
 import { FileFolder } from 'twenty-shared/types';
@@ -13,6 +13,8 @@ import { sanitizeFile } from 'src/engine/core-modules/file/utils/sanitize-file.u
 
 @Injectable()
 export class FileEmailAttachmentService {
+  private readonly logger = new Logger(FileEmailAttachmentService.name);
+
   constructor(
     private readonly fileStorageService: FileStorageService,
     private readonly applicationService: ApplicationService,
@@ -68,5 +70,27 @@ export class FileEmailAttachmentService {
         fileFolder: FileFolder.EmailAttachment,
       }),
     };
+  }
+
+  async deleteFiles({
+    fileIds,
+    workspaceId,
+  }: {
+    fileIds: string[];
+    workspaceId: string;
+  }): Promise<void> {
+    for (const fileId of fileIds) {
+      try {
+        await this.fileStorageService.deleteByFileId({
+          fileId,
+          workspaceId,
+          fileFolder: FileFolder.EmailAttachment,
+        });
+      } catch (error) {
+        this.logger.warn(
+          `Failed to delete email attachment file ${fileId}: ${error}`,
+        );
+      }
+    }
   }
 }
