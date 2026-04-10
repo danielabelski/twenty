@@ -1,28 +1,57 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import {
+  useEffect,
+  useRef,
+  type CSSProperties,
+} from 'react';
 import * as THREE from 'three';
 
-const IMAGE_SRC = '/images/home/problem/problem.jpg';
+const IMAGE_SRC = '/images/home/problem/monolith-problem.webp';
+const PREVIEW_DISTANCE = 4;
 const VIRTUAL_RENDER_HEIGHT = 768;
+const REFERENCE_PREVIEW_DISTANCE = 4;
+const MIN_FOOTPRINT_SCALE = 0.001;
 const IMAGE_POINTER_FOLLOW = 0.38;
 const IMAGE_POINTER_VELOCITY_DAMPING = 0.82;
 
-const settings = {
+type HalftoneTuning = {
+  dashColor: string;
+  imageContrast: number;
+  power: number;
+  scale: number;
+  width: number;
+};
+
+type AnimationTuning = {
+  hoverLightEnabled: boolean;
+  hoverLightIntensity: number;
+  hoverLightRadius: number;
+  waveSpeed: number;
+};
+
+type MonolithTuning = {
+  animation: AnimationTuning;
+  backgroundColor: string;
+  halftone: HalftoneTuning;
+};
+
+const DEFAULT_TUNING: MonolithTuning = {
   halftone: {
     dashColor: '#BABABA',
-    imageContrast: 1.5,
-    power: 0.05,
+    imageContrast: 1,
+    power: 0.21,
     scale: 10,
-    width: 0.6,
+    width: 0.65,
   },
   animation: {
-    hoverLightEnabled: false,
-    hoverLightIntensity: 0.8,
-    hoverLightRadius: 0.2,
+    hoverLightEnabled: true,
+    hoverLightIntensity: 0.13,
+    hoverLightRadius: 1,
     waveSpeed: 1,
   },
-} as const;
+  backgroundColor: '#1C1C1C',
+};
 
 const passThroughVertexShader = /* glsl */ `
   varying vec2 vUv;
@@ -65,50 +94,13 @@ const blurFragmentShader = /* glsl */ `
   }
 `;
 
-const imagePassthroughFragmentShader = /* glsl */ `
-  precision highp float;
-
-  uniform sampler2D tImage;
-  uniform vec2 imageSize;
-  uniform vec2 viewportSize;
-  uniform float zoom;
-  uniform float contrast;
-
-  varying vec2 vUv;
-
-  void main() {
-    float imageAspect = imageSize.x / imageSize.y;
-    float viewAspect = viewportSize.x / viewportSize.y;
-
-    vec2 uv = vUv;
-
-    // Cover: fill the full masked area and crop the overflow.
-    if (imageAspect > viewAspect) {
-      float scale = viewAspect / imageAspect;
-      uv.x = (uv.x - 0.5) * scale + 0.5;
-    } else {
-      float scale = imageAspect / viewAspect;
-      uv.y = (uv.y - 0.5) * scale + 0.5;
-    }
-
-    uv = (uv - 0.5) / zoom + 0.5;
-
-    float inBounds = step(0.0, uv.x) * step(uv.x, 1.0)
-      * step(0.0, uv.y) * step(uv.y, 1.0);
-
-    vec4 color = texture2D(tImage, clamp(uv, 0.0, 1.0));
-    vec3 contrastColor = clamp((color.rgb - 0.5) * contrast + 0.5, 0.0, 1.0);
-
-    gl_FragColor = vec4(contrastColor, inBounds);
-  }
-`;
-
 const halftoneFragmentShader = /* glsl */ `
   precision highp float;
 
   uniform sampler2D tScene;
   uniform sampler2D tGlow;
-  uniform vec2 resolution;
+  uniform vec2 effectResolution;
+  uniform vec2 logicalResolution;
   uniform float tile;
   uniform float s_3;
   uniform float s_4;
@@ -116,7 +108,7 @@ const halftoneFragmentShader = /* glsl */ `
   uniform float time;
   uniform float waveAmount;
   uniform float waveSpeed;
-  uniform float distanceScale;
+  uniform float footprintScale;
   uniform vec2 interactionUv;
   uniform vec2 interactionVelocity;
   uniform vec2 dragOffset;
@@ -154,9 +146,11 @@ const halftoneFragmentShader = /* glsl */ `
       }
     }
 
-    float halftoneSize = max(tile / max(distanceScale, 0.001), 1.0);
-    vec2 pointerPx = interactionUv * resolution;
-    vec2 fragDelta = gl_FragCoord.xy - pointerPx;
+    vec2 fragCoord =
+      (gl_FragCoord.xy / max(effectResolution, vec2(1.0))) * logicalResolution;
+    float halftoneSize = max(tile * max(footprintScale, 0.001), 1.0);
+    vec2 pointerPx = interactionUv * logicalResolution;
+    vec2 fragDelta = fragCoord - pointerPx;
     float fragDist = length(fragDelta);
     vec2 radialDir = fragDist > 0.001 ? fragDelta / fragDist : vec2(0.0, 1.0);
     float velocityMagnitude = length(interactionVelocity);
@@ -169,13 +163,13 @@ const halftoneFragmentShader = /* glsl */ `
 
     float hoverLightMask = 0.0;
     if (hoverLightStrength > 0.0) {
-      float lightRadiusPx = hoverLightRadius * resolution.y;
+      float lightRadiusPx = hoverLightRadius * logicalResolution.y;
       hoverLightMask = smoothstep(lightRadiusPx, 0.0, fragDist);
     }
 
     float hoverFlowMask = 0.0;
     if (hoverFlowStrength > 0.0) {
-      float hoverRadiusPx = hoverFlowRadius * resolution.y;
+      float hoverRadiusPx = hoverFlowRadius * logicalResolution.y;
       hoverFlowMask = smoothstep(hoverRadiusPx, 0.0, fragDist);
     }
 
@@ -184,7 +178,7 @@ const halftoneFragmentShader = /* glsl */ `
       motionDir * hoverFlowStrength * hoverFlowMask *
         (0.4 + motionBias) * halftoneSize * 1.15;
     vec2 travelDisplacement = dragOffset * dragFlowStrength * 0.45;
-    vec2 effectCoord = gl_FragCoord.xy + hoverDisplacement + travelDisplacement;
+    vec2 effectCoord = fragCoord + hoverDisplacement + travelDisplacement;
 
     float bandRow = floor(effectCoord.y / halftoneSize);
     float waveOffset =
@@ -193,7 +187,7 @@ const halftoneFragmentShader = /* glsl */ `
 
     vec2 cellIndex = floor(effectCoord / halftoneSize);
     vec2 sampleUv = clamp(
-      (cellIndex + 0.5) * halftoneSize / resolution,
+      (cellIndex + 0.5) * halftoneSize / logicalResolution,
       vec2(0.0),
       vec2(1.0)
     );
@@ -231,6 +225,51 @@ const halftoneFragmentShader = /* glsl */ `
   }
 `;
 
+const imagePassthroughFragmentShader = /* glsl */ `
+  precision highp float;
+
+  uniform sampler2D tImage;
+  uniform vec2 imageSize;
+  uniform vec2 viewportSize;
+  uniform float zoom;
+  uniform float contrast;
+
+  varying vec2 vUv;
+
+  void main() {
+    float imageAspect = imageSize.x / imageSize.y;
+    float viewAspect = viewportSize.x / viewportSize.y;
+
+    vec2 uv = vUv;
+
+    // Cover: fill the full masked area and crop overflow.
+    if (imageAspect > viewAspect) {
+      float scale = viewAspect / imageAspect;
+      uv.x = (uv.x - 0.5) * scale + 0.5;
+    } else {
+      float scale = imageAspect / viewAspect;
+      uv.y = (uv.y - 0.5) * scale + 0.5;
+    }
+
+    uv = (uv - 0.5) / zoom + 0.5;
+
+    float inBounds = step(0.0, uv.x) * step(uv.x, 1.0)
+      * step(0.0, uv.y) * step(uv.y, 1.0);
+
+    vec4 color = texture2D(tImage, clamp(uv, 0.0, 1.0));
+    vec3 contrastColor = clamp((color.rgb - 0.5) * contrast + 0.5, 0.0, 1.0);
+
+    gl_FragColor = vec4(contrastColor, inBounds);
+  }
+`;
+
+type Rect = {
+  height: number;
+  width: number;
+  x: number;
+  y: number;
+};
+
 type InteractionState = {
   mouseX: number;
   mouseY: number;
@@ -240,6 +279,46 @@ type InteractionState = {
   smoothedMouseX: number;
   smoothedMouseY: number;
 };
+
+type MountHalftoneCanvasOptions = {
+  container: HTMLDivElement;
+  imageUrl: string;
+};
+
+type MonolithProps = {
+  imageUrl?: string;
+  style?: CSSProperties;
+};
+
+function clampRectToViewport(
+  rect: Rect,
+  viewportWidth: number,
+  viewportHeight: number,
+) {
+  const minX = Math.max(rect.x, 0);
+  const minY = Math.max(rect.y, 0);
+  const maxX = Math.min(rect.x + rect.width, viewportWidth);
+  const maxY = Math.min(rect.y + rect.height, viewportHeight);
+
+  if (maxX <= minX || maxY <= minY) {
+    return null;
+  }
+
+  return {
+    x: minX,
+    y: minY,
+    width: maxX - minX,
+    height: maxY - minY,
+  };
+}
+
+function getRectArea(rect: Rect | null) {
+  if (!rect) {
+    return 0;
+  }
+
+  return Math.max(rect.width, 0) * Math.max(rect.height, 0);
+}
 
 function createRenderTarget(width: number, height: number) {
   return new THREE.WebGLRenderTarget(width, height, {
@@ -261,6 +340,103 @@ function createInteractionState(): InteractionState {
   };
 }
 
+function getImagePreviewZoom(previewDistance: number) {
+  return REFERENCE_PREVIEW_DISTANCE / Math.max(previewDistance, 0.001);
+}
+
+function getContainedImageRect(options: {
+  imageHeight: number;
+  imageWidth: number;
+  viewportHeight: number;
+  viewportWidth: number;
+  zoom: number;
+}) {
+  const { imageHeight, imageWidth, viewportHeight, viewportWidth, zoom } =
+    options;
+
+  if (
+    imageWidth <= 0 ||
+    imageHeight <= 0 ||
+    viewportWidth <= 0 ||
+    viewportHeight <= 0
+  ) {
+    return null;
+  }
+
+  const imageAspect = imageWidth / imageHeight;
+  const viewAspect = viewportWidth / viewportHeight;
+
+  let fittedWidth = viewportWidth;
+  let fittedHeight = viewportHeight;
+
+  if (imageAspect > viewAspect) {
+    fittedHeight = viewportWidth / imageAspect;
+  } else {
+    fittedWidth = viewportHeight * imageAspect;
+  }
+
+  const scaledWidth = fittedWidth * zoom;
+  const scaledHeight = fittedHeight * zoom;
+
+  return clampRectToViewport(
+    {
+      x: (viewportWidth - scaledWidth) * 0.5,
+      y: (viewportHeight - scaledHeight) * 0.5,
+      width: scaledWidth,
+      height: scaledHeight,
+    },
+    viewportWidth,
+    viewportHeight,
+  );
+}
+
+function getFootprintScaleFromRects(
+  currentRect: Rect | null,
+  referenceRect: Rect | null,
+) {
+  const currentArea = getRectArea(currentRect);
+  const referenceArea = getRectArea(referenceRect);
+
+  if (currentArea <= 0 || referenceArea <= 0) {
+    return 1;
+  }
+
+  return Math.max(Math.sqrt(currentArea / referenceArea), MIN_FOOTPRINT_SCALE);
+}
+
+function getImageFootprintScale(options: {
+  imageHeight: number;
+  imageWidth: number;
+  previewDistance: number;
+  viewportHeight: number;
+  viewportWidth: number;
+}) {
+  const {
+    imageHeight,
+    imageWidth,
+    previewDistance,
+    viewportHeight,
+    viewportWidth,
+  } = options;
+
+  const currentRect = getContainedImageRect({
+    imageHeight,
+    imageWidth,
+    viewportHeight,
+    viewportWidth,
+    zoom: getImagePreviewZoom(previewDistance),
+  });
+  const referenceRect = getContainedImageRect({
+    imageHeight,
+    imageWidth,
+    viewportHeight,
+    viewportWidth,
+    zoom: 1,
+  });
+
+  return getFootprintScaleFromRects(currentRect, referenceRect);
+}
+
 function loadImage(imageUrl: string) {
   return new Promise<HTMLImageElement>((resolve, reject) => {
     const image = new Image();
@@ -272,10 +448,10 @@ function loadImage(imageUrl: string) {
   });
 }
 
-async function mountHalftoneCanvas(
-  container: HTMLDivElement,
-  imageUrl: string,
-) {
+async function mountHalftoneCanvas(options: MountHalftoneCanvasOptions) {
+  const { container, imageUrl } = options;
+  const tuning = DEFAULT_TUNING;
+
   const getWidth = () => Math.max(container.clientWidth, 1);
   const getHeight = () => Math.max(container.clientHeight, 1);
   const getVirtualHeight = () => Math.max(VIRTUAL_RENDER_HEIGHT, getHeight());
@@ -286,7 +462,6 @@ async function mountHalftoneCanvas(
     );
 
   const image = await loadImage(imageUrl);
-  const interaction = createInteractionState();
 
   const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false });
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -313,70 +488,73 @@ async function mountHalftoneCanvas(
   const orthographicCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
   const imageMaterial = new THREE.ShaderMaterial({
-    fragmentShader: imagePassthroughFragmentShader,
     uniforms: {
+      contrast: { value: tuning.halftone.imageContrast },
       imageSize: { value: new THREE.Vector2(image.width, image.height) },
       tImage: { value: imageTexture },
       viewportSize: {
         value: new THREE.Vector2(getVirtualWidth(), getVirtualHeight()),
       },
-      contrast: { value: settings.halftone.imageContrast },
-      zoom: { value: 1 },
+      zoom: { value: getImagePreviewZoom(PREVIEW_DISTANCE) },
     },
     vertexShader: passThroughVertexShader,
+    fragmentShader: imagePassthroughFragmentShader,
   });
 
   const imageScene = new THREE.Scene();
   imageScene.add(new THREE.Mesh(fullScreenGeometry, imageMaterial));
 
   const blurHorizontalMaterial = new THREE.ShaderMaterial({
-    fragmentShader: blurFragmentShader,
     uniforms: {
       dir: { value: new THREE.Vector2(1, 0) },
       res: { value: new THREE.Vector2(getVirtualWidth(), getVirtualHeight()) },
       tInput: { value: null },
     },
     vertexShader: passThroughVertexShader,
+    fragmentShader: blurFragmentShader,
   });
 
   const blurVerticalMaterial = new THREE.ShaderMaterial({
-    fragmentShader: blurFragmentShader,
     uniforms: {
       dir: { value: new THREE.Vector2(0, 1) },
       res: { value: new THREE.Vector2(getVirtualWidth(), getVirtualHeight()) },
       tInput: { value: null },
     },
     vertexShader: passThroughVertexShader,
+    fragmentShader: blurFragmentShader,
   });
 
   const halftoneMaterial = new THREE.ShaderMaterial({
-    fragmentShader: halftoneFragmentShader,
     transparent: true,
     uniforms: {
       cropToBounds: { value: 1 },
-      dashColor: { value: new THREE.Color(settings.halftone.dashColor) },
-      distanceScale: { value: 1 },
-      dragOffset: { value: new THREE.Vector2(0, 0) },
+      dashColor: { value: new THREE.Color(tuning.halftone.dashColor) },
       dragFlowStrength: { value: 0 },
+      dragOffset: { value: new THREE.Vector2(0, 0) },
+      effectResolution: {
+        value: new THREE.Vector2(getVirtualWidth(), getVirtualHeight()),
+      },
+      footprintScale: { value: 1 },
       hoverFlowRadius: { value: 0.18 },
       hoverFlowStrength: { value: 0 },
-      hoverLightRadius: { value: settings.animation.hoverLightRadius },
+      hoverLightRadius: { value: tuning.animation.hoverLightRadius },
       hoverLightStrength: { value: 0 },
       interactionUv: { value: new THREE.Vector2(0.5, 0.5) },
       interactionVelocity: { value: new THREE.Vector2(0, 0) },
-      resolution: {
+      logicalResolution: {
         value: new THREE.Vector2(getVirtualWidth(), getVirtualHeight()),
       },
-      s_3: { value: settings.halftone.power },
-      s_4: { value: settings.halftone.width },
+      s_3: { value: tuning.halftone.power },
+      s_4: { value: tuning.halftone.width },
       tGlow: { value: blurTargetB.texture },
-      tile: { value: settings.halftone.scale },
+      tile: { value: tuning.halftone.scale },
       time: { value: 0 },
       tScene: { value: sceneTarget.texture },
       waveAmount: { value: 0 },
-      waveSpeed: { value: settings.animation.waveSpeed },
+      waveSpeed: { value: tuning.animation.waveSpeed },
     },
     vertexShader: passThroughVertexShader,
+    fragmentShader: halftoneFragmentShader,
   });
 
   const blurHorizontalScene = new THREE.Scene();
@@ -392,6 +570,36 @@ async function mountHalftoneCanvas(
   const postScene = new THREE.Scene();
   postScene.add(new THREE.Mesh(fullScreenGeometry, halftoneMaterial));
 
+  const updateViewportUniforms = (
+    logicalWidth: number,
+    logicalHeight: number,
+    effectWidth: number,
+    effectHeight: number,
+  ) => {
+    blurHorizontalMaterial.uniforms.res.value.set(effectWidth, effectHeight);
+    blurVerticalMaterial.uniforms.res.value.set(effectWidth, effectHeight);
+    halftoneMaterial.uniforms.effectResolution.value.set(
+      effectWidth,
+      effectHeight,
+    );
+    halftoneMaterial.uniforms.logicalResolution.value.set(
+      logicalWidth,
+      logicalHeight,
+    );
+    imageMaterial.uniforms.viewportSize.value.set(logicalWidth, logicalHeight);
+  };
+
+  const getHalftoneScale = () =>
+    getImageFootprintScale({
+      imageHeight: image.height,
+      imageWidth: image.width,
+      previewDistance: PREVIEW_DISTANCE,
+      viewportHeight: getVirtualHeight(),
+      viewportWidth: getVirtualWidth(),
+    });
+
+  const interaction = createInteractionState();
+
   const syncSize = () => {
     const virtualWidth = getVirtualWidth();
     const virtualHeight = getVirtualHeight();
@@ -400,10 +608,12 @@ async function mountHalftoneCanvas(
     sceneTarget.setSize(virtualWidth, virtualHeight);
     blurTargetA.setSize(virtualWidth, virtualHeight);
     blurTargetB.setSize(virtualWidth, virtualHeight);
-    blurHorizontalMaterial.uniforms.res.value.set(virtualWidth, virtualHeight);
-    blurVerticalMaterial.uniforms.res.value.set(virtualWidth, virtualHeight);
-    halftoneMaterial.uniforms.resolution.value.set(virtualWidth, virtualHeight);
-    imageMaterial.uniforms.viewportSize.value.set(virtualWidth, virtualHeight);
+    updateViewportUniforms(
+      virtualWidth,
+      virtualHeight,
+      virtualWidth,
+      virtualHeight,
+    );
   };
 
   const resizeObserver = new ResizeObserver(syncSize);
@@ -490,6 +700,12 @@ async function mountHalftoneCanvas(
     animationFrameId = window.requestAnimationFrame(renderFrame);
 
     halftoneMaterial.uniforms.time.value = clock.getElapsedTime();
+    halftoneMaterial.uniforms.dashColor.value.set(tuning.halftone.dashColor);
+    halftoneMaterial.uniforms.s_3.value = tuning.halftone.power;
+    halftoneMaterial.uniforms.s_4.value = tuning.halftone.width;
+    halftoneMaterial.uniforms.tile.value = tuning.halftone.scale;
+    halftoneMaterial.uniforms.waveSpeed.value = tuning.animation.waveSpeed;
+    imageMaterial.uniforms.contrast.value = tuning.halftone.imageContrast;
 
     interaction.smoothedMouseX +=
       (interaction.mouseX - interaction.smoothedMouseX) * IMAGE_POINTER_FOLLOW;
@@ -508,9 +724,16 @@ async function mountHalftoneCanvas(
     );
     halftoneMaterial.uniforms.dragOffset.value.set(0, 0);
     halftoneMaterial.uniforms.hoverLightStrength.value =
-      interaction.pointerInside && settings.animation.hoverLightEnabled
-        ? settings.animation.hoverLightIntensity
+      interaction.pointerInside && tuning.animation.hoverLightEnabled
+        ? tuning.animation.hoverLightIntensity
         : 0;
+    halftoneMaterial.uniforms.hoverLightRadius.value =
+      tuning.animation.hoverLightRadius;
+    halftoneMaterial.uniforms.hoverFlowStrength.value = 0;
+    halftoneMaterial.uniforms.hoverFlowRadius.value = 0.18;
+    halftoneMaterial.uniforms.dragFlowStrength.value = 0;
+    imageMaterial.uniforms.zoom.value = getImagePreviewZoom(PREVIEW_DISTANCE);
+    halftoneMaterial.uniforms.footprintScale.value = getHalftoneScale();
 
     renderer.setRenderTarget(sceneTarget);
     renderer.render(imageScene, orthographicCamera);
@@ -563,7 +786,10 @@ async function mountHalftoneCanvas(
   };
 }
 
-export default function Monolith() {
+export default function Monolith({
+  imageUrl = IMAGE_SRC,
+  style,
+}: MonolithProps) {
   const mountReference = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -573,25 +799,27 @@ export default function Monolith() {
       return;
     }
 
-    const unmountPromise = mountHalftoneCanvas(container, IMAGE_SRC).catch(
-      (error) => {
-        console.error(error);
-        return undefined;
-      },
-    );
+    const unmountPromise = mountHalftoneCanvas({
+      container,
+      imageUrl,
+    }).catch((error) => {
+      console.error(error);
+      return undefined;
+    });
 
     return () => {
       void unmountPromise.then((dispose) => dispose?.());
     };
-  }, []);
+  }, [imageUrl]);
 
   return (
     <div
       ref={mountReference}
       style={{
-        background: '#1C1C1C',
+        background: DEFAULT_TUNING.backgroundColor,
         height: '100%',
         width: '100%',
+        ...style,
       }}
     />
   );

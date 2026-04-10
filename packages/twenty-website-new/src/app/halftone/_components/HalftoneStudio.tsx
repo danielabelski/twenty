@@ -10,6 +10,7 @@ import {
   disposeGeometryCache,
   getGeometryForSpec,
 } from '@/app/halftone/_lib/geometry-registry';
+import { REFERENCE_PREVIEW_DISTANCE } from '@/app/halftone/_lib/footprint';
 import {
   deriveExportComponentName,
   generateReactComponent,
@@ -162,8 +163,6 @@ const HiddenFileInput = styled.input`
 
 const DEFAULT_IMAGE_ASSET_PATH = '/images/shared/halftone/twenty-logo.svg';
 const DEFAULT_IMAGE_FILENAME = 'twenty-logo.svg';
-const EXPORTED_PRESET_PREVIEW_DISTANCE = 4;
-
 type PendingFilePicker = {
   resolve: (file: File | null) => void;
 };
@@ -712,7 +711,7 @@ export function HalftoneStudio() {
 
       exportPoseReference.current = preset.initialPose;
       setCanvasInitialPose(preset.initialPose);
-      setPreviewDistance(EXPORTED_PRESET_PREVIEW_DISTANCE);
+      setPreviewDistance(preset.previewDistance ?? REFERENCE_PREVIEW_DISTANCE);
       setExportName(
         preset.componentName ?? presetFile.name.replace(/\.(tsx|html)$/i, ''),
       );
@@ -773,6 +772,7 @@ export function HalftoneStudio() {
         componentName,
         modelFilename,
         exportPoseReference.current,
+        previewDistance,
         importedFile ?? undefined,
         imageExportFilename,
         exportBackgroundColor,
@@ -789,6 +789,7 @@ export function HalftoneStudio() {
     exportName,
     exportBackground,
     imageFile,
+    previewDistance,
     selectedImportedFile,
     selectedShape,
     state.settings,
@@ -852,6 +853,7 @@ export function HalftoneStudio() {
         componentName,
         modelFilename,
         exportPoseReference.current,
+        previewDistance,
         importedFile ?? undefined,
         imageExportFilename,
         exportBackgroundColor,
@@ -866,6 +868,7 @@ export function HalftoneStudio() {
     exportName,
     exportBackground,
     imageFile,
+    previewDistance,
     selectedImportedFile,
     selectedShape,
     state.settings,

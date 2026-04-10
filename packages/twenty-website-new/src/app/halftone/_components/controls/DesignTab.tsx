@@ -181,7 +181,7 @@ export function DesignTab({
             value={previewDistance}
             valueLabel={formatDecimal(previewDistance, 1)}
           >
-            Distance
+            Distance (preview framing)
           </SliderControl>
         </ControlGrid>
       </Section>

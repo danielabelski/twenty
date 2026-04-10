@@ -1,5 +1,11 @@
 'use client';
 
+import {
+  getImageFootprintScale,
+  getImagePreviewZoom,
+  getMeshFootprintScale,
+  VIRTUAL_RENDER_HEIGHT,
+} from '@/app/halftone/_lib/footprint';
 import type {
   HalftoneExportPose,
   HalftoneStudioSettings,
@@ -8,8 +14,6 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 import { styled } from '@linaria/react';
 import { type MutableRefObject, useEffect, useRef } from 'react';
 import * as THREE from 'three';
-
-const VIRTUAL_RENDER_HEIGHT = 768;
 
 const passThroughVertexShader = /* glsl */ `
   varying vec2 vUv;
@@ -95,7 +99,8 @@ const halftoneFragmentShader = /* glsl */ `
 
   uniform sampler2D tScene;
   uniform sampler2D tGlow;
-  uniform vec2 resolution;
+  uniform vec2 effectResolution;
+  uniform vec2 logicalResolution;
   uniform float tile;
   uniform float s_3;
   uniform float s_4;
@@ -103,7 +108,7 @@ const halftoneFragmentShader = /* glsl */ `
   uniform float time;
   uniform float waveAmount;
   uniform float waveSpeed;
-  uniform float distanceScale;
+  uniform float footprintScale;
   uniform vec2 interactionUv;
   uniform vec2 interactionVelocity;
   uniform vec2 dragOffset;
@@ -142,9 +147,11 @@ const halftoneFragmentShader = /* glsl */ `
       }
     }
 
-    float halftoneSize = max(tile / max(distanceScale, 0.001), 1.0);
-    vec2 pointerPx = interactionUv * resolution;
-    vec2 fragDelta = gl_FragCoord.xy - pointerPx;
+    vec2 fragCoord =
+      (gl_FragCoord.xy / max(effectResolution, vec2(1.0))) * logicalResolution;
+    float halftoneSize = max(tile * max(footprintScale, 0.001), 1.0);
+    vec2 pointerPx = interactionUv * logicalResolution;
+    vec2 fragDelta = fragCoord - pointerPx;
     float fragDist = length(fragDelta);
     vec2 radialDir = fragDist > 0.001 ? fragDelta / fragDist : vec2(0.0, 1.0);
     float velocityMagnitude = length(interactionVelocity);
@@ -157,13 +164,13 @@ const halftoneFragmentShader = /* glsl */ `
 
     float hoverLightMask = 0.0;
     if (hoverLightStrength > 0.0) {
-      float lightRadiusPx = hoverLightRadius * resolution.y;
+      float lightRadiusPx = hoverLightRadius * logicalResolution.y;
       hoverLightMask = smoothstep(lightRadiusPx, 0.0, fragDist);
     }
 
     float hoverFlowMask = 0.0;
     if (hoverFlowStrength > 0.0) {
-      float hoverRadiusPx = hoverFlowRadius * resolution.y;
+      float hoverRadiusPx = hoverFlowRadius * logicalResolution.y;
       hoverFlowMask = smoothstep(hoverRadiusPx, 0.0, fragDist);
     }
 
@@ -171,7 +178,7 @@ const halftoneFragmentShader = /* glsl */ `
       radialDir * hoverFlowStrength * hoverFlowMask * halftoneSize * 0.55 +
       motionDir * hoverFlowStrength * hoverFlowMask * (0.4 + motionBias) * halftoneSize * 1.15;
     vec2 travelDisplacement = dragOffset * dragFlowStrength * 0.45;
-    vec2 effectCoord = gl_FragCoord.xy + hoverDisplacement + travelDisplacement;
+    vec2 effectCoord = fragCoord + hoverDisplacement + travelDisplacement;
 
     float bandRow = floor(effectCoord.y / halftoneSize);
     float waveOffset =
@@ -180,7 +187,7 @@ const halftoneFragmentShader = /* glsl */ `
 
     vec2 cellIndex = floor(effectCoord / halftoneSize);
     vec2 sampleUv = clamp(
-      (cellIndex + 0.5) * halftoneSize / resolution,
+      (cellIndex + 0.5) * halftoneSize / logicalResolution,
       vec2(0.0),
       vec2(1.0)
     );
@@ -222,7 +229,6 @@ const halftoneFragmentShader = /* glsl */ `
   }
 `;
 
-const REFERENCE_PREVIEW_DISTANCE = 4;
 const IMAGE_POINTER_FOLLOW = 0.38;
 const IMAGE_POINTER_VELOCITY_DAMPING = 0.82;
 const MAX_PREVIEW_PIXEL_RATIO = 2;
@@ -429,10 +435,6 @@ function setPrimaryLightPosition(
     height,
     Math.sin(lightAngle) * 5,
   );
-}
-
-function getImagePreviewZoom(previewDistance: number) {
-  return REFERENCE_PREVIEW_DISTANCE / Math.max(previewDistance, 0.001);
 }
 
 function updateLighting(
@@ -764,8 +766,11 @@ export function HalftoneCanvas({
       uniforms: {
         tScene: { value: sceneTarget.texture },
         tGlow: { value: blurTargetB.texture },
-        resolution: {
+        effectResolution: {
           value: new THREE.Vector2(getRenderWidth(), getRenderHeight()),
+        },
+        logicalResolution: {
+          value: new THREE.Vector2(getVirtualWidth(), getVirtualHeight()),
         },
         tile: { value: settings.halftone.scale },
         s_3: { value: settings.halftone.power },
@@ -774,7 +779,7 @@ export function HalftoneCanvas({
         time: { value: 0 },
         waveAmount: { value: 0 },
         waveSpeed: { value: 1 },
-        distanceScale: { value: 1.0 },
+        footprintScale: { value: 1.0 },
         interactionUv: { value: new THREE.Vector2(0.5, 0.5) },
         interactionVelocity: { value: new THREE.Vector2(0, 0) },
         dragOffset: { value: new THREE.Vector2(0, 0) },
@@ -807,7 +812,7 @@ export function HalftoneCanvas({
         tImage: { value: null },
         imageSize: { value: new THREE.Vector2(1, 1) },
         viewportSize: {
-          value: new THREE.Vector2(getRenderWidth(), getRenderHeight()),
+          value: new THREE.Vector2(getVirtualWidth(), getVirtualHeight()),
         },
         zoom: { value: getImagePreviewZoom(previewDistance) },
         contrast: { value: settings.halftone.imageContrast },
@@ -846,6 +851,72 @@ export function HalftoneCanvas({
       sceneTarget,
     };
 
+    const updateViewportUniforms = (
+      logicalWidth: number,
+      logicalHeight: number,
+      effectWidth: number,
+      effectHeight: number,
+    ) => {
+      blurHorizontalMaterial.uniforms.res.value.set(effectWidth, effectHeight);
+      blurVerticalMaterial.uniforms.res.value.set(effectWidth, effectHeight);
+      halftoneMaterial.uniforms.effectResolution.value.set(
+        effectWidth,
+        effectHeight,
+      );
+      halftoneMaterial.uniforms.logicalResolution.value.set(
+        logicalWidth,
+        logicalHeight,
+      );
+      imageMaterial.uniforms.viewportSize.value.set(
+        logicalWidth,
+        logicalHeight,
+      );
+    };
+
+    const getImageHalftoneScale = (
+      viewportWidth: number,
+      viewportHeight: number,
+      activePreviewDistance: number,
+    ) => {
+      const imageSize = imageMaterial.uniforms.imageSize.value as THREE.Vector2;
+
+      return getImageFootprintScale({
+        imageHeight: imageSize.y,
+        imageWidth: imageSize.x,
+        previewDistance: activePreviewDistance,
+        viewportHeight,
+        viewportWidth,
+      });
+    };
+
+    const getMeshHalftoneScale = (
+      viewportWidth: number,
+      viewportHeight: number,
+      lookAtTarget: THREE.Vector3,
+    ) => {
+      if (!mesh.geometry.boundingBox) {
+        mesh.geometry.computeBoundingBox();
+      }
+
+      const localBounds = mesh.geometry.boundingBox;
+
+      if (!localBounds) {
+        return 1;
+      }
+
+      mesh.updateMatrixWorld();
+      camera.updateMatrixWorld();
+
+      return getMeshFootprintScale({
+        camera,
+        localBounds,
+        lookAtTarget,
+        meshMatrixWorld: mesh.matrixWorld,
+        viewportHeight,
+        viewportWidth,
+      });
+    };
+
     resourcesReference.current = resources;
     syncResources(resources, settingsReference.current);
 
@@ -875,20 +946,12 @@ export function HalftoneCanvas({
       renderer.setSize(snapshotWidth, snapshotHeight, false);
 
       // Update material uniforms for snapshot resolution
-      blurHorizontalMaterial.uniforms.res.value.set(
+      updateViewportUniforms(
+        snapshotWidth,
+        snapshotHeight,
         snapshotWidth,
         snapshotHeight,
       );
-      blurVerticalMaterial.uniforms.res.value.set(
-        snapshotWidth,
-        snapshotHeight,
-      );
-      halftoneMaterial.uniforms.resolution.value.set(
-        snapshotWidth,
-        snapshotHeight,
-      );
-      // Disable distance scaling and pointer effects for export
-      halftoneMaterial.uniforms.distanceScale.value = 1.0;
       halftoneMaterial.uniforms.hoverLightStrength.value = 0;
       halftoneMaterial.uniforms.hoverFlowStrength.value = 0;
       halftoneMaterial.uniforms.dragFlowStrength.value = 0;
@@ -897,14 +960,22 @@ export function HalftoneCanvas({
       halftoneMaterial.uniforms.cropToBounds.value = isImage ? 1 : 0;
 
       if (isImage) {
-        imageMaterial.uniforms.viewportSize.value.set(
+        imageMaterial.uniforms.zoom.value = getImagePreviewZoom(
+          previewDistanceReference.current,
+        );
+        halftoneMaterial.uniforms.footprintScale.value = getImageHalftoneScale(
           snapshotWidth,
           snapshotHeight,
+          previewDistanceReference.current,
         );
-        imageMaterial.uniforms.zoom.value = 1;
       } else {
         camera.aspect = snapshotWidth / snapshotHeight;
         camera.updateProjectionMatrix();
+        halftoneMaterial.uniforms.footprintScale.value = getMeshHalftoneScale(
+          snapshotWidth,
+          snapshotHeight,
+          new THREE.Vector3(0, mesh.position.y * 0.2, 0),
+        );
       }
 
       // Render scene to snapshot target
@@ -957,14 +1028,13 @@ export function HalftoneCanvas({
       renderer.setSize(prevSize.x, prevSize.y, false);
       halftoneMaterial.uniforms.tScene.value = sceneTarget.texture;
       halftoneMaterial.uniforms.tGlow.value = blurTargetB.texture;
-      blurHorizontalMaterial.uniforms.res.value.set(prevSize.x, prevSize.y);
-      blurVerticalMaterial.uniforms.res.value.set(prevSize.x, prevSize.y);
-      halftoneMaterial.uniforms.resolution.value.set(prevSize.x, prevSize.y);
-      halftoneMaterial.uniforms.distanceScale.value = isImage
-        ? 1
-        : previewDistanceReference.current / REFERENCE_PREVIEW_DISTANCE;
+      updateViewportUniforms(
+        getVirtualWidth(),
+        getVirtualHeight(),
+        prevSize.x,
+        prevSize.y,
+      );
       if (isImage) {
-        imageMaterial.uniforms.viewportSize.value.set(prevSize.x, prevSize.y);
         imageMaterial.uniforms.zoom.value = getImagePreviewZoom(
           previewDistanceReference.current,
         );
@@ -1075,6 +1145,8 @@ export function HalftoneCanvas({
 
       const width = getWidth();
       const height = getHeight();
+      const logicalWidth = getVirtualWidth();
+      const logicalHeight = getVirtualHeight();
       const renderWidth = getRenderWidth();
       const renderHeight = getRenderHeight();
 
@@ -1084,10 +1156,12 @@ export function HalftoneCanvas({
       sceneTarget.setSize(renderWidth, renderHeight);
       blurTargetA.setSize(renderWidth, renderHeight);
       blurTargetB.setSize(renderWidth, renderHeight);
-      blurHorizontalMaterial.uniforms.res.value.set(renderWidth, renderHeight);
-      blurVerticalMaterial.uniforms.res.value.set(renderWidth, renderHeight);
-      halftoneMaterial.uniforms.resolution.value.set(renderWidth, renderHeight);
-      imageMaterial.uniforms.viewportSize.value.set(renderWidth, renderHeight);
+      updateViewportUniforms(
+        logicalWidth,
+        logicalHeight,
+        renderWidth,
+        renderHeight,
+      );
     };
 
     const resizeObserver = new ResizeObserver(syncSize);
@@ -1341,6 +1415,8 @@ export function HalftoneCanvas({
         clock.getElapsedTime();
       const delta = 1 / 60;
       const baseDistance = previewDistanceReference.current;
+      const logicalWidth = getVirtualWidth();
+      const logicalHeight = getVirtualHeight();
       const isImageMode = activeSettings.sourceMode === 'image';
       const hasImageTexture = resources.imageTexture !== null;
 
@@ -1351,9 +1427,6 @@ export function HalftoneCanvas({
           : 0;
       halftoneMaterial.uniforms.waveSpeed.value =
         activeSettings.animation.waveSpeed;
-      halftoneMaterial.uniforms.distanceScale.value = isImageMode
-        ? 1
-        : baseDistance / REFERENCE_PREVIEW_DISTANCE;
 
       // Image mode selected but no image loaded yet — show empty canvas
       if (isImageMode && !hasImageTexture) {
@@ -1381,8 +1454,8 @@ export function HalftoneCanvas({
           1 - interaction.smoothedMouseY,
         );
         halftoneMaterial.uniforms.interactionVelocity.value.set(
-          interaction.pointerVelocityX * getRenderWidth(),
-          -interaction.pointerVelocityY * getRenderHeight(),
+          interaction.pointerVelocityX * logicalWidth,
+          -interaction.pointerVelocityY * logicalHeight,
         );
         halftoneMaterial.uniforms.dragOffset.value.set(0, 0);
         halftoneMaterial.uniforms.hoverLightStrength.value =
@@ -1397,8 +1470,13 @@ export function HalftoneCanvas({
 
         imageMaterial.uniforms.zoom.value = getImagePreviewZoom(baseDistance);
         imageMaterial.uniforms.viewportSize.value.set(
-          getRenderWidth(),
-          getRenderHeight(),
+          logicalWidth,
+          logicalHeight,
+        );
+        halftoneMaterial.uniforms.footprintScale.value = getImageHalftoneScale(
+          logicalWidth,
+          logicalHeight,
+          baseDistance,
         );
 
         poseChangeReference.current({
@@ -1637,8 +1715,15 @@ export function HalftoneCanvas({
           camera.position.z += (baseDistance - camera.position.z) * 0.12;
         }
 
-        camera.lookAt(0, meshOffsetY * 0.2, 0);
+        const lookAtTarget = new THREE.Vector3(0, meshOffsetY * 0.2, 0);
+
+        camera.lookAt(lookAtTarget);
         setPrimaryLightPosition(primaryLight, lightAngle, lightHeight);
+        halftoneMaterial.uniforms.footprintScale.value = getMeshHalftoneScale(
+          logicalWidth,
+          logicalHeight,
+          lookAtTarget,
+        );
 
         poseChangeReference.current({
           autoElapsed: interaction.autoElapsed,

@@ -1,12 +1,15 @@
 import {
+  HALFTONE_FOOTPRINT_RUNTIME_SOURCE,
+  REFERENCE_PREVIEW_DISTANCE,
+  VIRTUAL_RENDER_HEIGHT,
+} from '@/app/halftone/_lib/footprint';
+import {
   LEGACY_HALFTONE_SETTING_KEYS,
   isRoundedBandHalftoneSettings,
   type HalftoneExportPose,
   type HalftoneGeometrySpec,
   type HalftoneStudioSettings,
 } from '@/app/halftone/_lib/state';
-
-const VIRTUAL_RENDER_HEIGHT = 768;
 
 const passThroughVertexShader = /* glsl */ `
   varying vec2 vUv;
@@ -92,7 +95,8 @@ const halftoneFragmentShader = /* glsl */ `
 
   uniform sampler2D tScene;
   uniform sampler2D tGlow;
-  uniform vec2 resolution;
+  uniform vec2 effectResolution;
+  uniform vec2 logicalResolution;
   uniform float tile;
   uniform float s_3;
   uniform float s_4;
@@ -100,7 +104,7 @@ const halftoneFragmentShader = /* glsl */ `
   uniform float time;
   uniform float waveAmount;
   uniform float waveSpeed;
-  uniform float distanceScale;
+  uniform float footprintScale;
   uniform vec2 interactionUv;
   uniform vec2 interactionVelocity;
   uniform vec2 dragOffset;
@@ -139,9 +143,11 @@ const halftoneFragmentShader = /* glsl */ `
       }
     }
 
-    float halftoneSize = max(tile / max(distanceScale, 0.001), 1.0);
-    vec2 pointerPx = interactionUv * resolution;
-    vec2 fragDelta = gl_FragCoord.xy - pointerPx;
+    vec2 fragCoord =
+      (gl_FragCoord.xy / max(effectResolution, vec2(1.0))) * logicalResolution;
+    float halftoneSize = max(tile * max(footprintScale, 0.001), 1.0);
+    vec2 pointerPx = interactionUv * logicalResolution;
+    vec2 fragDelta = fragCoord - pointerPx;
     float fragDist = length(fragDelta);
     vec2 radialDir = fragDist > 0.001 ? fragDelta / fragDist : vec2(0.0, 1.0);
     float velocityMagnitude = length(interactionVelocity);
@@ -154,13 +160,13 @@ const halftoneFragmentShader = /* glsl */ `
 
     float hoverLightMask = 0.0;
     if (hoverLightStrength > 0.0) {
-      float lightRadiusPx = hoverLightRadius * resolution.y;
+      float lightRadiusPx = hoverLightRadius * logicalResolution.y;
       hoverLightMask = smoothstep(lightRadiusPx, 0.0, fragDist);
     }
 
     float hoverFlowMask = 0.0;
     if (hoverFlowStrength > 0.0) {
-      float hoverRadiusPx = hoverFlowRadius * resolution.y;
+      float hoverRadiusPx = hoverFlowRadius * logicalResolution.y;
       hoverFlowMask = smoothstep(hoverRadiusPx, 0.0, fragDist);
     }
 
@@ -168,7 +174,7 @@ const halftoneFragmentShader = /* glsl */ `
       radialDir * hoverFlowStrength * hoverFlowMask * halftoneSize * 0.55 +
       motionDir * hoverFlowStrength * hoverFlowMask * (0.4 + motionBias) * halftoneSize * 1.15;
     vec2 travelDisplacement = dragOffset * dragFlowStrength * 0.45;
-    vec2 effectCoord = gl_FragCoord.xy + hoverDisplacement + travelDisplacement;
+    vec2 effectCoord = fragCoord + hoverDisplacement + travelDisplacement;
 
     float bandRow = floor(effectCoord.y / halftoneSize);
     float waveOffset =
@@ -177,7 +183,7 @@ const halftoneFragmentShader = /* glsl */ `
 
     vec2 cellIndex = floor(effectCoord / halftoneSize);
     vec2 sampleUv = clamp(
-      (cellIndex + 0.5) * halftoneSize / resolution,
+      (cellIndex + 0.5) * halftoneSize / logicalResolution,
       vec2(0.0),
       vec2(1.0)
     );
@@ -788,6 +794,7 @@ export type ParsedExportedPreset = {
   imageAssetReference: string | null;
   initialPose: HalftoneExportPose;
   modelAssetReference: string | null;
+  previewDistance: number;
   settings: HalftoneStudioSettings;
   shape: ExportedShapeDescriptor;
 };
@@ -828,6 +835,12 @@ function normalizeExportPose(
       : 0,
     timeElapsed: Number.isFinite(pose.timeElapsed) ? pose.timeElapsed : 0,
   };
+}
+
+function normalizePreviewDistance(previewDistance: number | undefined) {
+  return Number.isFinite(previewDistance)
+    ? Math.max(previewDistance ?? REFERENCE_PREVIEW_DISTANCE, 0.001)
+    : REFERENCE_PREVIEW_DISTANCE;
 }
 
 function toPascalCase(value: string) {
@@ -924,11 +937,27 @@ export function parseExportedPreset(content: string): ParsedExportedPreset {
     'initialPose',
   );
   const initialPose = normalizeExportPose(
-    extractSerializedJson<HalftoneExportPose>(
-      content,
-      'initialPose',
-      'VIRTUAL_RENDER_HEIGHT',
-    ),
+    (() => {
+      try {
+        return extractSerializedJson<HalftoneExportPose>(
+          content,
+          'initialPose',
+          'previewDistance',
+        );
+      } catch {
+        return extractSerializedJson<HalftoneExportPose>(
+          content,
+          'initialPose',
+          'VIRTUAL_RENDER_HEIGHT',
+        );
+      }
+    })(),
+  );
+  const previewDistanceMatch = content.match(
+    /const\s+previewDistance\s*=\s*([0-9]+(?:\.[0-9]+)?)\s*;/,
+  );
+  const previewDistance = normalizePreviewDistance(
+    previewDistanceMatch ? Number(previewDistanceMatch[1]) : undefined,
   );
   const componentName =
     extractFirstMatch(content, [
@@ -949,6 +978,7 @@ export function parseExportedPreset(content: string): ParsedExportedPreset {
     imageAssetReference,
     initialPose,
     modelAssetReference,
+    previewDistance,
     settings,
     shape,
   };
@@ -1053,18 +1083,23 @@ function serializeRuntimeSource(
   settings: HalftoneStudioSettings,
   shape: ExportedShapeDescriptor,
   initialPose: HalftoneExportPose,
+  previewDistance: number | undefined,
 ) {
   const isImageMode = settings.sourceMode === 'image';
+  const normalizedPreviewDistance = normalizePreviewDistance(previewDistance);
 
   return `
 const settings = ${JSON.stringify(settings, null, 2)};
 const shape = ${JSON.stringify(shape, null, 2)};
 const initialPose = ${JSON.stringify(initialPose, null, 2)};
+const previewDistance = ${JSON.stringify(normalizedPreviewDistance)};
 const VIRTUAL_RENDER_HEIGHT = ${VIRTUAL_RENDER_HEIGHT};
 const passThroughVertexShader = ${JSON.stringify(passThroughVertexShader)};
 const blurFragmentShader = ${JSON.stringify(blurFragmentShader)};
 const halftoneFragmentShader = ${JSON.stringify(halftoneFragmentShader)};
 ${isImageMode ? `const imagePassthroughFragmentShader = ${JSON.stringify(imagePassthroughFragmentShader)};` : ''}
+
+${HALFTONE_FOOTPRINT_RUNTIME_SOURCE}
 
 ${isImageMode ? '' : GEOMETRY_RUNTIME_SOURCE}
 
@@ -1202,7 +1237,7 @@ async function mountHalftoneCanvas(options) {
   const scene3d = new THREE.Scene();
   scene3d.background = null;
 
-  const baseCameraDistance = 4;
+  const baseCameraDistance = previewDistance;
   const camera = new THREE.PerspectiveCamera(45, getWidth() / getHeight(), 0.1, 100);
   camera.position.z = baseCameraDistance;
 
@@ -1273,7 +1308,10 @@ async function mountHalftoneCanvas(options) {
     uniforms: {
       tScene: { value: sceneTarget.texture },
       tGlow: { value: blurTargetB.texture },
-      resolution: {
+      effectResolution: {
+        value: new THREE.Vector2(getVirtualWidth(), getVirtualHeight()),
+      },
+      logicalResolution: {
         value: new THREE.Vector2(getVirtualWidth(), getVirtualHeight()),
       },
       tile: { value: settings.halftone.scale },
@@ -1283,7 +1321,7 @@ async function mountHalftoneCanvas(options) {
       time: { value: 0 },
       waveAmount: { value: 0 },
       waveSpeed: { value: 1 },
-      distanceScale: { value: 1.0 },
+      footprintScale: { value: 1.0 },
       interactionUv: { value: new THREE.Vector2(0.5, 0.5) },
       interactionVelocity: { value: new THREE.Vector2(0, 0) },
       dragOffset: { value: new THREE.Vector2(0, 0) },
@@ -1309,6 +1347,46 @@ async function mountHalftoneCanvas(options) {
   const postScene = new THREE.Scene();
   postScene.add(new THREE.Mesh(fullScreenGeometry, halftoneMaterial));
 
+  const updateViewportUniforms = (
+    logicalWidth,
+    logicalHeight,
+    effectWidth,
+    effectHeight,
+  ) => {
+    blurHorizontalMaterial.uniforms.res.value.set(effectWidth, effectHeight);
+    blurVerticalMaterial.uniforms.res.value.set(effectWidth, effectHeight);
+    halftoneMaterial.uniforms.effectResolution.value.set(
+      effectWidth,
+      effectHeight,
+    );
+    halftoneMaterial.uniforms.logicalResolution.value.set(
+      logicalWidth,
+      logicalHeight,
+    );
+  };
+
+  const getHalftoneScale = (viewportWidth, viewportHeight, lookAtTarget) => {
+    if (!mesh.geometry.boundingBox) {
+      mesh.geometry.computeBoundingBox();
+    }
+
+    if (!mesh.geometry.boundingBox) {
+      return 1;
+    }
+
+    mesh.updateMatrixWorld();
+    camera.updateMatrixWorld();
+
+    return getMeshFootprintScale({
+      camera,
+      localBounds: mesh.geometry.boundingBox,
+      lookAtTarget,
+      meshMatrixWorld: mesh.matrixWorld,
+      viewportHeight,
+      viewportWidth,
+    });
+  };
+
   const interaction = createInteractionState();
   const autoRotateEnabled = settings.animation.autoRotateEnabled;
   const followHoverEnabled = settings.animation.followHoverEnabled;
@@ -1327,9 +1405,12 @@ async function mountHalftoneCanvas(options) {
     sceneTarget.setSize(virtualWidth, virtualHeight);
     blurTargetA.setSize(virtualWidth, virtualHeight);
     blurTargetB.setSize(virtualWidth, virtualHeight);
-    blurHorizontalMaterial.uniforms.res.value.set(virtualWidth, virtualHeight);
-    blurVerticalMaterial.uniforms.res.value.set(virtualWidth, virtualHeight);
-    halftoneMaterial.uniforms.resolution.value.set(virtualWidth, virtualHeight);
+    updateViewportUniforms(
+      virtualWidth,
+      virtualHeight,
+      virtualWidth,
+      virtualHeight,
+    );
   };
 
   const resizeObserver = new ResizeObserver(syncSize);
@@ -1635,8 +1716,15 @@ async function mountHalftoneCanvas(options) {
       camera.position.z += (baseCameraDistance - camera.position.z) * 0.12;
     }
 
-    camera.lookAt(0, meshOffsetY * 0.2, 0);
+    const lookAtTarget = new THREE.Vector3(0, meshOffsetY * 0.2, 0);
+
+    camera.lookAt(lookAtTarget);
     setPrimaryLightPosition(primaryLight, lightAngle, lightHeight);
+    halftoneMaterial.uniforms.footprintScale.value = getHalftoneScale(
+      getVirtualWidth(),
+      getVirtualHeight(),
+      lookAtTarget,
+    );
 
     if (!settings.halftone.enabled) {
       renderer.setRenderTarget(null);
@@ -1754,7 +1842,7 @@ async function mountHalftoneCanvas(options) {
       tImage: { value: imageTexture },
       imageSize: { value: new THREE.Vector2(image.width, image.height) },
       viewportSize: { value: new THREE.Vector2(getVirtualWidth(), getVirtualHeight()) },
-      zoom: { value: 1 },
+      zoom: { value: getImagePreviewZoom(previewDistance) },
       contrast: { value: settings.halftone.imageContrast },
     },
     vertexShader: passThroughVertexShader,
@@ -1789,7 +1877,10 @@ async function mountHalftoneCanvas(options) {
     uniforms: {
       tScene: { value: sceneTarget.texture },
       tGlow: { value: blurTargetB.texture },
-      resolution: {
+      effectResolution: {
+        value: new THREE.Vector2(getVirtualWidth(), getVirtualHeight()),
+      },
+      logicalResolution: {
         value: new THREE.Vector2(getVirtualWidth(), getVirtualHeight()),
       },
       tile: { value: settings.halftone.scale },
@@ -1799,7 +1890,7 @@ async function mountHalftoneCanvas(options) {
       time: { value: 0 },
       waveAmount: { value: 0 },
       waveSpeed: { value: settings.animation.waveSpeed },
-      distanceScale: { value: 1.0 },
+      footprintScale: { value: 1.0 },
       interactionUv: { value: new THREE.Vector2(0.5, 0.5) },
       interactionVelocity: { value: new THREE.Vector2(0, 0) },
       dragOffset: { value: new THREE.Vector2(0, 0) },
@@ -1823,6 +1914,34 @@ async function mountHalftoneCanvas(options) {
   const postScene = new THREE.Scene();
   postScene.add(new THREE.Mesh(fullScreenGeometry, halftoneMaterial));
 
+  const updateViewportUniforms = (
+    logicalWidth,
+    logicalHeight,
+    effectWidth,
+    effectHeight,
+  ) => {
+    blurHorizontalMaterial.uniforms.res.value.set(effectWidth, effectHeight);
+    blurVerticalMaterial.uniforms.res.value.set(effectWidth, effectHeight);
+    halftoneMaterial.uniforms.effectResolution.value.set(
+      effectWidth,
+      effectHeight,
+    );
+    halftoneMaterial.uniforms.logicalResolution.value.set(
+      logicalWidth,
+      logicalHeight,
+    );
+    imageMaterial.uniforms.viewportSize.value.set(logicalWidth, logicalHeight);
+  };
+
+  const getHalftoneScale = () =>
+    getImageFootprintScale({
+      imageHeight: image.height,
+      imageWidth: image.width,
+      previewDistance,
+      viewportHeight: getVirtualHeight(),
+      viewportWidth: getVirtualWidth(),
+    });
+
   const interaction = createInteractionState();
   const imagePointerFollow = 0.38;
   const imagePointerVelocityDamping = 0.82;
@@ -1835,10 +1954,12 @@ async function mountHalftoneCanvas(options) {
     sceneTarget.setSize(virtualWidth, virtualHeight);
     blurTargetA.setSize(virtualWidth, virtualHeight);
     blurTargetB.setSize(virtualWidth, virtualHeight);
-    blurHorizontalMaterial.uniforms.res.value.set(virtualWidth, virtualHeight);
-    blurVerticalMaterial.uniforms.res.value.set(virtualWidth, virtualHeight);
-    halftoneMaterial.uniforms.resolution.value.set(virtualWidth, virtualHeight);
-    imageMaterial.uniforms.viewportSize.value.set(virtualWidth, virtualHeight);
+    updateViewportUniforms(
+      virtualWidth,
+      virtualHeight,
+      virtualWidth,
+      virtualHeight,
+    );
   };
 
   const resizeObserver = new ResizeObserver(syncSize);
@@ -1989,6 +2110,8 @@ async function mountHalftoneCanvas(options) {
     halftoneMaterial.uniforms.hoverFlowStrength.value = 0;
     halftoneMaterial.uniforms.hoverFlowRadius.value = 0.18;
     halftoneMaterial.uniforms.dragFlowStrength.value = 0;
+    imageMaterial.uniforms.zoom.value = getImagePreviewZoom(previewDistance);
+    halftoneMaterial.uniforms.footprintScale.value = getHalftoneScale();
 
     renderer.setRenderTarget(sceneTarget);
     renderer.render(imageScene, orthographicCamera);
@@ -2061,6 +2184,7 @@ export function generateReactComponent(
   componentName = 'HalftoneDashes',
   modelFilenameOverride?: string,
   initialPose?: HalftoneExportPose,
+  previewDistance?: number,
   importedFile?: File,
   imageFilename?: string,
   background = 'transparent',
@@ -2080,7 +2204,7 @@ export function generateReactComponent(
     return `import { useEffect, useRef, type CSSProperties } from 'react';
 import * as THREE from 'three';
 
-${serializeRuntimeSource(settings, shape, pose)}
+${serializeRuntimeSource(settings, shape, pose, previewDistance)}
 
 ${createImageMountScript()}
 
@@ -2136,7 +2260,7 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
-${serializeRuntimeSource(settings, shape, pose)}
+${serializeRuntimeSource(settings, shape, pose, previewDistance)}
 
 ${createMountScript()}
 
@@ -2192,6 +2316,7 @@ export async function generateStandaloneHtml(
   componentName = 'HalftoneDashes',
   modelFilenameOverride?: string,
   initialPose?: HalftoneExportPose,
+  previewDistance?: number,
   importedFile?: File,
   imageFilename?: string,
   background = 'transparent',
@@ -2329,7 +2454,7 @@ export async function generateStandaloneHtml(
     <script type="module">
       ${threeImports}
 
-      ${serializeRuntimeSource(settings, shape, pose)}
+      ${serializeRuntimeSource(settings, shape, pose, previewDistance)}
 
       ${mountScript}
 
