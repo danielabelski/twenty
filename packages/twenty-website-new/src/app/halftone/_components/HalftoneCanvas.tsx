@@ -1,126 +1,13 @@
 'use client';
 
+import type {
+  HalftoneExportPose,
+  HalftoneStudioSettings,
+} from '@/app/halftone/_lib/state';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { styled } from '@linaria/react';
 import { type MutableRefObject, useEffect, useRef } from 'react';
 import * as THREE from 'three';
-
-type HalftoneSourceMode = 'shape' | 'image';
-type HalftoneRotateAxis =
-  | 'x'
-  | 'y'
-  | 'z'
-  | 'xy'
-  | '-x'
-  | '-y'
-  | '-z'
-  | '-xy';
-type HalftoneRotatePreset = 'axis' | 'lissajous' | 'orbit' | 'tumble';
-
-interface HalftoneLightingSettings {
-  intensity: number;
-  fillIntensity: number;
-  ambientIntensity: number;
-  angleDegrees: number;
-  height: number;
-}
-
-interface HalftoneMaterialSettings {
-  roughness: number;
-  metalness: number;
-}
-
-interface HalftoneEffectSettings {
-  enabled: boolean;
-  numRows: number;
-  contrast: number;
-  power: number;
-  shading: number;
-  baseInk: number;
-  maxBar: number;
-  rowMerge: number;
-  cellRatio: number;
-  cutoff: number;
-  highlightOpen: number;
-  shadowGrouping: number;
-  shadowCrush: number;
-  dashColor: string;
-}
-
-interface HalftoneBackgroundSettings {
-  transparent: boolean;
-  color: string;
-}
-
-interface HalftoneAnimationSettings {
-  autoRotateEnabled: boolean;
-  breatheEnabled: boolean;
-  cameraParallaxEnabled: boolean;
-  followHoverEnabled: boolean;
-  followDragEnabled: boolean;
-  floatEnabled: boolean;
-  hoverLightEnabled: boolean;
-  dragFlowEnabled: boolean;
-  lightSweepEnabled: boolean;
-  rotateEnabled: boolean;
-  autoSpeed: number;
-  autoWobble: number;
-  breatheAmount: number;
-  breatheSpeed: number;
-  cameraParallaxAmount: number;
-  cameraParallaxEase: number;
-  driftAmount: number;
-  hoverRange: number;
-  hoverEase: number;
-  hoverReturn: boolean;
-  dragSens: number;
-  dragFriction: number;
-  dragMomentum: boolean;
-  rotateAxis: HalftoneRotateAxis;
-  rotatePreset: HalftoneRotatePreset;
-  rotateSpeed: number;
-  rotatePingPong: boolean;
-  floatAmplitude: number;
-  floatSpeed: number;
-  lightSweepHeightRange: number;
-  lightSweepRange: number;
-  lightSweepSpeed: number;
-  springDamping: number;
-  springReturnEnabled: boolean;
-  springStrength: number;
-  hoverLightIntensity: number;
-  hoverLightRadius: number;
-  dragFlowDecay: number;
-  dragFlowRadius: number;
-  dragFlowStrength: number;
-  hoverWarpStrength: number;
-  hoverWarpRadius: number;
-  dragWarpStrength: number;
-  waveEnabled: boolean;
-  waveSpeed: number;
-  waveAmount: number;
-}
-
-interface HalftoneExportPose {
-  autoElapsed: number;
-  rotateElapsed: number;
-  rotationX: number;
-  rotationY: number;
-  rotationZ: number;
-  targetRotationX: number;
-  targetRotationY: number;
-  timeElapsed: number;
-}
-
-interface HalftoneStudioSettings {
-  sourceMode: HalftoneSourceMode;
-  shapeKey: string;
-  lighting: HalftoneLightingSettings;
-  material: HalftoneMaterialSettings;
-  halftone: HalftoneEffectSettings;
-  background: HalftoneBackgroundSettings;
-  animation: HalftoneAnimationSettings;
-}
 
 const VIRTUAL_RENDER_HEIGHT = 768;
 
@@ -207,19 +94,9 @@ const halftoneFragmentShader = /* glsl */ `
   uniform sampler2D tScene;
   uniform sampler2D tGlow;
   uniform vec2 resolution;
-  uniform float numRows;
-  uniform float glowStr;
-  uniform float contrast;
-  uniform float power;
-  uniform float shading;
-  uniform float baseInk;
-  uniform float maxBar;
-  uniform float rowMerge;
-  uniform float cellRatio;
-  uniform float cutoff;
-  uniform float highlightOpen;
-  uniform float shadowGrouping;
-  uniform float shadowCrush;
+  uniform float tile;
+  uniform float s_3;
+  uniform float s_4;
   uniform vec3 dashColor;
   uniform float time;
   uniform float waveAmount;
@@ -233,10 +110,25 @@ const halftoneFragmentShader = /* glsl */ `
   uniform float hoverFlowStrength;
   uniform float hoverFlowRadius;
   uniform float dragFlowStrength;
-  uniform float dragFlowRadius;
   uniform float cropToBounds;
 
   varying vec2 vUv;
+
+  float distSegment(in vec2 p, in vec2 a, in vec2 b) {
+    vec2 pa = p - a;
+    vec2 ba = b - a;
+    float denom = max(dot(ba, ba), 0.000001);
+    float h = clamp(dot(pa, ba) / denom, 0.0, 1.0);
+    return length(pa - ba * h);
+  }
+
+  float lineSimpleEt(in vec2 p, in float r, in float thickness) {
+    vec2 a = vec2(0.5) + vec2(-r, 0.0);
+    vec2 b = vec2(0.5) + vec2(r, 0.0);
+    float distToSegment = distSegment(p, a, b);
+    float halfThickness = thickness * r;
+    return distToSegment - halfThickness;
+  }
 
   void main() {
     // Crop to image bounds: discard fragments outside source image (image mode only)
@@ -248,7 +140,7 @@ const halftoneFragmentShader = /* glsl */ `
       }
     }
 
-    float baseRowH = resolution.y / (numRows * distanceScale);
+    float halftoneSize = max(tile / max(distanceScale, 0.001), 1.0);
     vec2 pointerPx = interactionUv * resolution;
     vec2 fragDelta = gl_FragCoord.xy - pointerPx;
     float fragDist = length(fragDelta);
@@ -273,122 +165,55 @@ const halftoneFragmentShader = /* glsl */ `
       hoverFlowMask = smoothstep(hoverRadiusPx, 0.0, fragDist);
     }
 
-    float dragFlowMask = 0.0;
-    if (dragFlowStrength > 0.0) {
-      float dragRadiusPx = dragFlowRadius * resolution.y;
-      dragFlowMask = smoothstep(dragRadiusPx, 0.0, fragDist);
-    }
-
     vec2 hoverDisplacement =
-      radialDir * hoverFlowStrength * hoverFlowMask * baseRowH * 0.55 +
-      motionDir * hoverFlowStrength * hoverFlowMask * (0.4 + motionBias) * baseRowH * 1.15;
-    vec2 dragDisplacement = dragOffset * dragFlowMask * dragFlowStrength * 0.8;
-    vec2 effectCoord = gl_FragCoord.xy + hoverDisplacement + dragDisplacement;
+      radialDir * hoverFlowStrength * hoverFlowMask * halftoneSize * 0.55 +
+      motionDir * hoverFlowStrength * hoverFlowMask * (0.4 + motionBias) * halftoneSize * 1.15;
+    vec2 travelDisplacement = dragOffset * dragFlowStrength * 0.45;
+    vec2 effectCoord = gl_FragCoord.xy + hoverDisplacement + travelDisplacement;
 
-    float densityBoost =
-      hoverFlowStrength * hoverFlowMask * 0.22 +
-      dragFlowStrength * dragFlowMask * 0.16;
-    float rowH = baseRowH / (1.0 + densityBoost);
+    float bandRow = floor(effectCoord.y / halftoneSize);
+    float waveOffset =
+      waveAmount * sin(time * waveSpeed + bandRow * 0.5) * halftoneSize;
+    effectCoord.x += waveOffset;
 
-    float offsetY = effectCoord.y;
-    float row = floor(offsetY / rowH);
-    float rowFrac = offsetY / rowH - row;
-    float rowV = (row + 0.5) * rowH / resolution.y;
-    float dy = abs(rowFrac - 0.5);
-
-    float waveOffset = waveAmount * sin(time * waveSpeed + row * 0.5) * rowH;
-    float effectiveX = effectCoord.x + waveOffset;
-
-    float localCellRatio = cellRatio * (
-      1.0 +
-      hoverFlowStrength * hoverFlowMask * 0.08 +
-      dragFlowStrength * dragFlowMask * 0.1 * motionBias
+    vec2 cellIndex = floor(effectCoord / halftoneSize);
+    vec2 sampleUv = clamp(
+      (cellIndex + 0.5) * halftoneSize / resolution,
+      vec2(0.0),
+      vec2(1.0)
     );
-    float cellW = rowH * localCellRatio;
-    float cellIdx = floor(effectiveX / cellW);
-    float cellFrac = (effectiveX - cellIdx * cellW) / cellW;
-    float cellU = (cellIdx + 0.5) * cellW / resolution.x;
-
-    vec2 sampleUv = vec2(
-      clamp(cellU, 0.0, 1.0),
-      clamp(rowV, 0.0, 1.0)
-    );
+    vec2 cellUv = fract(effectCoord / halftoneSize);
 
     vec4 sceneSample = texture2D(tScene, sampleUv);
-    vec4 glowCell = texture2D(tGlow, sampleUv);
-
     float mask = smoothstep(0.02, 0.08, sceneSample.a);
-    float lum = dot(sceneSample.rgb, vec3(0.299, 0.587, 0.114));
-    float avgLum = dot(glowCell.rgb, vec3(0.299, 0.587, 0.114));
-    float detail = lum - avgLum;
-
-    float litLum = lum + max(detail, 0.0) * shading
-      - max(-detail, 0.0) * shading * 0.55;
     float lightLift =
-      hoverLightStrength * hoverLightMask * mix(0.78, 1.18, motionBias) * 0.34;
-    float lightFocus = hoverLightStrength * hoverLightMask * 0.12;
-    litLum = clamp(litLum + lightLift, 0.0, 1.0);
-    litLum = clamp((litLum - cutoff) / max(1.0 - cutoff, 0.001), 0.0, 1.0);
-    litLum = pow(litLum, max(contrast - lightFocus, 0.25));
-
-    float darkness = 1.0 - litLum;
-    float groupedLum = clamp((avgLum - cutoff) / max(1.0 - cutoff, 0.001), 0.0, 1.0);
-    groupedLum = pow(groupedLum, max(contrast * 0.9, 0.25));
-    float groupedDarkness = 1.0 - groupedLum;
-    darkness = mix(darkness, max(darkness, groupedDarkness), shadowGrouping);
-    darkness = clamp(
-      (darkness - highlightOpen) / max(1.0 - highlightOpen, 0.001),
+      hoverLightStrength *
+      hoverLightMask *
+      mix(0.78, 1.18, motionBias) *
+      0.22;
+    float bandRadius = clamp(
+      (
+        (
+          sceneSample.r +
+          sceneSample.g +
+          sceneSample.b +
+          s_3 * length(vec2(0.5))
+        ) *
+        (1.0 / 3.0)
+      ) + lightLift,
       0.0,
       1.0
-    );
+    ) * 1.86 * 0.5;
 
-    float shadowMask = smoothstep(0.42, 0.96, darkness);
-    darkness = mix(
-      darkness,
-      mix(darkness, 1.0, shadowMask),
-      shadowCrush
-    );
-
-    float inkBase = baseInk * smoothstep(0.03, 0.24, darkness);
-    float ink = mix(inkBase, 1.0, darkness);
-    float fill = pow(ink, 1.05) * power;
-    fill = clamp(fill, 0.0, 1.0) * mask;
-
-    float dynamicBarHalf = mix(0.08, maxBar, smoothstep(0.03, 0.85, ink));
-    float dynamicBarHalfY = min(
-      dynamicBarHalf + rowMerge * smoothstep(0.42, 0.98, ink),
-      0.78
-    );
-    float dx2 = abs(cellFrac - 0.5);
-    float halfFill = fill * 0.5;
-    float bodyHalfW = max(halfFill - dynamicBarHalf * (rowH / cellW), 0.0);
-    float capRX = dynamicBarHalf * rowH;
-    float capRY = dynamicBarHalfY * rowH;
-
-    float inDash = 0.0;
-    if (dx2 <= bodyHalfW) {
-      float edgeDist = dynamicBarHalfY - dy;
-      inDash = smoothstep(-0.03, 0.03, edgeDist);
-    } else {
-      float cdx = (dx2 - bodyHalfW) * cellW;
-      float cdy = dy * rowH;
-      float ellipseDist = sqrt(
-        (cdx * cdx) / max(capRX * capRX, 0.0001) +
-        (cdy * cdy) / max(capRY * capRY, 0.0001)
-      );
-      inDash = 1.0 - smoothstep(1.0 - 0.08, 1.0 + 0.08, ellipseDist);
+    float alpha = 0.0;
+    if (bandRadius > 0.0001) {
+      float signedDistance = lineSimpleEt(cellUv, bandRadius, s_4);
+      float edge = 0.02;
+      alpha = (1.0 - smoothstep(0.0, edge, signedDistance)) * mask;
     }
 
-    inDash *= step(0.001, ink) * mask;
-    inDash *= 1.0 + 0.03 * sin(time * 0.8 + row * 0.1);
-
-    vec4 glow = texture2D(tGlow, vUv);
-    float glowLum = dot(glow.rgb, vec3(0.299, 0.587, 0.114));
-    float halo = glowLum * glowStr * 0.25 * (1.0 - inDash);
-    float sharp = smoothstep(0.3, 0.5, inDash + halo);
-    vec3 color = dashColor * sharp;
-
-    gl_FragColor = vec4(color, sharp);
+    vec3 color = dashColor * alpha;
+    gl_FragColor = vec4(color, alpha);
 
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
@@ -398,7 +223,6 @@ const halftoneFragmentShader = /* glsl */ `
 const REFERENCE_PREVIEW_DISTANCE = 4;
 const IMAGE_POINTER_FOLLOW = 0.38;
 const IMAGE_POINTER_VELOCITY_DAMPING = 0.82;
-const IMAGE_DRAG_OFFSET_LIMIT = 0.08;
 const MAX_PREVIEW_PIXEL_RATIO = 2;
 
 function createEnvironmentTexture(renderer: THREE.WebGLRenderer) {
@@ -423,6 +247,10 @@ const CanvasMount = styled.div<{ $background: string }>`
 export type HalftoneSnapshotFn = (
   width: number,
   height: number,
+  options?: {
+    backgroundColor?: string;
+    includeBackground?: boolean;
+  },
 ) => Promise<Blob | null>;
 
 type HalftoneCanvasProps = {
@@ -466,8 +294,6 @@ type SceneResources = {
 type InteractionState = {
   activePointerId: number | null;
   autoElapsed: number;
-  dragOffsetX: number;
-  dragOffsetY: number;
   dragging: boolean;
   mouseX: number;
   mouseY: number;
@@ -512,8 +338,6 @@ function createInteractionState(
   return {
     activePointerId: null,
     autoElapsed: initialPose?.autoElapsed ?? 0,
-    dragOffsetX: 0,
-    dragOffsetY: 0,
     dragging: false,
     mouseX: 0.5,
     mouseY: 0.5,
@@ -582,17 +406,10 @@ function getCanvasCursor(
   isDragging: boolean,
 ) {
   if (settings.sourceMode === 'image') {
-    if (settings.animation.dragFlowEnabled) {
-      return isDragging ? 'grabbing' : 'crosshair';
-    }
-
     return 'crosshair';
   }
 
-  if (
-    settings.animation.followDragEnabled ||
-    settings.animation.autoRotateEnabled
-  ) {
+  if (settings.animation.followDragEnabled) {
     return isDragging ? 'grabbing' : 'grab';
   }
 
@@ -643,24 +460,9 @@ function updateHalftone(
   resources: SceneResources,
   settings: HalftoneStudioSettings,
 ) {
-  resources.halftoneMaterial.uniforms.numRows.value = settings.halftone.numRows;
-  resources.halftoneMaterial.uniforms.contrast.value =
-    settings.halftone.contrast;
-  resources.halftoneMaterial.uniforms.power.value = settings.halftone.power;
-  resources.halftoneMaterial.uniforms.shading.value = settings.halftone.shading;
-  resources.halftoneMaterial.uniforms.baseInk.value = settings.halftone.baseInk;
-  resources.halftoneMaterial.uniforms.maxBar.value = settings.halftone.maxBar;
-  resources.halftoneMaterial.uniforms.rowMerge.value =
-    settings.halftone.rowMerge;
-  resources.halftoneMaterial.uniforms.cellRatio.value =
-    settings.halftone.cellRatio;
-  resources.halftoneMaterial.uniforms.cutoff.value = settings.halftone.cutoff;
-  resources.halftoneMaterial.uniforms.highlightOpen.value =
-    settings.halftone.highlightOpen;
-  resources.halftoneMaterial.uniforms.shadowGrouping.value =
-    settings.halftone.shadowGrouping;
-  resources.halftoneMaterial.uniforms.shadowCrush.value =
-    settings.halftone.shadowCrush;
+  resources.halftoneMaterial.uniforms.tile.value = settings.halftone.scale;
+  resources.halftoneMaterial.uniforms.s_3.value = settings.halftone.power;
+  resources.halftoneMaterial.uniforms.s_4.value = settings.halftone.width;
   (resources.halftoneMaterial.uniforms.dashColor.value as THREE.Color).set(
     settings.halftone.dashColor,
   );
@@ -703,8 +505,6 @@ function resetInteractionState(
 ) {
   interactionState.activePointerId = null;
   interactionState.dragging = false;
-  interactionState.dragOffsetX = 0;
-  interactionState.dragOffsetY = 0;
   interactionState.mouseX = 0.5;
   interactionState.mouseY = 0.5;
   interactionState.pointerInside = false;
@@ -963,19 +763,9 @@ export function HalftoneCanvas({
         resolution: {
           value: new THREE.Vector2(getRenderWidth(), getRenderHeight()),
         },
-        numRows: { value: settings.halftone.numRows },
-        glowStr: { value: 0 },
-        contrast: { value: settings.halftone.contrast },
-        power: { value: settings.halftone.power },
-        shading: { value: settings.halftone.shading },
-        baseInk: { value: settings.halftone.baseInk },
-        maxBar: { value: settings.halftone.maxBar },
-        rowMerge: { value: settings.halftone.rowMerge },
-        cellRatio: { value: settings.halftone.cellRatio },
-        cutoff: { value: settings.halftone.cutoff },
-        highlightOpen: { value: settings.halftone.highlightOpen },
-        shadowGrouping: { value: settings.halftone.shadowGrouping },
-        shadowCrush: { value: settings.halftone.shadowCrush },
+        tile: { value: settings.halftone.scale },
+        s_3: { value: settings.halftone.power },
+        s_4: { value: settings.halftone.width },
         dashColor: { value: new THREE.Color(settings.halftone.dashColor) },
         time: { value: 0 },
         waveAmount: { value: 0 },
@@ -989,7 +779,6 @@ export function HalftoneCanvas({
         hoverFlowStrength: { value: 0 },
         hoverFlowRadius: { value: 0.18 },
         dragFlowStrength: { value: 0 },
-        dragFlowRadius: { value: 0.24 },
         cropToBounds: { value: 0 },
       },
       vertexShader: passThroughVertexShader,
@@ -1059,11 +848,15 @@ export function HalftoneCanvas({
     const captureSnapshot: HalftoneSnapshotFn = async (
       snapshotWidth: number,
       snapshotHeight: number,
+      options,
     ) => {
       const activeSettings = settingsReference.current;
       const isImage =
         activeSettings.sourceMode === 'image' &&
         resources.imageTexture !== null;
+      const includeBackground = options?.includeBackground ?? false;
+      const backgroundColor =
+        options?.backgroundColor ?? activeSettings.background.color;
 
       // Create temporary render targets at export resolution
       const snapScene = createRenderTarget(snapshotWidth, snapshotHeight);
@@ -1194,16 +987,19 @@ export function HalftoneCanvas({
         );
       }
 
-      const cropBounds = getAlphaCropBounds(
-        flippedBuffer,
-        snapshotWidth,
-        snapshotHeight,
-      ) ?? {
-        minX: 0,
-        minY: 0,
-        maxX: snapshotWidth - 1,
-        maxY: snapshotHeight - 1,
-      };
+      const cropBounds = includeBackground
+        ? {
+            minX: 0,
+            minY: 0,
+            maxX: snapshotWidth - 1,
+            maxY: snapshotHeight - 1,
+          }
+        : (getAlphaCropBounds(flippedBuffer, snapshotWidth, snapshotHeight) ?? {
+            minX: 0,
+            minY: 0,
+            maxX: snapshotWidth - 1,
+            maxY: snapshotHeight - 1,
+          });
       const croppedWidth = cropBounds.maxX - cropBounds.minX + 1;
       const croppedHeight = cropBounds.maxY - cropBounds.minY + 1;
       const croppedBuffer = new Uint8ClampedArray(
@@ -1236,7 +1032,23 @@ export function HalftoneCanvas({
         return null;
       }
 
-      ctx.putImageData(imageData, 0, 0);
+      if (includeBackground) {
+        const sourceCanvas = document.createElement('canvas');
+        sourceCanvas.width = croppedWidth;
+        sourceCanvas.height = croppedHeight;
+        const sourceContext = sourceCanvas.getContext('2d');
+
+        if (!sourceContext) {
+          return null;
+        }
+
+        sourceContext.putImageData(imageData, 0, 0);
+        ctx.fillStyle = backgroundColor;
+        ctx.fillRect(0, 0, croppedWidth, croppedHeight);
+        ctx.drawImage(sourceCanvas, 0, 0);
+      } else {
+        ctx.putImageData(imageData, 0, 0);
+      }
 
       return new Promise<Blob | null>((resolve) => {
         offscreen.toBlob((blob) => resolve(blob), 'image/png');
@@ -1333,14 +1145,22 @@ export function HalftoneCanvas({
       }
     };
 
+    const markFirstInteraction = () => {
+      if (didInteractReference.current) {
+        return;
+      }
+
+      didInteractReference.current = true;
+      onFirstInteraction();
+    };
+
     const handlePointerDown = (event: PointerEvent) => {
       const interaction = interactionReference.current;
       const activeSettings = settingsReference.current;
       const canDrag =
         activeSettings.sourceMode === 'image'
-          ? activeSettings.animation.dragFlowEnabled
-          : activeSettings.animation.followDragEnabled ||
-            activeSettings.animation.autoRotateEnabled;
+          ? false
+          : activeSettings.animation.followDragEnabled;
 
       updatePointerPosition(event, { resetVelocity: true });
       interaction.pointerX = event.clientX;
@@ -1364,20 +1184,21 @@ export function HalftoneCanvas({
         interaction.dragging,
       );
 
-      if (!didInteractReference.current) {
-        didInteractReference.current = true;
-        onFirstInteraction();
-      }
+      markFirstInteraction();
     };
 
     const handlePointerMove = (event: PointerEvent) => {
       const interaction = interactionReference.current;
       const resetVelocity = !interaction.pointerInside && !interaction.dragging;
-      const pointerStep = updatePointerPosition(
+      updatePointerPosition(
         event,
         resetVelocity ? { resetVelocity: true } : undefined,
       );
       const activeSettings = settingsReference.current;
+
+      if (activeSettings.sourceMode === 'image' && interaction.pointerInside) {
+        markFirstInteraction();
+      }
 
       if (!interaction.dragging) {
         return;
@@ -1390,27 +1211,9 @@ export function HalftoneCanvas({
         return;
       }
 
-      if (activeSettings.sourceMode === 'image') {
-        if (!activeSettings.animation.dragFlowEnabled) {
-          return;
-        }
-
-        interaction.dragOffsetX = THREE.MathUtils.clamp(
-          interaction.dragOffsetX + pointerStep.deltaX * 2.2,
-          -IMAGE_DRAG_OFFSET_LIMIT,
-          IMAGE_DRAG_OFFSET_LIMIT,
-        );
-        interaction.dragOffsetY = THREE.MathUtils.clamp(
-          interaction.dragOffsetY + pointerStep.deltaY * 2.2,
-          -IMAGE_DRAG_OFFSET_LIMIT,
-          IMAGE_DRAG_OFFSET_LIMIT,
-        );
-        return;
-      }
-
       const animation = activeSettings.animation;
 
-      if (!animation.followDragEnabled && !animation.autoRotateEnabled) {
+      if (!animation.followDragEnabled) {
         return;
       }
 
@@ -1490,16 +1293,14 @@ export function HalftoneCanvas({
       releasePointerCapture(interaction.activePointerId);
       interaction.activePointerId = null;
       interaction.dragging = false;
-      interaction.dragOffsetX = 0;
-      interaction.dragOffsetY = 0;
       interaction.pointerInside = false;
       interaction.pointerVelocityX = 0;
       interaction.pointerVelocityY = 0;
 
-      if (activeSettings.sourceMode !== 'image') {
-        interaction.mouseX = 0.5;
-        interaction.mouseY = 0.5;
-      }
+      interaction.mouseX = 0.5;
+      interaction.mouseY = 0.5;
+      interaction.smoothedMouseX = 0.5;
+      interaction.smoothedMouseY = 0.5;
 
       canvas.style.cursor = getCanvasCursor(activeSettings, false);
     };
@@ -1555,40 +1356,16 @@ export function HalftoneCanvas({
       halftoneMaterial.uniforms.cropToBounds.value = isImageMode ? 1 : 0;
 
       if (isImageMode) {
-        const pointerFollow = interaction.dragging
-          ? 0.46
-          : IMAGE_POINTER_FOLLOW;
-        const pointerActive = interaction.pointerInside || interaction.dragging;
+        const pointerActive = interaction.pointerInside;
 
         interaction.smoothedMouseX +=
-          (interaction.mouseX - interaction.smoothedMouseX) * pointerFollow;
+          (interaction.mouseX - interaction.smoothedMouseX) *
+          IMAGE_POINTER_FOLLOW;
         interaction.smoothedMouseY +=
-          (interaction.mouseY - interaction.smoothedMouseY) * pointerFollow;
+          (interaction.mouseY - interaction.smoothedMouseY) *
+          IMAGE_POINTER_FOLLOW;
         interaction.pointerVelocityX *= IMAGE_POINTER_VELOCITY_DAMPING;
         interaction.pointerVelocityY *= IMAGE_POINTER_VELOCITY_DAMPING;
-
-        if (activeSettings.animation.dragFlowEnabled) {
-          const dragDecay = 1 - activeSettings.animation.dragFlowDecay;
-          interaction.dragOffsetX *= dragDecay;
-          interaction.dragOffsetY *= dragDecay;
-
-          if (Math.abs(interaction.dragOffsetX) < 0.00005) {
-            interaction.dragOffsetX = 0;
-          }
-
-          if (Math.abs(interaction.dragOffsetY) < 0.00005) {
-            interaction.dragOffsetY = 0;
-          }
-        } else {
-          interaction.dragOffsetX = 0;
-          interaction.dragOffsetY = 0;
-        }
-
-        const dragActive =
-          activeSettings.animation.dragFlowEnabled &&
-          (interaction.dragging ||
-            Math.abs(interaction.dragOffsetX) > 0.0005 ||
-            Math.abs(interaction.dragOffsetY) > 0.0005);
 
         halftoneMaterial.uniforms.interactionUv.value.set(
           interaction.smoothedMouseX,
@@ -1598,10 +1375,7 @@ export function HalftoneCanvas({
           interaction.pointerVelocityX * getRenderWidth(),
           -interaction.pointerVelocityY * getRenderHeight(),
         );
-        halftoneMaterial.uniforms.dragOffset.value.set(
-          interaction.dragOffsetX * getRenderWidth(),
-          -interaction.dragOffsetY * getRenderHeight(),
-        );
+        halftoneMaterial.uniforms.dragOffset.value.set(0, 0);
         halftoneMaterial.uniforms.hoverLightStrength.value =
           pointerActive && activeSettings.animation.hoverLightEnabled
             ? activeSettings.animation.hoverLightIntensity
@@ -1610,11 +1384,7 @@ export function HalftoneCanvas({
           activeSettings.animation.hoverLightRadius;
         halftoneMaterial.uniforms.hoverFlowStrength.value = 0;
         halftoneMaterial.uniforms.hoverFlowRadius.value = 0.18;
-        halftoneMaterial.uniforms.dragFlowStrength.value = dragActive
-          ? activeSettings.animation.dragFlowStrength
-          : 0;
-        halftoneMaterial.uniforms.dragFlowRadius.value =
-          activeSettings.animation.dragFlowRadius;
+        halftoneMaterial.uniforms.dragFlowStrength.value = 0;
 
         imageMaterial.uniforms.zoom.value = getImagePreviewZoom(baseDistance);
         imageMaterial.uniforms.viewportSize.value.set(
@@ -1654,14 +1424,7 @@ export function HalftoneCanvas({
         let lightHeight = activeSettings.lighting.height;
 
         if (activeSettings.animation.autoRotateEnabled) {
-          if (!interaction.dragging) {
-            interaction.autoElapsed += delta;
-            interaction.targetRotationX += interaction.velocityX;
-            interaction.targetRotationY += interaction.velocityY;
-            interaction.velocityX *= 0.92;
-            interaction.velocityY *= 0.92;
-          }
-
+          interaction.autoElapsed += delta;
           baseRotationY +=
             interaction.autoElapsed * activeSettings.animation.autoSpeed;
           baseRotationX +=

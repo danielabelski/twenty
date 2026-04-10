@@ -14,7 +14,7 @@ import { createPortal } from 'react-dom';
 
 const TAB_LABEL_WIDTH = 72;
 
-export const PanelShell = styled.aside`
+export const PanelShell = styled.aside<{ $collapsed?: boolean }>`
   background: rgba(18, 18, 22, 0.88);
   backdrop-filter: blur(24px) saturate(1.4);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -27,22 +27,24 @@ export const PanelShell = styled.aside`
   flex-direction: column;
   font-family: ${theme.font.family.sans};
   font-size: 11px;
-  height: 100%;
+  height: ${(props) => (props.$collapsed ? 'auto' : '100%')};
   overflow: hidden;
-  width: min(320px, calc(100vw - 32px));
+  width: ${(props) =>
+    props.$collapsed ? 'auto' : 'min(320px, calc(100vw - 32px))'};
 
   @media (max-width: ${theme.breakpoints.md - 1}px) {
-    height: 100%;
-    width: 100%;
+    height: ${(props) => (props.$collapsed ? 'auto' : '100%')};
+    width: ${(props) => (props.$collapsed ? 'auto' : '100%')};
   }
 `;
 
-export const TabsBar = styled.div`
+export const TabsBar = styled.div<{ $collapsed?: boolean }>`
+  align-items: center;
   display: flex;
   flex-shrink: 0;
   gap: 6px;
   margin: 0;
-  padding: 12px 12px 0;
+  padding: ${(props) => (props.$collapsed ? '12px' : '12px 12px 0')};
 `;
 
 export const TabButton = styled.button<{ $active: boolean }>`
@@ -65,9 +67,7 @@ export const TabButton = styled.button<{ $active: boolean }>`
 
   &:hover {
     background: ${(props) =>
-      props.$active
-        ? 'rgba(255, 255, 255, 0.1)'
-        : 'rgba(255, 255, 255, 0.04)'};
+      props.$active ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.04)'};
     color: ${(props) =>
       props.$active
         ? 'rgba(255, 255, 255, 0.94)'
@@ -527,7 +527,9 @@ export function ColorField({ ariaLabel, onChange, value }: ColorFieldProps) {
         aria-label={`${ariaLabel} hex value`}
         maxLength={7}
         onBlur={commitDraftValue}
+        onClick={(event) => event.currentTarget.select()}
         onChange={(event) => setDraftValue(event.target.value.toUpperCase())}
+        onFocus={(event) => event.currentTarget.select()}
         onKeyDown={(event) => {
           if (event.key === 'Enter') {
             event.preventDefault();
@@ -629,30 +631,53 @@ export const ExportPreview = styled.div`
 export const ExportButton = styled.button<{ $primary?: boolean }>`
   align-items: center;
   background: ${(props) =>
-    props.$primary ? '#4A38F5' : 'rgba(255, 255, 255, 0.08)'};
-  border: 1px solid
-    ${(props) =>
-      props.$primary ? 'rgba(116, 98, 255, 0.7)' : 'rgba(255, 255, 255, 0.12)'};
+    props.$primary ? 'rgba(255, 255, 255, 0.24)' : 'rgba(255, 255, 255, 0.2)'};
+  border: none;
   border-radius: 8px;
-  color: ${(props) => (props.$primary ? '#fff' : 'rgba(255, 255, 255, 0.8)')};
+  color: ${(props) =>
+    props.$primary ? 'rgba(255, 255, 255, 0.92)' : 'rgba(255, 255, 255, 0.8)'};
   cursor: pointer;
   display: flex;
   font-family: ${theme.font.family.sans};
   font-size: 11px;
-  font-weight: 600;
+  font-weight: ${theme.font.weight.medium};
   gap: 8px;
   justify-content: center;
+  line-height: normal;
   margin-top: ${(props) => (props.$primary ? '0' : '8px')};
-  min-height: 31px;
   padding: 7px 12px;
-  transition: all 0.2s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.15s ease;
   width: 100%;
 
   &:hover {
     background: ${(props) =>
-      props.$primary ? '#5a4af7' : 'rgba(255, 255, 255, 0.14)'};
-    border-color: ${(props) =>
-      props.$primary ? 'rgba(130, 114, 255, 0.9)' : 'rgba(255, 255, 255, 0.22)'};
+      props.$primary
+        ? 'rgba(255, 255, 255, 0.28)'
+        : 'rgba(255, 255, 255, 0.24)'};
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  &:active {
+    background: ${(props) =>
+      props.$primary
+        ? 'rgba(255, 255, 255, 0.3)'
+        : 'rgba(255, 255, 255, 0.28)'};
+    transform: translateY(1px);
+  }
+
+  &:focus-visible {
+    outline: 1px solid rgba(255, 255, 255, 0.36);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.36);
+    cursor: not-allowed;
+    transform: none;
   }
 `;
 
@@ -680,6 +705,10 @@ type SliderControlProps = {
   valueLabel: string;
 };
 
+const NORMALIZED_SLIDER_MIN = 1;
+const NORMALIZED_SLIDER_MAX = 100;
+const NORMALIZED_SLIDER_RANGE = NORMALIZED_SLIDER_MAX - NORMALIZED_SLIDER_MIN;
+
 function getStepPrecision(step: number | undefined) {
   if (!step || Number.isInteger(step)) {
     return 0;
@@ -697,13 +726,7 @@ function getStepPrecision(step: number | undefined) {
 }
 
 function formatEditableValue(value: number, step: number | undefined) {
-  const precision = getStepPrecision(step);
-
-  if (precision === 0) {
-    return String(Math.round(value));
-  }
-
-  return String(Number(value.toFixed(precision)));
+  return String(Math.round(value));
 }
 
 function clampAndSnapValue(
@@ -721,9 +744,49 @@ function clampAndSnapValue(
   const precision = getStepPrecision(step);
   const snappedValue = Math.round((clampedValue - min) / step) * step + min;
 
-  return Number(
-    Math.min(Math.max(snappedValue, min), max).toFixed(precision),
+  return Number(Math.min(Math.max(snappedValue, min), max).toFixed(precision));
+}
+
+function getEffectiveSliderStep(step: number | undefined) {
+  return step && step > 0 ? step : 1;
+}
+
+function toNormalizedSliderValue(value: number, min: number, max: number) {
+  const range = max - min;
+
+  if (range <= 0) {
+    return NORMALIZED_SLIDER_MIN;
+  }
+
+  return (
+    NORMALIZED_SLIDER_MIN + ((value - min) / range) * NORMALIZED_SLIDER_RANGE
   );
+}
+
+function fromNormalizedSliderValue(value: number, min: number, max: number) {
+  const range = max - min;
+
+  if (range <= 0) {
+    return min;
+  }
+
+  return (
+    min + ((value - NORMALIZED_SLIDER_MIN) / NORMALIZED_SLIDER_RANGE) * range
+  );
+}
+
+function getNormalizedSliderStep(
+  min: number,
+  max: number,
+  step: number | undefined,
+) {
+  const range = max - min;
+
+  if (range <= 0) {
+    return undefined;
+  }
+
+  return (getEffectiveSliderStep(step) / range) * NORMALIZED_SLIDER_RANGE;
 }
 
 export function SliderControl({
@@ -737,7 +800,10 @@ export function SliderControl({
 }: SliderControlProps) {
   const [draftValue, setDraftValue] = useState<string | null>(null);
   const valueInputReference = useRef<HTMLInputElement>(null);
-  const fillPercent = ((value - min) / (max - min)) * 100;
+  const normalizedValue = toNormalizedSliderValue(value, min, max);
+  const normalizedStep = getNormalizedSliderStep(min, max, step);
+  const fillPercent =
+    ((normalizedValue - NORMALIZED_SLIDER_MIN) / NORMALIZED_SLIDER_RANGE) * 100;
   const isEditing = draftValue !== null;
 
   useEffect(() => {
@@ -754,17 +820,28 @@ export function SliderControl({
       return;
     }
 
-    const nextValue = Number.parseFloat(draftValue);
+    const nextNormalizedValue = Number.parseFloat(draftValue);
     setDraftValue(null);
 
-    if (!Number.isFinite(nextValue)) {
+    if (!Number.isFinite(nextNormalizedValue)) {
       return;
     }
 
-    const normalizedValue = clampAndSnapValue(nextValue, min, max, step);
+    const clampedNormalizedValue = clampAndSnapValue(
+      nextNormalizedValue,
+      NORMALIZED_SLIDER_MIN,
+      NORMALIZED_SLIDER_MAX,
+      1,
+    );
+    const nextValue = clampAndSnapValue(
+      fromNormalizedSliderValue(clampedNormalizedValue, min, max),
+      min,
+      max,
+      getEffectiveSliderStep(step),
+    );
 
     onChange({
-      target: { value: String(normalizedValue) },
+      target: { value: String(nextValue) },
     } as React.ChangeEvent<HTMLInputElement>);
   };
 
@@ -772,19 +849,34 @@ export function SliderControl({
     <SliderLabel>
       <span>{children}</span>
       <SliderInput
-        max={max}
-        min={min}
-        onChange={onChange}
-        step={step}
+        max={NORMALIZED_SLIDER_MAX}
+        min={NORMALIZED_SLIDER_MIN}
+        onChange={(event) => {
+          const nextValue = clampAndSnapValue(
+            fromNormalizedSliderValue(Number(event.target.value), min, max),
+            min,
+            max,
+            getEffectiveSliderStep(step),
+          );
+
+          onChange({
+            ...event,
+            target: {
+              ...event.target,
+              value: String(nextValue),
+            },
+          } as React.ChangeEvent<HTMLInputElement>);
+        }}
+        step={normalizedStep}
         style={{ '--fill': `${fillPercent}%` } as React.CSSProperties}
         type="range"
-        value={value}
+        value={normalizedValue}
       />
       {isEditing ? (
         <EditableControlValueInput
-          inputMode="decimal"
-          max={max}
-          min={min}
+          inputMode="numeric"
+          max={NORMALIZED_SLIDER_MAX}
+          min={NORMALIZED_SLIDER_MIN}
           onBlur={commitDraftValue}
           onChange={(event) => setDraftValue(event.target.value)}
           onKeyDown={(event) => {
@@ -800,7 +892,7 @@ export function SliderControl({
             }
           }}
           ref={valueInputReference}
-          step={step}
+          step={1}
           type="number"
           value={draftValue}
         />
@@ -809,15 +901,18 @@ export function SliderControl({
           onClick={(event) => {
             event.preventDefault();
             event.stopPropagation();
-            setDraftValue(formatEditableValue(value, step));
+            setDraftValue(formatEditableValue(normalizedValue, normalizedStep));
           }}
           onMouseDown={(event) => {
             event.preventDefault();
             event.stopPropagation();
           }}
+          title={valueLabel}
           type="button"
         >
-          <ControlValue>{valueLabel}</ControlValue>
+          <ControlValue>
+            {formatEditableValue(normalizedValue, normalizedStep)}
+          </ControlValue>
         </EditableControlValueButton>
       )}
     </SliderLabel>

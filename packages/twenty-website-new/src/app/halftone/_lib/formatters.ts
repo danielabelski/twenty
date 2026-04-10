@@ -31,10 +31,6 @@ export function formatAnimationName(animation: {
       activeModes.push('hoverLight');
     }
 
-    if (animation.dragFlowEnabled) {
-      activeModes.push('dragSmear');
-    }
-
     return activeModes.length > 0 ? activeModes.join(' + ') : 'still';
   }
 
