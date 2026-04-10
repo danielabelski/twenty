@@ -15,6 +15,7 @@ import {
   RegisteredAIModel,
 } from 'src/engine/metadata-modules/ai/ai-models/services/ai-model-registry.service';
 import { SdkProviderFactoryService } from 'src/engine/metadata-modules/ai/ai-models/services/sdk-provider-factory.service';
+import { sanitizeToolSetForXaiResponses } from 'src/engine/metadata-modules/ai/ai-models/utils/sanitize-xai-tool-set.util';
 import { FlatAgentWithRoleId } from 'src/engine/metadata-modules/flat-agent/types/flat-agent.type';
 
 @Injectable()
@@ -26,11 +27,11 @@ export class AgentModelConfigService {
 
   getProviderOptions(
     model: RegisteredAIModel,
-    agent: FlatAgentWithRoleId,
+    _agent: FlatAgentWithRoleId,
   ): ProviderOptions {
     switch (model.sdkPackage) {
       case AI_SDK_XAI:
-        return this.getXaiProviderOptions(agent);
+        return {};
       case AI_SDK_ANTHROPIC:
         return this.getAnthropicProviderOptions(model);
       case AI_SDK_BEDROCK:
@@ -40,9 +41,18 @@ export class AgentModelConfigService {
     }
   }
 
+  prepareToolSetForModel(model: RegisteredAIModel, tools: ToolSet): ToolSet {
+    if (model.sdkPackage === AI_SDK_XAI) {
+      return sanitizeToolSetForXaiResponses(tools);
+    }
+
+    return tools;
+  }
+
   getNativeModelTools(
     model: RegisteredAIModel,
     agent: FlatAgentWithRoleId,
+    options: { useProviderNativeWebSearch: boolean },
   ): ToolSet {
     const tools: ToolSet = {};
 
@@ -52,7 +62,10 @@ export class AgentModelConfigService {
 
     switch (model.sdkPackage) {
       case AI_SDK_ANTHROPIC:
-        if (agent.modelConfiguration.webSearch?.enabled) {
+        if (
+          options.useProviderNativeWebSearch &&
+          agent.modelConfiguration.webSearch?.enabled
+        ) {
           const anthropicProvider = model.providerName
             ? this.sdkProviderFactory.getRawAnthropicProvider(
                 model.providerName,
@@ -65,7 +78,10 @@ export class AgentModelConfigService {
         }
         break;
       case AI_SDK_BEDROCK: {
-        if (agent.modelConfiguration.webSearch?.enabled) {
+        if (
+          options.useProviderNativeWebSearch &&
+          agent.modelConfiguration.webSearch?.enabled
+        ) {
           const bedrockProvider = model.providerName
             ? this.sdkProviderFactory.getRawBedrockProvider(model.providerName)
             : undefined;
@@ -78,7 +94,10 @@ export class AgentModelConfigService {
         break;
       }
       case AI_SDK_OPENAI:
-        if (agent.modelConfiguration.webSearch?.enabled) {
+        if (
+          options.useProviderNativeWebSearch &&
+          agent.modelConfiguration.webSearch?.enabled
+        ) {
           const openaiProvider = model.providerName
             ? this.sdkProviderFactory.getRawOpenAIProvider(model.providerName)
             : undefined;
@@ -88,38 +107,34 @@ export class AgentModelConfigService {
           }
         }
         break;
+      case AI_SDK_XAI:
+        if (!model.providerName) {
+          break;
+        }
+
+        const xaiProvider = this.sdkProviderFactory.getRawXaiProvider(
+          model.providerName,
+        );
+
+        if (!xaiProvider) {
+          break;
+        }
+
+        if (
+          options.useProviderNativeWebSearch &&
+          agent.modelConfiguration.webSearch?.enabled
+        ) {
+          tools.web_search = xaiProvider.tools.webSearch() as ToolSet[string];
+        }
+
+        if (agent.modelConfiguration.twitterSearch?.enabled) {
+          tools.x_search = xaiProvider.tools.xSearch() as ToolSet[string];
+        }
+
+        break;
     }
 
     return tools;
-  }
-
-  private getXaiProviderOptions(agent: FlatAgentWithRoleId): ProviderOptions {
-    if (
-      !agent.modelConfiguration ||
-      (!agent.modelConfiguration.webSearch?.enabled &&
-        !agent.modelConfiguration.twitterSearch?.enabled)
-    ) {
-      return {};
-    }
-
-    const sources: Array<{ type: string }> = [];
-
-    if (agent.modelConfiguration.webSearch?.enabled) {
-      sources.push({ type: 'web' });
-    }
-
-    if (agent.modelConfiguration.twitterSearch?.enabled) {
-      sources.push({ type: 'x' });
-    }
-
-    return {
-      xai: {
-        searchParameters: {
-          mode: 'auto',
-          ...(sources.length > 0 && { sources }),
-        },
-      },
-    };
   }
 
   private getAnthropicProviderOptions(

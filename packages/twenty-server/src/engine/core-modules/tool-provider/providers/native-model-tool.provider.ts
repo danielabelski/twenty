@@ -8,6 +8,7 @@ import { type ToolProviderContext } from 'src/engine/core-modules/tool-provider/
 
 import { ToolCategory } from 'twenty-shared/ai';
 import { WebSearchService } from 'src/engine/core-modules/web-search/web-search.service';
+import { AI_SDK_XAI } from 'src/engine/metadata-modules/ai/ai-models/constants/ai-sdk-package.const';
 import { AgentModelConfigService } from 'src/engine/metadata-modules/ai/ai-models/services/agent-model-config.service';
 import { AiModelRegistryService } from 'src/engine/metadata-modules/ai/ai-models/services/ai-model-registry.service';
 
@@ -34,22 +35,27 @@ export class NativeModelToolProvider implements NativeToolProvider {
       return {};
     }
 
-    const useNativeSearch = this.webSearchService.shouldUseNativeSearch();
+    const useProviderNativeWebSearch =
+      this.webSearchService.shouldUseNativeSearch();
 
     this.logger.log(
-      `Web search strategy: ${useNativeSearch ? 'native (provider SDK)' : 'external (EXA)'}`,
+      `Web search strategy: ${useProviderNativeWebSearch ? 'native (provider SDK)' : 'external (EXA)'}`,
     );
-
-    if (!useNativeSearch) {
-      return {};
-    }
 
     const registeredModel =
       await this.aiModelRegistryService.resolveModelForAgent(context.agent);
 
+    if (
+      !useProviderNativeWebSearch &&
+      registeredModel.sdkPackage !== AI_SDK_XAI
+    ) {
+      return {};
+    }
+
     return this.agentModelConfigService.getNativeModelTools(
       registeredModel,
       context.agent,
+      { useProviderNativeWebSearch },
     );
   }
 }

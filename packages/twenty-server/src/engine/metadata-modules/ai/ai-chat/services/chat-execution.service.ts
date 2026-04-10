@@ -57,6 +57,7 @@ import {
   AiModelRegistryService,
   type RegisteredAIModel,
 } from 'src/engine/metadata-modules/ai/ai-models/services/ai-model-registry.service';
+import { AgentModelConfigService } from 'src/engine/metadata-modules/ai/ai-models/services/agent-model-config.service';
 import { SdkProviderFactoryService } from 'src/engine/metadata-modules/ai/ai-models/services/sdk-provider-factory.service';
 import { type AIModelConfig } from 'src/engine/metadata-modules/ai/ai-models/types/ai-model-config.type';
 import { WebSearchService } from 'src/engine/core-modules/web-search/web-search.service';
@@ -87,6 +88,7 @@ export class ChatExecutionService {
     private readonly toolRegistry: ToolRegistryService,
     private readonly skillService: SkillService,
     private readonly aiModelRegistryService: AiModelRegistryService,
+    private readonly agentModelConfigService: AgentModelConfigService,
     private readonly aiBillingService: AiBillingService,
     private readonly agentActorContextService: AgentActorContextService,
     private readonly workspaceDomainsService: WorkspaceDomainsService,
@@ -217,6 +219,11 @@ export class ChatExecutionService {
       ),
     };
 
+    const modelTools = this.agentModelConfigService.prepareToolSetForModel(
+      registeredModel,
+      activeTools,
+    );
+
     let processedMessages: UIMessage[] = messages;
 
     let storedFiles: Array<{
@@ -248,7 +255,7 @@ export class ChatExecutionService {
     );
 
     this.logger.log(
-      `Starting chat execution with model ${registeredModel.modelId}, ${Object.keys(activeTools).length} active tools`,
+      `Starting chat execution with model ${registeredModel.modelId}, ${Object.keys(modelTools).length} active tools`,
     );
 
     const systemMessage: SystemModelMessage = {
@@ -349,7 +356,7 @@ export class ChatExecutionService {
     const stream = streamText({
       model: registeredModel.model,
       messages: [systemMessage, ...modelMessages],
-      tools: activeTools,
+      tools: modelTools,
       abortSignal,
       stopWhen: stepCountIs(AGENT_CONFIG.MAX_STEPS),
       experimental_telemetry: AI_TELEMETRY_CONFIG,

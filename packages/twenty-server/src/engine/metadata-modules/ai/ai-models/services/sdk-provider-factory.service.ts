@@ -9,7 +9,7 @@ import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { createMistral } from '@ai-sdk/mistral';
 import { createOpenAI, type OpenAIProvider } from '@ai-sdk/openai';
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
-import { createXai } from '@ai-sdk/xai';
+import { createXai, type XaiProvider } from '@ai-sdk/xai';
 import { fromNodeProviderChain } from '@aws-sdk/credential-providers';
 import { type LanguageModel } from 'ai';
 import { type AiSdkPackage } from 'twenty-shared/ai';
@@ -85,6 +85,10 @@ export class SdkProviderFactoryService {
     return this.getRawProvider<OpenAIProvider>(providerName, AI_SDK_OPENAI);
   }
 
+  getRawXaiProvider(providerName: string): XaiProvider | undefined {
+    return this.getRawProvider<XaiProvider>(providerName, AI_SDK_XAI);
+  }
+
   clearCache(): void {
     this.providerInstances.clear();
   }
@@ -102,7 +106,7 @@ export class SdkProviderFactoryService {
       case AI_SDK_MISTRAL:
         return this.buildStandardProvider(config, createMistral);
       case AI_SDK_XAI:
-        return this.buildStandardProvider(config, createXai);
+        return this.buildXaiProvider(config);
       case AI_SDK_BEDROCK:
         return this.buildBedrockProvider(config);
       case AI_SDK_OPENAI_COMPATIBLE:
@@ -184,6 +188,19 @@ export class SdkProviderFactoryService {
       createModel: (modelId: string) => provider(modelId),
       rawProvider: provider,
       sdkPackage: AI_SDK_OPENAI_COMPATIBLE,
+    };
+  }
+
+  private buildXaiProvider(config: AiProviderConfig): AiSdkProviderInstance {
+    const provider = createXai({
+      ...(config.apiKey && { apiKey: config.apiKey }),
+      ...(config.baseUrl && { baseURL: config.baseUrl }),
+    });
+
+    return {
+      createModel: (modelId: string) => provider.responses(modelId),
+      rawProvider: provider,
+      sdkPackage: AI_SDK_XAI,
     };
   }
 }

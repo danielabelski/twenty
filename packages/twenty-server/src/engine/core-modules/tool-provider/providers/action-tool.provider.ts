@@ -150,7 +150,10 @@ export class ActionToolProvider implements ToolProvider {
       );
     }
 
-    if (this.webSearchService.isEnabled()) {
+    const isWebSearchEnabledForAgent =
+      context.agent?.modelConfiguration?.webSearch?.enabled !== false;
+
+    if (this.webSearchService.isEnabled() && isWebSearchEnabledForAgent) {
       descriptors.push(
         this.buildDescriptor('web_search', this.webSearchTool, includeSchemas),
       );

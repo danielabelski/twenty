@@ -16,12 +16,9 @@ import { type ToolProviderContext } from 'src/engine/core-modules/tool-provider/
 
 import { isUserAuthContext } from 'src/engine/core-modules/auth/guards/is-user-auth-context.guard';
 import { type WorkspaceAuthContext } from 'src/engine/core-modules/auth/types/workspace-auth-context.type';
-import { ToolCategory } from 'twenty-shared/ai';
 import { ToolRegistryService } from 'src/engine/core-modules/tool-provider/services/tool-registry.service';
+import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { type AgentExecutionResult } from 'src/engine/metadata-modules/ai/ai-agent-execution/types/agent-execution-result.type';
-import { countNativeWebSearchCallsFromSteps } from 'src/engine/metadata-modules/ai/ai-billing/utils/count-native-web-search-calls-from-steps.util';
-import { extractCacheCreationTokensFromSteps } from 'src/engine/metadata-modules/ai/ai-billing/utils/extract-cache-creation-tokens.util';
-import { mergeLanguageModelUsage } from 'src/engine/metadata-modules/ai/ai-billing/utils/merge-language-model-usage.util';
 import {
   AgentException,
   AgentExceptionCode,
@@ -30,12 +27,15 @@ import { AGENT_CONFIG } from 'src/engine/metadata-modules/ai/ai-agent/constants/
 import { WORKFLOW_SYSTEM_PROMPTS } from 'src/engine/metadata-modules/ai/ai-agent/constants/agent-system-prompts.const';
 import { type AgentEntity } from 'src/engine/metadata-modules/ai/ai-agent/entities/agent.entity';
 import { repairToolCall } from 'src/engine/metadata-modules/ai/ai-agent/utils/repair-tool-call.util';
+import { countNativeWebSearchCallsFromSteps } from 'src/engine/metadata-modules/ai/ai-billing/utils/count-native-web-search-calls-from-steps.util';
+import { extractCacheCreationTokensFromSteps } from 'src/engine/metadata-modules/ai/ai-billing/utils/extract-cache-creation-tokens.util';
+import { mergeLanguageModelUsage } from 'src/engine/metadata-modules/ai/ai-billing/utils/merge-language-model-usage.util';
 import { AI_TELEMETRY_CONFIG } from 'src/engine/metadata-modules/ai/ai-models/constants/ai-telemetry.const';
 import { AgentModelConfigService } from 'src/engine/metadata-modules/ai/ai-models/services/agent-model-config.service';
-import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { AiModelRegistryService } from 'src/engine/metadata-modules/ai/ai-models/services/ai-model-registry.service';
 import { RoleTargetEntity } from 'src/engine/metadata-modules/role-target/role-target.entity';
 import { type RolePermissionConfig } from 'src/engine/twenty-orm/types/role-permission-config';
+import { ToolCategory } from 'twenty-shared/ai';
 
 // Agent execution within workflows uses database and action tools only.
 // Workflow tools are intentionally excluded to avoid circular dependencies
@@ -178,11 +178,18 @@ export class AgentAsyncExecutorService {
         );
       }
 
-      this.logger.log(`Generated ${Object.keys(tools).length} tools for agent`);
+      const modelTools = this.agentModelConfigService.prepareToolSetForModel(
+        registeredModel,
+        tools,
+      );
+
+      this.logger.log(
+        `Generated ${Object.keys(modelTools).length} tools for agent`,
+      );
 
       const textResponse = await generateText({
         system: `${WORKFLOW_SYSTEM_PROMPTS.BASE}\n\n${agent ? agent.prompt : ''}`,
-        tools,
+        tools: modelTools,
         model: registeredModel.model,
         prompt: userPrompt,
         stopWhen: stepCountIs(AGENT_CONFIG.MAX_STEPS),
@@ -258,6 +265,7 @@ export class AgentAsyncExecutorService {
       if (error instanceof AgentException) {
         throw error;
       }
+
       throw new AgentException(
         error instanceof Error ? error.message : 'Agent execution failed',
         AgentExceptionCode.AGENT_EXECUTION_FAILED,

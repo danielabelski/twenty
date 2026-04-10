@@ -8,6 +8,7 @@ import {
   AI_SDK_ANTHROPIC,
   AI_SDK_BEDROCK,
   AI_SDK_OPENAI,
+  AI_SDK_XAI,
 } from 'src/engine/metadata-modules/ai/ai-models/constants/ai-sdk-package.const';
 import { NodeEnvironment } from 'src/engine/core-modules/twenty-config/interfaces/node-environment.interface';
 import { SupportDriver } from 'src/engine/core-modules/twenty-config/interfaces/support.interface';
@@ -45,7 +46,10 @@ export class ClientConfigService {
     const hasNativeWebSearch =
       sdkPackage === AI_SDK_OPENAI ||
       sdkPackage === AI_SDK_ANTHROPIC ||
-      sdkPackage === AI_SDK_BEDROCK;
+      sdkPackage === AI_SDK_BEDROCK ||
+      sdkPackage === AI_SDK_XAI;
+
+    const hasNativeTwitterSearch = sdkPackage === AI_SDK_XAI;
 
     const isWebSearchDriverEnabled =
       this.twentyConfigService.get('WEB_SEARCH_DRIVER') !==
@@ -57,12 +61,13 @@ export class ClientConfigService {
       this.twentyConfigService.get('CODE_INTERPRETER_TYPE') !==
       CodeInterpreterDriverType.DISABLED;
 
-    if (!webSearch && !codeInterpreter) {
+    if (!webSearch && !hasNativeTwitterSearch && !codeInterpreter) {
       return undefined;
     }
 
     return {
       ...(webSearch && { webSearch }),
+      ...(hasNativeTwitterSearch && { twitterSearch: true }),
       ...(codeInterpreter && { codeInterpreter }),
     };
   }
