@@ -97,7 +97,6 @@ msgstr "(selectată: {selectedIconKey})"
 
 #. js-lingui-id: ZBGbuw
 #: src/pages/settings/security/event-logs/components/EventLogJsonCell.tsx
-#: src/pages/settings/ai/components/SettingsSystemToolTableRow.tsx
 #: src/modules/workflow/workflow-steps/components/WorkflowRunStepOutputDetail.tsx
 #: src/modules/workflow/workflow-steps/components/WorkflowRunStepInputDetail.tsx
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminJsonDataIndicatorHealthStatus.tsx
@@ -158,6 +157,16 @@ msgstr "{0, plural, one {Nu aveți permisiunea de a accesa câmpul {fieldsList}}
 #: src/modules/settings/usage/components/UsagePieChart.tsx
 msgid "{0} credits"
 msgstr "{0} credite"
+
+#. js-lingui-id: peiknr
+#. placeholder {0}: activeVisibleFieldLabels.length
+#. placeholder {0}: activeFilterLabels.length
+#. placeholder {0}: activeSortLabels.length
+#: src/modules/side-panel/pages/page-layout/hooks/useRecordTableSettingsDescriptions.ts
+#: src/modules/side-panel/pages/page-layout/hooks/useRecordTableSettingsDescriptions.ts
+#: src/modules/side-panel/pages/page-layout/hooks/useRecordTableSettingsDescriptions.ts
+msgid "{0} shown"
+msgstr ""
 
 #. js-lingui-id: r4l/MK
 #. placeholder {0}: formatUsageValue(totalCredits)
@@ -317,6 +326,11 @@ msgstr "{jobCount, plural, one {Acest lucru îl va elimina permanent din coadă.
 msgid "{jobCount, plural, one {This will retry the selected job. It will be re-executed from the beginning.} other {This will retry the selected jobs. They will be re-executed from the beginning.}}"
 msgstr "{jobCount, plural, one {Aceasta va reîncerca locul de muncă selectat. Va fi re-executat de la început.} few {Aceasta va reîncerca locurile de muncă selectate. Vor fi re-executate de la început.} other {Aceasta va reîncerca locurile de muncă selectate. Vor fi re-executate de la început.}}"
 
+#. js-lingui-id: Y32cMj
+#: src/modules/page-layout/widgets/email-thread/components/EmailThreadIntermediaryMessages.tsx
+msgid "{messagesLength} emails"
+msgstr ""
+
 #. js-lingui-id: Koe99p
 #: src/modules/settings/data-model/object-details/components/SettingsObjectRelationItemTableRow.tsx
 #: src/modules/settings/data-model/object-details/components/SettingsObjectFieldItemTableRow.tsx
@@ -425,7 +439,7 @@ msgid "{totalCount} selected"
 msgstr "{totalCount} selectate"
 
 #. js-lingui-id: WwbakM
-#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutFieldsSettings.tsx
+#: src/modules/side-panel/pages/page-layout/components/record-page/SidePanelRecordPageFieldsSettings.tsx
 msgid "{totalFieldsCount} fields"
 msgstr "{totalFieldsCount} câmpuri"
 
@@ -452,11 +466,13 @@ msgstr "{workspaceMemberName} va fi retras din următorul rol:"
 msgid "••••••••"
 msgstr "••••••••"
 
-#. js-lingui-id: tD9raa
+#. js-lingui-id: SMgdEJ
 #. placeholder {0}: formatNumber(preview.estimatedTokenCount, { abbreviate: true, decimals: 1, })
+#. placeholder {0}: formatNumber( section.estimatedTokenCount, { abbreviate: true, decimals: 1, }, )
 #: src/pages/settings/ai/SettingsAIPrompts.tsx
-msgid "~{0} tokens"
-msgstr "~{0} jetoane"
+#: src/pages/settings/ai/SettingsAIPrompts.tsx
+msgid "~ {0} tokens"
+msgstr ""
 
 #. js-lingui-id: Cx0xl3
 #: src/modules/workflow/workflow-steps/workflow-actions/delay-actions/components/WorkflowEditActionDelay.tsx
@@ -769,7 +785,6 @@ msgstr "Acțiuni pe care utilizatorii le pot efectua asupra acestui obiect"
 #: src/modules/settings/data-model/object-details/components/SettingsObjectFieldDisabledActionDropdown.tsx
 #: src/modules/settings/components/SettingsEnterpriseFeatureGateCard.tsx
 #: src/modules/information-banner/components/enterprise/InformationBannerLegacyEnterpriseKey.tsx
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
 msgid "Activate"
 msgstr "Activează"
 
@@ -777,11 +792,6 @@ msgstr "Activează"
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
 msgid "Activate Enterprise Key"
 msgstr "Activați cheia Enterprise"
-
-#. js-lingui-id: tu8A/k
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-msgid "Activate Workflow"
-msgstr "Activează Fluxul de Lucru"
 
 #. js-lingui-id: jSZacs
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
@@ -840,12 +850,6 @@ msgstr "Adaugă un grup"
 #: src/modules/ai/components/suggested-prompts/default-suggested-prompts.ts
 msgid "Add a new company we're in touch with (e.g. name, website, industry). Details: "
 msgstr "Adăugați o companie nouă cu care suntem în contact (de ex. nume, site web, industrie). Detalii: "
-
-#. js-lingui-id: m3/V2n
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-msgid "Add a node"
-msgstr "Adaugă nod"
 
 #. js-lingui-id: nGv1DN
 #: src/modules/side-panel/utils/getSidePanelSubPageTitle.ts
@@ -1024,6 +1028,7 @@ msgstr "Adăugați notă"
 
 #. js-lingui-id: dEO3Zx
 #: src/pages/settings/data-model/SettingsObjects.tsx
+#: src/pages/settings/data-model/SettingsObjects.tsx
 msgid "Add object"
 msgstr "Adaugă obiectul"
 
@@ -1129,14 +1134,6 @@ msgstr "Adaugă la lista neagră"
 msgid "Add to Favorite"
 msgstr "Adaugă la favorite"
 
-#. js-lingui-id: pBsoKL
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/mock/command-menu-items.mock.tsx
-#: src/modules/command-menu-item/mock/command-menu-items.mock.tsx
-msgid "Add to favorites"
-msgstr "Adaugă la favorite"
-
 #. js-lingui-id: q9e2Bs
 #: src/modules/views/view-picker/components/ViewPickerListContent.tsx
 msgid "Add view"
@@ -1154,6 +1151,16 @@ msgstr "Adaugă widget"
 #: src/modules/page-layout/widgets/components/DashboardWidgetPlaceholder.tsx
 msgid "Add Widget"
 msgstr "Adaugă Widget"
+
+#. js-lingui-id: 8zCitC
+#: src/modules/side-panel/pages/page-layout/components/WidgetSettingsPlacementSection.tsx
+msgid "Add widget above"
+msgstr ""
+
+#. js-lingui-id: yy7F6M
+#: src/modules/side-panel/pages/page-layout/components/WidgetSettingsPlacementSection.tsx
+msgid "Add widget below"
+msgstr ""
 
 #. js-lingui-id: m2qDV8
 #: src/modules/object-record/record-table/empty-state/utils/getEmptyStateTitle.ts
@@ -1329,6 +1336,7 @@ msgstr ""
 #. js-lingui-id: jsQZMk
 #: src/pages/settings/roles/SettingsRoleAddObjectLevel.tsx
 #: src/pages/settings/logic-functions/SettingsLogicFunctionDetail.tsx
+#: src/pages/settings/ai/SettingsToolDetail.tsx
 #: src/pages/settings/ai/SettingsSkillForm.tsx
 #: src/pages/settings/ai/SettingsAgentTurnDetail.tsx
 #: src/pages/settings/ai/SettingsAgentTurnDetail.tsx
@@ -1366,7 +1374,6 @@ msgstr ""
 #. js-lingui-id: kNfr85
 #: src/pages/settings/ai/forms/components/SettingsAIAgentForm.tsx
 #: src/pages/settings/ai/components/SettingsAgentSettingsTab.tsx
-#: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowAiAgentPromptTab.tsx
 msgid "AI Model"
 msgstr "Model AI"
 
@@ -1379,11 +1386,6 @@ msgstr "AI nu este configurată. Setați OPENAI_API_KEY, ANTHROPIC_API_KEY sau X
 #: src/modules/ai/components/RoutingDebugDisplay.tsx
 msgid "AI request prep"
 msgstr "Pregătire cerere AI"
-
-#. js-lingui-id: QwgquD
-#: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowOutputSchemaBuilder.tsx
-msgid "AI Response Schema"
-msgstr "Schema răspuns AI"
 
 #. js-lingui-id: tzhisR
 #: src/pages/settings/ai/SettingsAIUsageUserDetail.tsx
@@ -1721,6 +1723,8 @@ msgstr "A apărut o eroare la încărcarea imaginii."
 #: src/modules/views/hooks/internal/usePerformViewAPIPersist.ts
 #: src/modules/ui/feedback/snack-bar-manager/hooks/useSnackBar.ts
 #: src/modules/page-layout/hooks/useUpdatePageLayoutWithTabsAndWidgets.ts
+#: src/modules/page-layout/hooks/useResetPageLayoutWidgetToDefault.ts
+#: src/modules/page-layout/hooks/useResetPageLayoutTabToDefault.ts
 #: src/modules/object-metadata/hooks/useUpdateOneObjectMetadataItem.ts
 #: src/modules/object-metadata/hooks/useUpdateOneFieldMetadataItem.ts
 #: src/modules/object-metadata/hooks/useDeleteOneObjectMetadataItem.ts
@@ -1774,6 +1778,12 @@ msgstr "Și"
 #: src/modules/object-record/advanced-filter/components/AdvancedFilterSubFieldSelectMenu.tsx
 msgid "Any {fieldLabel} field"
 msgstr "Orice câmp {fieldLabel}"
+
+#. js-lingui-id: COyjuu
+#: src/modules/side-panel/pages/page-layout/components/WidgetSettingsManageSection.tsx
+#: src/modules/side-panel/pages/page-layout/components/dropdown-content/WidgetVisibilityDropdownContent.tsx
+msgid "Any device"
+msgstr ""
 
 #. js-lingui-id: I8f+hC
 #: src/modules/views/components/AnyFieldSearchChip.tsx
@@ -1902,6 +1912,7 @@ msgstr ""
 #: src/pages/settings/data-model/SettingsObjectFieldTable.tsx
 #: src/pages/settings/data-model/constants/SettingsObjectTableMetadata.ts
 #: src/pages/settings/applications/components/SettingsApplicationDataTable.tsx
+#: src/pages/settings/ai/components/SettingsToolsTable.tsx
 #: src/modules/settings/data-model/object-details/components/SettingsObjectRelationsTable.tsx
 msgid "App"
 msgstr ""
@@ -1947,6 +1958,11 @@ msgstr "Detalii aplicație"
 msgid "Application installed successfully."
 msgstr "Aplicația a fost instalată cu succes."
 
+#. js-lingui-id: LllWIc
+#: src/pages/settings/security/event-logs/components/EventLogTableSelector.tsx
+msgid "Application Logs"
+msgstr ""
+
 #. js-lingui-id: +tE2x9
 #: src/pages/settings/applications/tabs/SettingsApplicationDetailAboutTab.tsx
 msgid "Application successfully uninstalled."
@@ -1965,8 +1981,6 @@ msgstr "Aplicația a fost actualizată cu succes."
 #. js-lingui-id: fL7WXr
 #: src/pages/settings/logic-functions/SettingsLogicFunctionDetail.tsx
 #: src/pages/settings/applications/SettingsAvailableApplicationDetails.tsx
-#: src/pages/settings/applications/SettingsApplications.tsx
-#: src/pages/settings/applications/SettingsApplications.tsx
 #: src/pages/settings/applications/SettingsApplications.tsx
 #: src/pages/settings/applications/SettingsApplications.tsx
 #: src/pages/settings/applications/SettingsApplicationRegistrationDetails.tsx
@@ -2002,6 +2016,11 @@ msgstr "Domenii Aprobate"
 msgid "Apps"
 msgstr "Aplicații"
 
+#. js-lingui-id: dEnE1D
+#: src/pages/settings/applications/tabs/SettingsApplicationsDeveloperTab.tsx
+msgid "Apps made by other developers published on npm"
+msgstr ""
+
 #. js-lingui-id: 8HV3WN
 #: src/pages/settings/profile/appearance/components/LocalePicker.tsx
 msgid "Arabic"
@@ -2027,29 +2046,34 @@ msgstr "Sigur doriți să ștergeți {relationObjectMetadataNameSingular} asocia
 msgid "Are you sure you want to delete this skill? This action cannot be undone."
 msgstr "Sigur doriți să ștergeți această abilitate? Această acțiune nu poate fi anulată."
 
-#. js-lingui-id: OJOR8q
-#: src/modules/command-menu-item/record/multiple-records/components/DestroyMultipleRecordsCommand.tsx
-#: src/modules/command-menu-item/engine-command/record/multiple-records/components/DestroyMultipleRecordsCommand.tsx
-msgid "Are you sure you want to destroy these records? They won't be recoverable anymore."
-msgstr "Sunteți sigur că doriți să distrugeți aceste înregistrări? Ele nu vor mai fi recuperabile."
+#. js-lingui-id: 0Cs5HS
+#: src/pages/settings/ai/SettingsToolDetail.tsx
+msgid "Are you sure you want to delete this tool? This action cannot be undone."
+msgstr ""
 
-#. js-lingui-id: UK5TO6
-#: src/modules/command-menu-item/record/single-record/components/DestroySingleRecordCommand.tsx
-#: src/modules/command-menu-item/engine-command/record/single-record/components/DestroySingleRecordCommand.tsx
-msgid "Are you sure you want to destroy this record? It cannot be recovered anymore."
-msgstr "Sunteți sigur că doriți să distrugeți această înregistrare? Nu mai poate fi recuperată."
+#. js-lingui-id: EySr+c
+#. placeholder {0}: objectMetadataItem.labelPlural
+#: src/modules/command-menu-item/engine-command/record/components/DestroyRecordsCommand.tsx
+msgid "Are you sure you want to destroy these {0}? They won't be recoverable anymore."
+msgstr ""
 
-#. js-lingui-id: mcHVC1
-#: src/modules/command-menu-item/record/multiple-records/components/RestoreMultipleRecordsCommand.tsx
-#: src/modules/command-menu-item/engine-command/record/multiple-records/components/RestoreMultipleRecordsCommand.tsx
-msgid "Are you sure you want to restore these records?"
-msgstr "Sunteți sigur că doriți să restaurați aceste înregistrări?"
+#. js-lingui-id: GfgNgF
+#. placeholder {0}: objectMetadataItem.labelSingular
+#: src/modules/command-menu-item/engine-command/record/components/DestroyRecordsCommand.tsx
+msgid "Are you sure you want to destroy this {0}? It cannot be recovered anymore."
+msgstr ""
 
-#. js-lingui-id: lmgkf0
-#: src/modules/command-menu-item/record/single-record/components/RestoreSingleRecordCommand.tsx
-#: src/modules/command-menu-item/engine-command/record/single-record/components/RestoreSingleRecordCommand.tsx
-msgid "Are you sure you want to restore this record?"
-msgstr "Sunteți sigur că doriți să restaurați această înregistrare?"
+#. js-lingui-id: RzJL8J
+#. placeholder {0}: objectMetadataItem.labelPlural
+#: src/modules/command-menu-item/engine-command/record/components/RestoreRecordsCommand.tsx
+msgid "Are you sure you want to restore these {0}?"
+msgstr ""
+
+#. js-lingui-id: XTKWxO
+#. placeholder {0}: objectMetadataItem.labelSingular
+#: src/modules/command-menu-item/engine-command/record/components/RestoreRecordsCommand.tsx
+msgid "Are you sure you want to restore this {0}?"
+msgstr ""
 
 #. js-lingui-id: 9JFf0y
 #: src/modules/settings/members/components/MemberPermissionsTab.tsx
@@ -2086,9 +2110,6 @@ msgstr "Ascendent"
 #: src/modules/side-panel/hooks/useOpenAskAIPageInSidePanel.ts
 #: src/modules/side-panel/components/SidePanelAskAIInfo.tsx
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useActionRolePermissionFlagConfig.ts
-#: src/modules/command-menu-item/record-agnostic/constants/RecordAgnosticCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record-agnostic/constants/RecordAgnosticCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record-agnostic/constants/RecordAgnosticCommandMenuItemsConfig.tsx
 #: src/modules/command-menu-item/engine-command/constants/EngineComponentKeyHeadlessComponentMap.tsx
 msgid "Ask AI"
 msgstr "Întreabă AI"
@@ -2225,6 +2246,7 @@ msgstr "Atașați fișiere"
 
 #. js-lingui-id: w/Sphq
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionEmailBase.tsx
+#: src/modules/activities/emails/components/EmailComposerFields.tsx
 msgid "Attachments"
 msgstr "Atașamente"
 
@@ -2424,6 +2446,12 @@ msgstr "URL de bază"
 msgid "Base URL is required"
 msgstr "URL-ul de bază este necesar"
 
+#. js-lingui-id: /xLNEx
+#: src/modules/activities/emails/components/EmailComposerFields.tsx
+#: src/modules/activities/emails/components/EmailComposerFields.tsx
+msgid "Bcc"
+msgstr ""
+
 #. js-lingui-id: PFohi3
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionEmailBase.tsx
 msgid "BCC"
@@ -2559,11 +2587,6 @@ msgstr "Construiți un tablou de bord care să arate: (1) valoarea totală a pip
 #: src/modules/settings/data-model/fields/forms/morph-relation/components/SettingsDataModelFieldRelationJunctionForm.tsx
 msgid "Build many-to-many relations"
 msgstr "Creați relații de tip mulți-la-mulți"
-
-#. js-lingui-id: +7fBMP
-#: src/pages/settings/ai/components/SettingsToolsTable.tsx
-msgid "Built-in"
-msgstr "Integrat"
 
 #. js-lingui-id: uvoIrk
 #: src/pages/settings/admin-panel/SettingsAdminAiProviderDetail.tsx
@@ -2732,17 +2755,13 @@ msgstr "Nu poți scana? Copiază"
 #: src/modules/spreadsheet-import/steps/components/MatchColumnsStep/MatchColumnsStep.tsx
 #: src/modules/spreadsheet-import/steps/components/MatchColumnsStep/MatchColumnsStep.tsx
 #: src/modules/spreadsheet-import/provider/components/SpreadsheetImport.tsx
+#: src/modules/side-panel/pages/compose-email/components/SidePanelComposeEmailPage.tsx
 #: src/modules/settings/components/SaveAndCancelButtons/CancelButton.tsx
 #: src/modules/settings/components/SaveAndCancelButtons/CancelButton.tsx
 #: src/modules/object-record/record-update-multiple/components/UpdateMultipleRecordsFooter.tsx
-#: src/modules/command-menu-item/record/constants/DashboardCommandMenuItemsConfig.tsx
+#: src/modules/activities/emails/components/EmailComposer.tsx
 msgid "Cancel"
 msgstr "Anulare"
-
-#. js-lingui-id: HYLdMN
-#: src/modules/command-menu-item/record/constants/DashboardCommandMenuItemsConfig.tsx
-msgid "Cancel Edition"
-msgstr "Anulează ediția"
 
 #. js-lingui-id: dV4HC5
 #: src/modules/settings/billing/components/SettingsBillingSubscriptionInfo.tsx
@@ -2779,6 +2798,11 @@ msgstr "Anulați schimbarea planului"
 #: src/modules/settings/billing/components/SettingsBillingSubscriptionInfo.tsx
 msgid "Cancel plan switching?"
 msgstr "Anulați schimbarea planului?"
+
+#. js-lingui-id: AnRu/j
+#: src/modules/page-layout/widgets/email-thread/components/EmailThreadComposer.tsx
+msgid "Cancel reply"
+msgstr ""
 
 #. js-lingui-id: N6gPiD
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
@@ -2832,6 +2856,12 @@ msgstr "Nu puteți încărca mai mult de {maxNumberOfValues} fișiere"
 msgid "Captcha (anti-bot check) is still loading, try again"
 msgstr "Captcha (verificare anti-bot) încă se încarcă, încearcă din nou"
 
+#. js-lingui-id: kryGs+
+#: src/modules/side-panel/pages/page-layout/components/record-page/SidePanelRecordPageFieldSettings.tsx
+#: src/modules/side-panel/pages/page-layout/components/dropdown-content/FieldWidgetLayoutDropdownContent.tsx
+msgid "Card"
+msgstr ""
+
 #. js-lingui-id: M1RLfx
 #: src/pages/settings/profile/appearance/components/LocalePicker.tsx
 msgid "Catalan"
@@ -2842,10 +2872,21 @@ msgstr "Catalană"
 msgid "Category"
 msgstr "Categorie"
 
+#. js-lingui-id: RpYfjZ
+#: src/modules/activities/emails/components/EmailComposerFields.tsx
+#: src/modules/activities/emails/components/EmailComposerFields.tsx
+msgid "Cc"
+msgstr ""
+
 #. js-lingui-id: XdZeJk
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionEmailBase.tsx
 msgid "CC"
 msgstr "CC"
+
+#. js-lingui-id: Dgsw8A
+#: src/modules/activities/emails/components/EmailComposerFields.tsx
+msgid "Cc/Bcc"
+msgstr ""
 
 #. js-lingui-id: tHntRt
 #: src/modules/page-layout/widgets/standalone-rich-text/components/DashboardEditorSideMenu.tsx
@@ -2895,7 +2936,7 @@ msgid "Change to Yearly?"
 msgstr "Schimbă la anual?"
 
 #. js-lingui-id: nuBbBr
-#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutWidgetTypeSelect.tsx
+#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutDashboardWidgetTypeSelect.tsx
 #: src/modules/side-panel/components/hooks/usePageLayoutHeaderInfo.ts
 msgid "Chart"
 msgstr "Grafic"
@@ -3101,12 +3142,13 @@ msgstr "Închide"
 
 #. js-lingui-id: uYADQM
 #: src/modules/information-banner/components/InformationBanner.tsx
+#: src/modules/information-banner/components/InformationBanner.tsx
 msgid "Close banner"
 msgstr "Închide bannerul"
 
 #. js-lingui-id: saip/v
 #: src/modules/ui/layout/page-header/components/PageHeaderToggleSidePanelButton.tsx
-#: src/modules/command-menu-item/server-items/display/components/CommandMenuItemMoreActionsButton.tsx
+#: src/modules/side-panel/components/SidePanelToggleButton.tsx
 msgid "Close side panel"
 msgstr "Închide panoul lateral"
 
@@ -3133,7 +3175,6 @@ msgstr "Codificați funcția dumneavoastră"
 
 #. js-lingui-id: H86f9p
 #: src/pages/settings/security/event-logs/components/EventLogJsonCell.tsx
-#: src/pages/settings/ai/components/SettingsSystemToolTableRow.tsx
 #: src/modules/workflow/workflow-steps/components/WorkflowRunStepOutputDetail.tsx
 #: src/modules/workflow/workflow-steps/components/WorkflowRunStepInputDetail.tsx
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminJsonDataIndicatorHealthStatus.tsx
@@ -3230,7 +3271,6 @@ msgstr "Vizualizare compactă"
 
 #. js-lingui-id: s2QZS6
 #: src/modules/sign-in-background-mock/components/SignInBackgroundMockPage.tsx
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
 msgid "Companies"
 msgstr "Companii"
 
@@ -3311,11 +3351,6 @@ msgstr "Configurați setările CalDAV pentru a sincroniza evenimentele calendaru
 msgid "Configure date, time, number, timezone, and calendar start day"
 msgstr "Configurați data, ora, numărul, fusul orar și ziua de început a calendarului"
 
-#. js-lingui-id: +SQwHr
-#: src/pages/settings/ai/components/SettingsAIModelsTab.tsx
-msgid "Configure default AI models and availability"
-msgstr "Configurează modelele AI implicite și disponibilitatea"
-
 #. js-lingui-id: utsXG8
 #: src/pages/settings/security/SettingsSecurity.tsx
 msgid "Configure fallback login methods for users with SSO bypass permissions"
@@ -3361,6 +3396,11 @@ msgstr "Configurați acest widget pentru a afișa câmpuri"
 msgid "Configure when this function should be executed"
 msgstr "Configurați când trebuie executată această funcție"
 
+#. js-lingui-id: hzDiM0
+#: src/pages/settings/ai/components/SettingsAIModelsTab.tsx
+msgid "Configure your default AI model"
+msgstr ""
+
 #. js-lingui-id: Bh4GBD
 #: src/modules/settings/accounts/components/SettingsAccountsSettingsSection.tsx
 msgid "Configure your emails and calendar settings."
@@ -3385,7 +3425,6 @@ msgstr "Configurat"
 #: src/modules/settings/billing/components/SettingsBillingSubscriptionInfo.tsx
 #: src/modules/settings/billing/components/SettingsBillingSubscriptionInfo.tsx
 #: src/modules/settings/billing/components/SettingsBillingSubscriptionInfo.tsx
-#: src/modules/command-menu-item/display/components/CommandModal.tsx
 msgid "Confirm"
 msgstr "Confirmă"
 
@@ -3489,8 +3528,8 @@ msgstr "Conținut"
 
 #. js-lingui-id: M73whl
 #: src/modules/side-panel/pages/root/components/SidePanelRootPage.tsx
-#: src/modules/settings/admin-panel/ai/components/SettingsAdminAiModelHoverCard.tsx
-#: src/modules/command-menu-item/server-items/display/components/SidePanelCommandMenuItemDisplayPage.tsx
+#: src/modules/settings/ai/components/SettingsAiModelHoverCard.tsx
+#: src/modules/command-menu-item/display/components/SidePanelCommandMenuItemDisplayPage.tsx
 #: src/modules/ai/components/RoutingDebugDisplay.tsx
 msgid "Context"
 msgstr "Context"
@@ -3687,20 +3726,15 @@ msgstr "Obiecte de bază"
 msgid "Cost"
 msgstr "Cost"
 
-#. js-lingui-id: Iw/ard
-#: src/modules/settings/admin-panel/ai/components/SettingsAdminAiModelHoverCard.tsx
-msgid "Cost / 1M"
-msgstr "Cost / 1M"
-
-#. js-lingui-id: 3kzLg2
-#: src/modules/settings/admin-panel/ai/components/SettingsAdminAiModelsTable.tsx
-msgid "Cost / 1M tokens"
-msgstr "Cost / 1M jetoane"
-
 #. js-lingui-id: iX2opZ
 #: src/modules/settings/billing/components/SettingsBillingCreditsSection.tsx
 msgid "Cost per 1k Extra Credits"
 msgstr "Cost per 1k credite suplimentare"
+
+#. js-lingui-id: Z9Z9PX
+#: src/modules/settings/ai/components/SettingsAiModelHoverCard.tsx
+msgid "Cost per 1M tokens"
+msgstr ""
 
 #. js-lingui-id: 3X5ngu
 #: src/pages/settings/admin-panel/SettingsAdminNewAiModel.tsx
@@ -3798,17 +3832,6 @@ msgstr "creează"
 msgid "Create"
 msgstr "Creează"
 
-#. js-lingui-id: M1NpGt
-#: src/modules/command-menu-item/record-agnostic/hooks/useRelatedRecordCommands.ts
-#: src/modules/command-menu-item/record-agnostic/hooks/useRelatedRecordCommands.ts
-msgid "Create {targetObjectLabelSingular}"
-msgstr "Creează {targetObjectLabelSingular}"
-
-#. js-lingui-id: 5XhrY3
-#: src/pages/settings/applications/tabs/SettingsApplicationsDeveloperTab.tsx
-msgid "Create & Develop"
-msgstr "Creează și dezvoltă"
-
 #. js-lingui-id: 8aATyU
 #: src/modules/ai/components/suggested-prompts/default-suggested-prompts.ts
 msgid "Create a dashboard"
@@ -3849,6 +3872,11 @@ msgstr "Creează un flux de lucru și revino aici pentru a vizualiza versiunile 
 msgid "Create a workspace"
 msgstr "Creează un spațiu de lucru"
 
+#. js-lingui-id: /WlFSf
+#: src/pages/settings/applications/tabs/SettingsApplicationsDeveloperTab.tsx
+msgid "Create an application"
+msgstr ""
+
 #. js-lingui-id: 8ZjIgO
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useSettingsRolePermissionFlagConfig.ts
 msgid "Create and configure AI agents"
@@ -3870,25 +3898,10 @@ msgstr "Creează vizualizare personalizată"
 msgid "Create date field"
 msgstr "Creează câmp de dată"
 
-#. js-lingui-id: kCNBJG
-#: src/modules/command-menu-item/record/constants/DashboardCommandMenuItemsConfig.tsx
-msgid "Create new dashboard"
-msgstr "Creează noul tablou de bord"
-
-#. js-lingui-id: d0DCww
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "Create new record"
-msgstr "Creează înregistrare nouă"
-
 #. js-lingui-id: vY2Gfm
 #: src/modules/views/view-picker/components/ViewPickerCreateButton.tsx
 msgid "Create new view"
 msgstr "Creează vizualizare nouă"
-
-#. js-lingui-id: UDbEyl
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-msgid "Create new workflow"
-msgstr "Creează un nou flux de lucru"
 
 #. js-lingui-id: gSyzEV
 #: src/pages/onboarding/CreateProfile.tsx
@@ -3899,11 +3912,6 @@ msgstr "Creează profil"
 #: src/utils/title-utils.ts
 msgid "Create Profile"
 msgstr "Creează profil"
-
-#. js-lingui-id: GPuEIc
-#: src/modules/side-panel/pages/root/components/SidePanelRootPage.tsx
-msgid "Create Related Record"
-msgstr "Creează înregistrare similară"
 
 #. js-lingui-id: RoyYUE
 #: src/pages/settings/ai/components/SettingsAgentRoleTab.tsx
@@ -3925,12 +3933,6 @@ msgstr "Creează Select..."
 #: src/modules/views/view-picker/components/ViewPickerContentCreateMode.tsx
 #: src/modules/views/components/UpdateViewButtonGroup.tsx
 msgid "Create view"
-msgstr "Creează vizualizare"
-
-#. js-lingui-id: 3D0MXY
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "Create View"
 msgstr "Creează vizualizare"
 
 #. js-lingui-id: SiPp29
@@ -4108,6 +4110,7 @@ msgstr "Membru curent al spațiului de lucru nu a fost găsit."
 #. js-lingui-id: 8Tg/JR
 #: src/pages/settings/applications/SettingsApplicationDetails.tsx
 #: src/pages/settings/ai/components/SettingsToolsTable.tsx
+#: src/pages/settings/ai/components/SettingsToolsTable.tsx
 #: src/modules/settings/roles/role-permissions/object-level-permissions/components/SettingsRolePermissionsObjectLevelObjectPicker.tsx
 #: src/modules/settings/data-model/fields/forms/date/utils/getDisplayFormatLabel.ts
 msgid "Custom"
@@ -4148,11 +4151,6 @@ msgstr "Furnizor personalizat"
 msgid "Custom Providers"
 msgstr "Furnizori personalizați"
 
-#. js-lingui-id: jt16uy
-#: src/pages/settings/ai/components/SettingsToolsTable.tsx
-msgid "Custom tools created in your workspace"
-msgstr "Instrumente personalizate create în spațiul dvs. de lucru"
-
 #. js-lingui-id: BjGDEB
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownCustomView.tsx
 msgid "Custom View"
@@ -4169,6 +4167,7 @@ msgid "Customization"
 msgstr "Personalizare"
 
 #. js-lingui-id: srRMnJ
+#: src/modules/settings/data-model/object-details/components/tabs/ObjectLayout.tsx
 #: src/modules/navigation-menu-item/edit/side-panel/components/SidePanelNavigationMenuItemEditPage.tsx
 #: src/modules/navigation-menu-item/edit/side-panel/components/SidePanelEditObjectViewBase.tsx
 #: src/modules/navigation-menu-item/edit/side-panel/components/SidePanelEditLinkItemView.tsx
@@ -4189,6 +4188,16 @@ msgstr "Personalizați câmpurile"
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useSettingsRolePermissionFlagConfig.ts
 msgid "Customize page layouts and UI structure"
 msgstr "Personalizează dispunerea paginilor și structura UI"
+
+#. js-lingui-id: LMX+xC
+#: src/modules/settings/data-model/object-details/components/tabs/ObjectLayout.tsx
+msgid "Customize record page"
+msgstr ""
+
+#. js-lingui-id: 1KIzk7
+#: src/modules/settings/data-model/object-details/components/tabs/ObjectLayout.tsx
+msgid "Customize the layout for this role"
+msgstr ""
 
 #. js-lingui-id: ZBgSzH
 #: src/modules/settings/members/components/MemberPermissionsTab.tsx
@@ -4226,6 +4235,7 @@ msgstr "Utilizare zilnică"
 #: src/pages/settings/developers/api-keys/SettingsDevelopersApiKeyDetail.tsx
 #: src/pages/settings/data-model/SettingsObjectFieldEdit.tsx
 #: src/pages/settings/applications/tabs/SettingsApplicationRegistrationGeneralTab.tsx
+#: src/pages/settings/ai/SettingsToolDetail.tsx
 #: src/pages/settings/ai/SettingsSkillForm.tsx
 #: src/pages/settings/ai/components/SettingsAgentSettingsTab.tsx
 #: src/pages/settings/admin-panel/SettingsAdminAiProviderDetail.tsx
@@ -4249,28 +4259,22 @@ msgid "Dark"
 msgstr "Întunecat"
 
 #. js-lingui-id: ogQzcZ
-#: src/modules/command-menu-item/record/single-record/dashboard/components/DuplicateDashboardSingleRecordCommand.tsx
 #: src/modules/command-menu-item/engine-command/record/single-record/dashboard/components/DuplicateDashboardSingleRecordCommand.tsx
 msgid "Dashboard duplicated successfully"
 msgstr "Tabloul de bord a fost duplicat cu succes"
-
-#. js-lingui-id: w6iIMm
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "Dashboards"
-msgstr "Tablouri de Bord"
 
 #. js-lingui-id: HKH+W+
 #: src/pages/settings/applications/components/SettingsApplicationDataTable.tsx
 #: src/modules/side-panel/pages/workflow/trigger-type/components/SidePanelWorkflowSelectTriggerTypeContent.tsx
 #: src/modules/side-panel/pages/workflow/action/components/SidePanelWorkflowSelectAction.tsx
 #: src/modules/side-panel/pages/page-layout/constants/ChartSettingsHeadings.ts
-#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutRecordTableSettings.tsx
 #: src/modules/navigation-menu-item/edit/side-panel/components/SidePanelNewSidebarItemMainMenu.tsx
 msgid "Data"
 msgstr "Date"
 
 #. js-lingui-id: nxnCld
-#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutFieldsSettings.tsx
+#: src/modules/side-panel/pages/page-layout/components/record-page/SidePanelRecordPageFieldsSettings.tsx
+#: src/modules/side-panel/pages/page-layout/components/record-page/SidePanelRecordPageFieldSettings.tsx
 msgid "Data and display"
 msgstr "Date și afișare"
 
@@ -4316,7 +4320,7 @@ msgid "Data on display"
 msgstr "Date afișate"
 
 #. js-lingui-id: Ix/CMz
-#: src/modules/settings/admin-panel/ai/components/SettingsAdminAiModelHoverCard.tsx
+#: src/modules/settings/ai/components/SettingsAiModelHoverCard.tsx
 msgid "Data residency"
 msgstr "Rezidența datelor"
 
@@ -4423,7 +4427,6 @@ msgstr "Zile între acțiuni"
 #: src/pages/settings/ai/SettingsSkillForm.tsx
 #: src/modules/settings/security/components/SSO/SettingsSecuritySSORowDropdownMenu.tsx
 #: src/modules/settings/data-model/object-details/components/tabs/ObjectSettings.tsx
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
 msgid "Deactivate"
 msgstr "Dezactivează"
 
@@ -4453,11 +4456,6 @@ msgstr "Dezactivați sau ștergeți această abilitate"
 msgid "Deactivate this field"
 msgstr "Dezactivează acest câmp"
 
-#. js-lingui-id: 4tpC8V
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-msgid "Deactivate Workflow"
-msgstr "Dezactivează Fluxul de Lucru"
-
 #. js-lingui-id: yAT3be
 #: src/pages/settings/SettingsProfile.tsx
 #: src/pages/settings/data-model/SettingsObjectTable.tsx
@@ -4480,11 +4478,12 @@ msgid "Decide which Sub-address fields you want to display"
 msgstr "Decideți ce câmpuri Sub-adresă doriți să afișați"
 
 #. js-lingui-id: Bn9+El
-#: src/modules/ai/components/AIChatEditorSection.tsx
+#: src/modules/ai/hooks/useAiModelOptions.ts
 msgid "default"
 msgstr ""
 
 #. js-lingui-id: ovBPCi
+#: src/pages/settings/ai/components/SettingsAIModelsTab.tsx
 #: src/modules/settings/data-model/fields/forms/date/utils/getDisplayFormatLabel.ts
 #: src/modules/settings/data-model/fields/forms/address/components/MultiSelectAddressFields.tsx
 msgid "Default"
@@ -4563,6 +4562,11 @@ msgstr "Definiți numele și instrucțiunile pentru această abilitate"
 msgid "Define user roles and access levels"
 msgstr "Definirea rolurilor utilizatorilor și a nivelurilor de acces"
 
+#. js-lingui-id: ErLA3E
+#: src/pages/settings/ai/SettingsToolDetail.tsx
+msgid "Define what this tool does"
+msgstr ""
+
 #. js-lingui-id: bQkkFU
 #: src/modules/settings/accounts/components/SettingsAccountsMessageChannelDetails.tsx
 #: src/modules/settings/accounts/components/SettingsAccountsCalendarChannelDetails.tsx
@@ -4592,6 +4596,8 @@ msgstr "șterge"
 #: src/pages/settings/data-model/SettingsObjectFieldEdit.tsx
 #: src/pages/settings/applications/tabs/SettingsApplicationRegistrationGeneralTab.tsx
 #: src/pages/settings/applications/tabs/SettingsApplicationRegistrationGeneralTab.tsx
+#: src/pages/settings/ai/SettingsToolDetail.tsx
+#: src/pages/settings/ai/SettingsToolDetail.tsx
 #: src/pages/settings/ai/SettingsSkillForm.tsx
 #: src/pages/settings/ai/SettingsSkillForm.tsx
 #: src/pages/settings/ai/components/SettingsSkillInactiveMenuDropDown.tsx
@@ -4620,11 +4626,6 @@ msgstr "șterge"
 #: src/modules/object-record/record-field-list/record-detail-section/relation/components/RecordDetailRelationRecordsListItem.tsx
 #: src/modules/object-record/record-field/ui/meta-types/input/components/MultiItemFieldMenuItem.tsx
 #: src/modules/navigation-menu-item/display/folder/components/NavigationMenuItemFolderNavigationDrawerItemDropdown.tsx
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/mock/command-menu-items.mock.tsx
-#: src/modules/command-menu-item/mock/command-menu-items.mock.tsx
 #: src/modules/blocknote-editor/components/CustomSideMenu.tsx
 #: src/modules/activities/files/components/AttachmentDropdown.tsx
 msgid "Delete"
@@ -4685,16 +4686,6 @@ msgstr "Șterge cheia API"
 msgid "Delete app"
 msgstr "Șterge aplicația"
 
-#. js-lingui-id: ikGfT5
-#: src/modules/command-menu-item/record/constants/DashboardCommandMenuItemsConfig.tsx
-msgid "Delete dashboard"
-msgstr "Ștergeți tabloul de bord"
-
-#. js-lingui-id: qnWLDf
-#: src/modules/command-menu-item/record/constants/DashboardCommandMenuItemsConfig.tsx
-msgid "Delete dashboards"
-msgstr "Ștergeți tablourile de bord"
-
 #. js-lingui-id: gf2eXy
 #: src/pages/settings/ai/components/SettingsAgentEvalsTab.tsx
 msgid "Delete Evaluation Input"
@@ -4724,11 +4715,6 @@ msgstr "Șterge nodul"
 #: src/pages/settings/applications/tabs/SettingsApplicationRegistrationGeneralTab.tsx
 msgid "Delete or transfer this app registration"
 msgstr "Ștergeți sau transferați această înregistrare de aplicație"
-
-#. js-lingui-id: kf0A63
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "Delete records"
-msgstr "Ștergere înregistrări"
 
 #. js-lingui-id: mcXHCJ
 #: src/modules/settings/roles/role-permissions/objects-permissions/components/SettingsRolePermissionsObjectsSection.tsx
@@ -4770,10 +4756,20 @@ msgstr "Șterge această integrare"
 msgid "Delete this role and assign a new role to its members"
 msgstr "Șterge acest rol și atribuie un rol nou membrilor săi"
 
+#. js-lingui-id: UvEQr6
+#: src/pages/settings/ai/SettingsToolDetail.tsx
+msgid "Delete this tool"
+msgstr ""
+
 #. js-lingui-id: KSOhjo
 #: src/modules/settings/developers/components/SettingsDevelopersWebhookForm.tsx
 msgid "Delete this webhook"
 msgstr "Șterge acest webhook"
+
+#. js-lingui-id: rQiOWg
+#: src/pages/settings/ai/SettingsToolDetail.tsx
+msgid "Delete Tool"
+msgstr ""
 
 #. js-lingui-id: jPvFKE
 #: src/modules/settings/two-factor-authentication/components/DeleteTwoFactorAuthenticationMethod.tsx
@@ -4791,19 +4787,10 @@ msgid "Delete webhook"
 msgstr "Șterge webhook"
 
 #. js-lingui-id: tWD0z0
+#: src/modules/side-panel/pages/page-layout/components/WidgetSettingsManageSection.tsx
 #: src/modules/side-panel/pages/page-layout/components/WidgetSettingsFooter.tsx
 msgid "Delete widget"
 msgstr "Șterge widgetul"
-
-#. js-lingui-id: UA2IpC
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-msgid "Delete workflow"
-msgstr "Șterge fluxul de lucru"
-
-#. js-lingui-id: ABwG9x
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-msgid "Delete workflows"
-msgstr "Șterge fluxuri de lucru"
 
 #. js-lingui-id: kYu0eF
 #: src/modules/settings/profile/components/DeleteWorkspace.tsx
@@ -4828,15 +4815,15 @@ msgstr "Șters"
 msgid "Deleted record"
 msgstr "Înregistrare ștearsă"
 
-#. js-lingui-id: WH/5rN
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "Deleted records"
-msgstr "Înregistrări șterse"
-
 #. js-lingui-id: wIAG+H
 #: src/modules/settings/two-factor-authentication/components/DeleteTwoFactorAuthenticationMethod.tsx
 msgid "Deleting this method will remove it permanently from your account."
 msgstr "Ștergerea acestei metode o va elimina permanent din contul tău."
+
+#. js-lingui-id: Ssdrw4
+#: src/modules/settings/ai/components/SettingsAiModelsTable.tsx
+msgid "Deprecated"
+msgstr ""
 
 #. js-lingui-id: O3LJh6
 #: src/modules/side-panel/pages/page-layout/utils/getSortLabelSuffixForFieldType.ts
@@ -4861,9 +4848,10 @@ msgstr "Descrie ce dorești ca AI să facă..."
 
 #. js-lingui-id: Nu4oKW
 #: src/pages/settings/data-model/SettingsObjectFieldEdit.tsx
+#: src/pages/settings/applications/tabs/SettingsApplicationsDeveloperTab.tsx
 #: src/pages/settings/applications/components/SettingsApplicationsTable.tsx
 #: src/pages/settings/applications/components/SettingsApplicationNameDescriptionTable.tsx
-#: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowOutputSchemaBuilder.tsx
+#: src/pages/settings/ai/SettingsToolDetail.tsx
 #: src/modules/settings/roles/role-permissions/permission-flags/components/SettingsRolePermissionsSettingsTableHeader.tsx
 #: src/modules/settings/roles/role-assignment/components/SettingsRoleAssignmentTable.tsx
 #: src/modules/settings/logic-functions/components/SettingsLogicFunctionNewForm.tsx
@@ -4872,28 +4860,22 @@ msgstr "Descrie ce dorești ca AI să facă..."
 msgid "Description"
 msgstr "Descriere"
 
+#. js-lingui-id: BBqGS9
+#: src/modules/side-panel/pages/page-layout/components/WidgetSettingsManageSection.tsx
+#: src/modules/side-panel/pages/page-layout/components/dropdown-content/WidgetVisibilityDropdownContent.tsx
+msgid "Desktop"
+msgstr ""
+
 #. js-lingui-id: +ow7t4
 #: src/modules/settings/roles/role-permissions/object-level-permissions/utils/objectPermissionKeyToHumanReadableText.ts
 #: src/modules/metadata-error-handler/hooks/useMetadataErrorHandler.ts
 msgid "destroy"
 msgstr "distrugere"
 
-#. js-lingui-id: 2xxBws
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "Destroy"
-msgstr "Distrugere"
-
 #. js-lingui-id: YI3c7h
 #: src/modules/settings/roles/role-permissions/object-level-permissions/object-form/components/SettingsRolePermissionsObjectLevelObjectFormObjectLevel.tsx
 msgid "Destroy {objectLabelPlural}"
 msgstr "Distruge {objectLabelPlural}"
-
-#. js-lingui-id: kG5yO6
-#: src/modules/command-menu-item/record/multiple-records/components/DestroyMultipleRecordsCommand.tsx
-#: src/modules/command-menu-item/engine-command/record/multiple-records/components/DestroyMultipleRecordsCommand.tsx
-msgid "Destroy Records"
-msgstr "Distruge înregistrările"
 
 #. js-lingui-id: L68qSB
 #: src/modules/settings/roles/role-permissions/objects-permissions/components/SettingsRolePermissionsObjectsSection.tsx
@@ -4906,7 +4888,7 @@ msgid "Detach"
 msgstr "Detașează"
 
 #. js-lingui-id: URmyfc
-#: src/pages/settings/security/event-logs/components/EventLogResultsTable.tsx
+#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
 #: src/modules/ai/components/RoutingDebugDisplay.tsx
 msgid "Details"
 msgstr "Detalii"
@@ -4921,19 +4903,13 @@ msgstr "Dezvoltator"
 msgid "Developers links"
 msgstr "Linkuri pentru dezvoltatori"
 
-#. js-lingui-id: zAg2B9
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-msgid "Discard Draft"
-msgstr "Renunță la ciornă"
-
 #. js-lingui-id: Xm/s+u
 #: src/modules/settings/accounts/components/SettingsAccountsCalendarChannelsGeneral.tsx
 msgid "Display"
 msgstr "Afișare"
 
 #. js-lingui-id: Ldgs6e
-#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutFieldsSettings.tsx
+#: src/modules/side-panel/pages/page-layout/components/record-page/SidePanelRecordPageFieldsSettings.tsx
 msgid "Display \"More fields\" button"
 msgstr "Afișează butonul \"Mai multe câmpuri\""
 
@@ -5110,15 +5086,8 @@ msgstr "Trageți fișierul aici..."
 
 #. js-lingui-id: euc6Ns
 #: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutTabSettingsContent.tsx
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/DashboardCommandMenuItemsConfig.tsx
 msgid "Duplicate"
 msgstr ""
-
-#. js-lingui-id: MR2sZ1
-#: src/modules/command-menu-item/record/constants/DashboardCommandMenuItemsConfig.tsx
-msgid "Duplicate Dashboard"
-msgstr "Duplicați tabloul de bord"
 
 #. js-lingui-id: qaE1sk
 #: src/modules/workflow/workflow-steps/components/WorkflowStepFooter.tsx
@@ -5128,11 +5097,6 @@ msgstr "Duplică nodul"
 #. js-lingui-id: mMsEuG
 #: src/modules/side-panel/pages/page-layout/components/WidgetSettingsFooter.tsx
 msgid "Duplicate widget"
-msgstr ""
-
-#. js-lingui-id: 2RpRNn
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-msgid "Duplicate Workflow"
 msgstr ""
 
 #. js-lingui-id: cheWPw
@@ -5253,7 +5217,6 @@ msgstr "eddy@gmail.com, @apple.com"
 #: src/modules/object-record/record-group/hooks/useRecordGroupActions.ts
 #: src/modules/object-record/record-field/ui/meta-types/input/components/MultiItemFieldMenuItem.tsx
 #: src/modules/object-record/record-field/ui/form-types/components/FormMultiSelectFieldInput.tsx
-#: src/modules/command-menu-item/record/constants/DashboardCommandMenuItemsConfig.tsx
 msgid "Edit"
 msgstr "Editare"
 
@@ -5270,15 +5233,10 @@ msgstr "Editează Cont"
 
 #. js-lingui-id: t1EOLt
 #: src/modules/layout-customization/hooks/useEnterLayoutCustomizationMode.ts
-#: src/modules/command-menu-item/server-items/edit/components/CommandMenuItemEditButton.tsx
-#: src/modules/command-menu-item/server-items/edit/components/CommandMenuItemEditButton.tsx
+#: src/modules/command-menu-item/edit/components/CommandMenuItemEditButton.tsx
+#: src/modules/command-menu-item/edit/components/CommandMenuItemEditButton.tsx
 msgid "Edit actions"
 msgstr ""
-
-#. js-lingui-id: GpnfNN
-#: src/modules/command-menu-item/record/constants/DashboardCommandMenuItemsConfig.tsx
-msgid "Edit Dashboard"
-msgstr "Editează tabloul de bord"
 
 #. js-lingui-id: DMIYL8
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useSettingsRolePermissionFlagConfig.ts
@@ -5291,8 +5249,8 @@ msgid "Edit field values"
 msgstr "Editați valorile câmpului"
 
 #. js-lingui-id: oKQ7ls
+#: src/modules/side-panel/hooks/useOpenWidgetSettingsInSidePanel.ts
 #: src/modules/settings/roles/role-permissions/object-level-permissions/components/SettingsRolePermissionsObjectLevelTableHeader.tsx
-#: src/modules/page-layout/hooks/useEditPageLayoutWidget.ts
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownHiddenFieldsContent.tsx
 msgid "Edit Fields"
 msgstr "Editați câmpurile"
@@ -5305,20 +5263,14 @@ msgid "Edit folder"
 msgstr "Editați folderul"
 
 #. js-lingui-id: JTcEch
-#: src/modules/page-layout/hooks/useEditPageLayoutWidget.ts
+#: src/modules/side-panel/hooks/useOpenWidgetSettingsInSidePanel.ts
 msgid "Edit Graph"
 msgstr "Editează graficul"
 
 #. js-lingui-id: WXPnsc
-#: src/modules/page-layout/hooks/useEditPageLayoutWidget.ts
+#: src/modules/side-panel/hooks/useOpenWidgetSettingsInSidePanel.ts
 msgid "Edit iFrame"
 msgstr "Editare iFrame"
-
-#. js-lingui-id: NZubw3
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "Edit Layout"
-msgstr "Editează dispunerea"
 
 #. js-lingui-id: /PoNoq
 #: src/modules/navigation-menu-item/edit/side-panel/hooks/useAddLinkToNavigationMenu.ts
@@ -5326,11 +5278,6 @@ msgstr "Editează dispunerea"
 #: src/modules/navigation-menu-item/display/dnd/hooks/useHandleAddToNavigationDrop.ts
 msgid "Edit link"
 msgstr "Editați linkul"
-
-#. js-lingui-id: m52s8z
-#: src/modules/command-menu-item/record-agnostic/constants/RecordAgnosticCommandMenuItemsConfig.tsx
-msgid "Edit navigation sidebar"
-msgstr "Editează bara laterală de navigare"
 
 #. js-lingui-id: IaSCqp
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useActionRolePermissionFlagConfig.ts
@@ -5350,7 +5297,7 @@ msgid "Edit Profile"
 msgstr ""
 
 #. js-lingui-id: 19vPbj
-#: src/modules/page-layout/hooks/useEditPageLayoutWidget.ts
+#: src/modules/side-panel/hooks/useOpenWidgetSettingsInSidePanel.ts
 msgid "Edit Record Table"
 msgstr "Editează tabelul de înregistrări"
 
@@ -5358,11 +5305,6 @@ msgstr "Editează tabelul de înregistrări"
 #: src/modules/settings/roles/role-permissions/objects-permissions/components/SettingsRolePermissionsObjectsSection.tsx
 msgid "Edit Records on All Objects"
 msgstr "Editează înregistrări pentru toate obiectele"
-
-#. js-lingui-id: DpuBzU
-#: src/modules/command-menu-item/record-agnostic/constants/RecordAgnosticCommandMenuItemsConfig.tsx
-msgid "Edit sidebar"
-msgstr "Editează bara laterală"
 
 #. js-lingui-id: eMFB6/
 #: src/modules/views/view-picker/components/ViewPickerContentEditMode.tsx
@@ -5381,6 +5323,8 @@ msgstr ""
 
 #. js-lingui-id: uBAxNB
 #: src/pages/settings/logic-functions/SettingsLogicFunctionDetail.tsx
+#: src/modules/side-panel/pages/page-layout/components/record-page/SidePanelRecordPageFieldSettings.tsx
+#: src/modules/side-panel/pages/page-layout/components/dropdown-content/FieldWidgetLayoutDropdownContent.tsx
 msgid "Editor"
 msgstr "Editor"
 
@@ -5458,15 +5402,15 @@ msgstr "E-mailul trebuie să fie unul valid"
 msgid "Email or domain is already in blocklist"
 msgstr "Emailul sau domeniul este deja în lista de blocare"
 
+#. js-lingui-id: Xl929X
+#: src/modules/activities/emails/hooks/useSendEmail.ts
+msgid "Email sent successfully"
+msgstr ""
+
 #. js-lingui-id: jvneza
 #: src/pages/settings/applications/SettingsAvailableApplicationDetails.tsx
 msgid "Email support"
 msgstr ""
-
-#. js-lingui-id: +VjrH/
-#: src/modules/side-panel/hooks/useOpenEmailThreadInSidePanel.ts
-msgid "Email Thread"
-msgstr "Fir de e-mail"
 
 #. js-lingui-id: LimKOG
 #: src/pages/settings/security/SettingsSecurityApprovedAccessDomain.tsx
@@ -5563,7 +5507,6 @@ msgstr "Gol"
 
 #. js-lingui-id: OMbipf
 #: src/pages/settings/security/event-logs/components/EventLogJsonCell.tsx
-#: src/pages/settings/ai/components/SettingsSystemToolTableRow.tsx
 #: src/modules/workflow/workflow-steps/components/WorkflowRunStepOutputDetail.tsx
 #: src/modules/workflow/workflow-steps/components/WorkflowRunStepInputDetail.tsx
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminJsonDataIndicatorHealthStatus.tsx
@@ -5579,7 +5522,7 @@ msgid "Empty Array"
 msgstr "Array Gol"
 
 #. js-lingui-id: 8X+jbk
-#: src/modules/activities/emails/components/EmailsCard.tsx
+#: src/modules/activities/emails/components/EmptyInboxPlaceholder.tsx
 msgid "Empty Inbox"
 msgstr "Inbox gol"
 
@@ -5605,14 +5548,24 @@ msgid "Enable bypass options"
 msgstr "Activează opțiunile de evitare"
 
 #. js-lingui-id: gZo0V9
-#: src/pages/settings/ai/components/SettingsAgentModelCapabilities.tsx
+#: src/modules/ai/components/SettingsAgentModelCapabilities.tsx
 msgid "Enable model-specific features"
 msgstr "Activează funcții specifice modelului"
+
+#. js-lingui-id: IrI9pg
+#: src/modules/settings/admin-panel/health-status/maintenance-mode/components/SettingsAdminMaintenanceMode.tsx
+msgid "End date"
+msgstr ""
 
 #. js-lingui-id: VFv2ZC
 #: src/pages/settings/security/event-logs/components/EventLogFilters.tsx
 msgid "End Date"
 msgstr "Data de sfârșit"
+
+#. js-lingui-id: Fqu/aC
+#: src/modules/settings/admin-panel/health-status/maintenance-mode/components/SettingsAdminMaintenanceMode.tsx
+msgid "End date must be after start date."
+msgstr ""
 
 #. js-lingui-id: k1i50B
 #: src/modules/information-banner/components/billing/InformationBannerEndTrialPeriod.tsx
@@ -6127,8 +6080,8 @@ msgid "Evaluations"
 msgstr ""
 
 #. js-lingui-id: 0pC/y6
-#: src/pages/settings/security/event-logs/components/EventLogResultsTable.tsx
-#: src/pages/settings/security/event-logs/components/EventLogResultsTable.tsx
+#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
+#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
 #: src/modules/activities/calendar/components/CalendarEventDetails.tsx
 msgid "Event"
 msgstr "Eveniment"
@@ -6247,6 +6200,11 @@ msgstr "Excludeți emailurile neprofesionale"
 msgid "Exclude the following people and domains from my email sync. Internal conversations will not be imported"
 msgstr "Exclude următoarele persoane și domenii din sincronizarea mea de email. Conversațiile interne nu vor fi importate"
 
+#. js-lingui-id: B0clc7
+#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
+msgid "Execution ID"
+msgstr ""
+
 #. js-lingui-id: YzI8cc
 #: src/modules/workflow/workflow-steps/workflow-actions/form-action/components/WorkflowFormFieldSettingsSelect.tsx
 msgid "Existing Field"
@@ -6274,7 +6232,6 @@ msgstr "Ieșire din Setări"
 
 #. js-lingui-id: 1A3EXy
 #: src/pages/settings/security/event-logs/components/EventLogJsonCell.tsx
-#: src/pages/settings/ai/components/SettingsSystemToolTableRow.tsx
 #: src/modules/workflow/workflow-steps/components/WorkflowRunStepOutputDetail.tsx
 #: src/modules/workflow/workflow-steps/components/WorkflowRunStepInputDetail.tsx
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminJsonDataIndicatorHealthStatus.tsx
@@ -6355,15 +6312,6 @@ msgstr "Expiră în {dateDiff}"
 
 #. js-lingui-id: GS+Mus
 #: src/modules/object-record/record-index/export/hooks/useRecordIndexExportRecords.ts
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/mock/command-menu-items.mock.tsx
-#: src/modules/command-menu-item/mock/command-menu-items.mock.tsx
 msgid "Export"
 msgstr "Export"
 
@@ -6381,73 +6329,6 @@ msgstr "Export ({percentageValue}%)"
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useActionRolePermissionFlagConfig.ts
 msgid "Export CSV"
 msgstr "Export CSV"
-
-#. js-lingui-id: KVvnDa
-#: src/modules/command-menu-item/record/constants/DashboardCommandMenuItemsConfig.tsx
-msgid "Export dashboard"
-msgstr "Exportă tabloul de bord"
-
-#. js-lingui-id: wVUjld
-#: src/modules/command-menu-item/record/constants/WorkspaceMembersCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/WorkspaceMembersCommandMenuItemsConfig.tsx
-msgid "Export member"
-msgstr ""
-
-#. js-lingui-id: D0b3Ip
-#: src/modules/command-menu-item/record/constants/WorkspaceMembersCommandMenuItemsConfig.tsx
-msgid "Export members"
-msgstr ""
-
-#. js-lingui-id: ep2rbf
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "Export records"
-msgstr "Exportul înregistrărilor"
-
-#. js-lingui-id: iHK6np
-#: src/modules/command-menu-item/record/constants/WorkflowRunsCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/WorkflowRunsCommandMenuItemsConfig.tsx
-msgid "Export run"
-msgstr "Exportare rulare"
-
-#. js-lingui-id: vwtAUW
-#: src/modules/command-menu-item/record/constants/WorkflowRunsCommandMenuItemsConfig.tsx
-msgid "Export runs"
-msgstr "Exportă rulările"
-
-#. js-lingui-id: q46CjD
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "Export to PDF"
-msgstr "Export în format PDF"
-
-#. js-lingui-id: BuprEs
-#: src/modules/command-menu-item/record/constants/WorkflowVersionsCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/WorkflowVersionsCommandMenuItemsConfig.tsx
-msgid "Export version"
-msgstr "Exportă versiunea"
-
-#. js-lingui-id: 4FLUle
-#: src/modules/command-menu-item/record/constants/WorkflowVersionsCommandMenuItemsConfig.tsx
-msgid "Export versions"
-msgstr "Exportă versiunile"
-
-#. js-lingui-id: DaGxE0
-#: src/modules/command-menu-item/record/constants/WorkspaceMembersCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/WorkflowRunsCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "Export view"
-msgstr "Exportați vizualizarea"
-
-#. js-lingui-id: +FMXdE
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-msgid "Export workflow"
-msgstr "Exportă flux de lucru"
-
-#. js-lingui-id: XcAij/
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-msgid "Export workflows"
-msgstr "Exportă fluxuri de lucru"
 
 #. js-lingui-id: 1JBTZV
 #: src/modules/workflow/workflow-trigger/components/WorkflowEditTriggerCronForm.tsx
@@ -6503,7 +6384,7 @@ msgid "Failed to add provider"
 msgstr "Eroare la adăugarea furnizorului"
 
 #. js-lingui-id: WM7GKt
-#: src/pages/settings/ai/components/SettingsToolsTable.tsx
+#: src/pages/settings/ai/SettingsAI.tsx
 msgid "Failed to create tool"
 msgstr "Crearea instrumentului a eșuat"
 
@@ -6517,14 +6398,17 @@ msgstr "Eșuat la ștergerea locurilor de muncă. Încercați din nou mai târzi
 msgid "Failed to delete skill"
 msgstr "Ștergerea abilității a eșuat"
 
+#. js-lingui-id: AUprM8
+#: src/pages/settings/ai/SettingsToolDetail.tsx
+msgid "Failed to delete tool"
+msgstr ""
+
 #. js-lingui-id: NUmmdc
-#: src/modules/command-menu-item/record/single-record/dashboard/components/DuplicateDashboardSingleRecordCommand.tsx
 #: src/modules/command-menu-item/engine-command/record/single-record/dashboard/components/DuplicateDashboardSingleRecordCommand.tsx
 msgid "Failed to duplicate dashboard"
 msgstr "Duplicarea tabloului de bord a eșuat"
 
 #. js-lingui-id: WYXxQF
-#: src/modules/command-menu-item/record/single-record/workflow/components/DuplicateWorkflowSingleRecordCommand.tsx
 #: src/modules/command-menu-item/engine-command/record/single-record/workflow/components/DuplicateWorkflowSingleRecordCommand.tsx
 msgid "Failed to duplicate workflow"
 msgstr ""
@@ -6615,6 +6499,17 @@ msgstr ""
 msgid "Failed to save workspace instructions"
 msgstr "Nu s-au putut salva instrucțiunile spațiului de lucru"
 
+#. js-lingui-id: Lo/GQ5
+#: src/modules/activities/emails/hooks/useSendEmail.ts
+#: src/modules/activities/emails/hooks/useSendEmail.ts
+msgid "Failed to send email"
+msgstr ""
+
+#. js-lingui-id: aj02T8
+#: src/modules/settings/admin-panel/health-status/maintenance-mode/components/SettingsAdminMaintenanceMode.tsx
+msgid "Failed to set maintenance mode."
+msgstr ""
+
 #. js-lingui-id: LVcnN8
 #: src/pages/settings/applications/tabs/SettingsApplicationRegistrationGeneralTab.tsx
 msgid "Failed to transfer ownership. Check that the subdomain is correct."
@@ -6637,6 +6532,8 @@ msgstr "Eroare la actualizarea modelului"
 
 #. js-lingui-id: W7Ff/4
 #: src/pages/settings/ai/components/SettingsAIModelsTab.tsx
+#: src/pages/settings/ai/components/SettingsAIModelsTab.tsx
+#: src/pages/settings/admin-panel/SettingsAdminAiProviderDetail.tsx
 #: src/pages/settings/admin-panel/SettingsAdminAiProviderDetail.tsx
 msgid "Failed to update model availability"
 msgstr "Eroare la actualizarea disponibilității modelului"
@@ -6645,6 +6542,11 @@ msgstr "Eroare la actualizarea disponibilității modelului"
 #: src/modules/settings/admin-panel/ai/components/SettingsAdminAI.tsx
 msgid "Failed to update model recommendation"
 msgstr "Eroare la actualizarea recomandării de model"
+
+#. js-lingui-id: q1MtjM
+#: src/modules/settings/admin-panel/ai/components/SettingsAdminAI.tsx
+msgid "Failed to update model recommendations"
+msgstr ""
 
 #. js-lingui-id: rCUG3c
 #: src/pages/settings/ai/components/SettingsAIModelsTab.tsx
@@ -6679,6 +6581,7 @@ msgstr "Actualizarea aplicației a eșuat."
 #. js-lingui-id: jU/HbX
 #: src/modules/object-record/record-field/ui/meta-types/hooks/useUploadFilesFieldFile.ts
 #: src/modules/advanced-text-editor/hooks/useUploadWorkflowFile.ts
+#: src/modules/activities/emails/hooks/useUploadEmailAttachment.ts
 msgid "Failed to upload \"{fileNameForError}\""
 msgstr "Nu s-a reușit încărcarea \"{fileNameForError}\""
 
@@ -6701,6 +6604,11 @@ msgstr "Nu s-a reușit încărcarea imaginii"
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminHealthAccountSyncCountersTable.tsx
 msgid "Failure Rate"
 msgstr "Rată de eșec"
+
+#. js-lingui-id: 8wngZM
+#: src/modules/command-menu-item/display/components/SidePanelCommandMenuItemDisplayPage.tsx
+msgid "Fallback"
+msgstr ""
 
 #. js-lingui-id: ocUvR+
 #: src/modules/ui/field/display/components/BooleanDisplay.tsx
@@ -6759,6 +6667,10 @@ msgstr "câmp"
 #. js-lingui-id: AXjA78
 #: src/modules/workflow/workflow-steps/workflow-actions/form-action/components/WorkflowFormFieldSettingsSelect.tsx
 #: src/modules/side-panel/pages/page-layout/utils/getFieldLabelWithSubField.ts
+#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutRecordPageWidgetTypeSelect.tsx
+#: src/modules/side-panel/pages/page-layout/components/record-page/SidePanelRecordPageFieldSettings.tsx
+#: src/modules/side-panel/pages/page-layout/components/record-page/SidePanelRecordPageFieldSettings.tsx
+#: src/modules/side-panel/pages/page-layout/components/dropdown-content/FieldWidgetLayoutDropdownContent.tsx
 #: src/modules/settings/developers/components/WebhookEntitySelect.tsx
 #: src/modules/page-layout/widgets/components/RecordPageAddWidgetSection.tsx
 msgid "Field"
@@ -6774,11 +6686,6 @@ msgstr "Câmp șters"
 msgid "Field name"
 msgstr "Nume câmp"
 
-#. js-lingui-id: fV7qkH
-#: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowOutputSchemaBuilder.tsx
-msgid "Field Name"
-msgstr "Nume câmp"
-
 #. js-lingui-id: x07QTl
 #: src/modules/settings/data-model/fields/forms/morph-relation/components/SettingsDataModelFieldRelationForm.tsx
 msgid "Field on destination"
@@ -6787,6 +6694,17 @@ msgstr "Câmp pe destinație"
 #. js-lingui-id: P8JCfj
 #: src/modules/metadata-error-handler/hooks/useMetadataErrorHandler.ts
 msgid "field permission"
+msgstr ""
+
+#. js-lingui-id: lcNTiF
+#: src/modules/side-panel/pages/page-layout/utils/getPageLayoutPageTitle.ts
+#: src/modules/side-panel/hooks/useOpenWidgetSettingsInSidePanel.ts
+msgid "Field widget"
+msgstr ""
+
+#. js-lingui-id: hlVgd/
+#: src/modules/side-panel/components/hooks/usePageLayoutHeaderInfo.ts
+msgid "Field Widget"
 msgstr ""
 
 #. js-lingui-id: RnX5oc
@@ -6800,7 +6718,8 @@ msgstr "câmpuri"
 #: src/pages/settings/data-model/constants/SettingsObjectTableMetadata.ts
 #: src/pages/settings/applications/components/SettingsApplicationDataTable.tsx
 #: src/pages/settings/applications/components/SettingsApplicationDataTable.tsx
-#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutRecordTableSettings.tsx
+#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutRecordPageWidgetTypeSelect.tsx
+#: src/modules/side-panel/pages/page-layout/components/dashboard/SidePanelDashboardRecordTableSettings.tsx
 #: src/modules/settings/roles/role-permissions/object-level-permissions/record-level-permissions/components/SettingsRolePermissionsObjectLevelRecordLevelPermissionFieldSelectFieldMenu.tsx
 #: src/modules/settings/data-model/object-details/components/tabs/ObjectFields.tsx
 #: src/modules/settings/data-model/new-object/components/SettingsAvailableStandardObjectsSection.tsx
@@ -6862,12 +6781,14 @@ msgstr "Al cincilea"
 
 #. js-lingui-id: sWmIx3
 #: src/modules/advanced-text-editor/hooks/useUploadWorkflowFile.ts
+#: src/modules/activities/emails/hooks/useUploadEmailAttachment.ts
 msgid "File \"{fileName}\" exceeds {maxUploadSize}"
 msgstr "Fișierul \"{fileName}\" depășește {maxUploadSize}"
 
 #. js-lingui-id: 0bK1RI
 #: src/modules/object-record/record-field/ui/meta-types/hooks/useUploadFilesFieldFile.ts
 #: src/modules/advanced-text-editor/hooks/useUploadWorkflowFile.ts
+#: src/modules/activities/emails/hooks/useUploadEmailAttachment.ts
 msgid "File \"{fileName}\" uploaded successfully"
 msgstr "Fișierul \"{fileName}\" a fost încărcat cu succes"
 
@@ -6902,7 +6823,7 @@ msgstr "Fișiere"
 #: src/modules/views/components/ViewBarFilterDropdownFieldSelectMenu.tsx
 #: src/modules/views/components/ViewBarFilterButton.tsx
 #: src/modules/side-panel/pages/page-layout/constants/settings/ChartConfigurationSettingLabels.ts
-#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutRecordTableSettings.tsx
+#: src/modules/side-panel/pages/page-layout/components/dashboard/SidePanelDashboardRecordTableSettings.tsx
 #: src/modules/settings/roles/components/SettingsRolesList.tsx
 #: src/modules/settings/data-model/object-details/components/SettingsObjectRelationsTable.tsx
 #: src/modules/object-record/record-table/record-table-header/components/RecordTableColumnHeadDropdownMenu.tsx
@@ -7087,6 +7008,11 @@ msgstr "Creditele din perioada de probă au fost epuizate. Abonați-vă acum pen
 msgid "French"
 msgstr "Franceză"
 
+#. js-lingui-id: ejVYRQ
+#: src/modules/activities/emails/components/EmailComposerFields.tsx
+msgid "From"
+msgstr ""
+
 #. js-lingui-id: qR8gT9
 #: src/modules/workflow/workflow-trigger/utils/cron-to-human/descriptors/getDayOfWeekDescription.ts
 msgid "from {startDay} to {endDay}"
@@ -7104,7 +7030,8 @@ msgid "Front components"
 msgstr "Componente Front"
 
 #. js-lingui-id: xf0TNb
-#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutWidgetTypeSelect.tsx
+#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutRecordPageWidgetTypeSelect.tsx
+#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutDashboardWidgetTypeSelect.tsx
 msgid "Front Components"
 msgstr "Componente Front"
 
@@ -7114,15 +7041,15 @@ msgstr "Componente Front"
 msgid "Full access"
 msgstr "Acces complet"
 
+#. js-lingui-id: YMZBxa
+#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
+msgid "Function"
+msgstr ""
+
 #. js-lingui-id: AHOl4W
 #: src/modules/settings/logic-functions/components/SettingsLogicFunctionLabelContainer.tsx
 msgid "Function name"
 msgstr "Numele funcției"
-
-#. js-lingui-id: xANKBj
-#: src/pages/settings/applications/tabs/SettingsApplicationDetailContentTab.tsx
-msgid "Functions"
-msgstr "Funcții"
 
 #. js-lingui-id: tkr79G
 #: src/utils/title-utils.ts
@@ -7211,61 +7138,18 @@ msgstr "Înapoi"
 msgid "Go to billing portal"
 msgstr "Accesați portalul de facturare"
 
-#. js-lingui-id: mUbv8L
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "Go to Companies"
-msgstr "Mergi la Companii"
-
-#. js-lingui-id: dvMw7T
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "Go to Dashboards"
-msgstr "Mergi la tablou de bord"
-
 #. js-lingui-id: dHvI9O
 #: src/modules/workflow/components/OverrideWorkflowDraftConfirmationModal.tsx
 msgid "Go to Draft"
 msgstr "Mergi la schiță"
-
-#. js-lingui-id: BQE4ob
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "Go to Notes"
-msgstr "Mergi la Note"
-
-#. js-lingui-id: buPcNi
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "Go to Opportunities"
-msgstr "Mergi la Oportunități"
-
-#. js-lingui-id: MrE/Qb
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/mock/command-menu-items.mock.tsx
-msgid "Go to People"
-msgstr "Mergi la Persoane"
-
-#. js-lingui-id: iS69s6
-#: src/modules/command-menu-item/record/constants/WorkflowVersionsCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-msgid "Go to runs"
-msgstr "Mergi la rulări"
 
 #. js-lingui-id: mT57+Q
 #: src/modules/views/view-picker/components/ViewPickerEditButton.tsx
 #: src/modules/views/view-picker/components/ViewPickerCreateButton.tsx
 #: src/modules/views/view-picker/components/ViewPickerCreateButton.tsx
 #: src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateRemote.tsx
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
 msgid "Go to Settings"
 msgstr "Mergeți la Setări"
-
-#. js-lingui-id: BM24SF
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "Go to Tasks"
-msgstr "Mergi la Sarcini"
-
-#. js-lingui-id: 203RqP
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "Go to Workflows"
-msgstr "Mergi la fluxuri de lucru"
 
 #. js-lingui-id: FYlHHU
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
@@ -7463,36 +7347,6 @@ msgstr "Câmpuri ascunse"
 msgid "Hide"
 msgstr "Ascunde"
 
-#. js-lingui-id: OlbYor
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "Hide deleted"
-msgstr "Ascunde șterse"
-
-#. js-lingui-id: rp2bZI
-#: src/modules/command-menu-item/record/constants/DashboardCommandMenuItemsConfig.tsx
-msgid "Hide deleted dashboards"
-msgstr "Ascunde tablourile de bord șterse"
-
-#. js-lingui-id: OTmbll
-#: src/modules/command-menu-item/record/constants/WorkspaceMembersCommandMenuItemsConfig.tsx
-msgid "Hide deleted members"
-msgstr ""
-
-#. js-lingui-id: FHhlye
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "Hide deleted records"
-msgstr "Ascunde înregistrările șterse"
-
-#. js-lingui-id: 0dZtKR
-#: src/modules/command-menu-item/record/constants/WorkflowRunsCommandMenuItemsConfig.tsx
-msgid "Hide deleted runs"
-msgstr "Ascunde rulările șterse"
-
-#. js-lingui-id: aOZAIB
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-msgid "Hide deleted workflows"
-msgstr "Ascunde fluxuri de lucru șterse"
-
 #. js-lingui-id: MuEcPp
 #: src/modules/side-panel/pages/page-layout/constants/settings/ChartConfigurationSettingLabels.ts
 msgid "Hide empty category"
@@ -7514,7 +7368,7 @@ msgid "Hide hidden groups"
 msgstr "Ascundeți grupurile ascunse"
 
 #. js-lingui-id: 2ouyMV
-#: src/modules/command-menu-item/server-items/edit/components/CommandMenuItemOptionsDropdown.tsx
+#: src/modules/command-menu-item/edit/components/CommandMenuItemOptionsDropdown.tsx
 msgid "Hide label"
 msgstr ""
 
@@ -7591,7 +7445,7 @@ msgid "https://example.com/callback"
 msgstr "https://example.com/callback"
 
 #. js-lingui-id: yhVtER
-#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutIframeSettings.tsx
+#: src/modules/side-panel/pages/page-layout/components/dashboard/SidePanelDashboardIframeSettings.tsx
 msgid "https://example.com/embed"
 msgstr "https://example.com/embed"
 
@@ -7673,6 +7527,11 @@ msgstr "dacă"
 msgid "If disabled, use advanced search filters to find these records"
 msgstr ""
 
+#. js-lingui-id: bTDz/2
+#: src/modules/settings/admin-panel/health-status/maintenance-mode/components/SettingsAdminMaintenanceMode.tsx
+msgid "If there's no link, no button will appear."
+msgstr ""
+
 #. js-lingui-id: ZfP/Ap
 #: src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateRemote.tsx
 msgid "If this is unexpected, please verify your settings."
@@ -7689,7 +7548,7 @@ msgid "If you’ve lost this key, you can regenerate it, but be aware that any s
 msgstr "Dacă ați pierdut această cheie, o puteți regenera, dar aveți în vedere că orice script folosind această cheie va necesita actualizare. Vă rugăm să tastați \"{confirmationValue}\" pentru confirmare."
 
 #. js-lingui-id: KDMdBi
-#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutWidgetTypeSelect.tsx
+#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutDashboardWidgetTypeSelect.tsx
 msgid "iFrame"
 msgstr "iFrame"
 
@@ -7767,7 +7626,6 @@ msgstr "Impersonarea este dezactivată pentru acest spațiu de lucru"
 
 #. js-lingui-id: l3s5ri
 #: src/modules/settings/accounts/components/SettingsAccountsMessageChannelDetails.tsx
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
 msgid "Import"
 msgstr "Importați"
 
@@ -7785,16 +7643,6 @@ msgstr "Importă CSV"
 #: src/modules/settings/accounts/components/SettingsAccountsMessageFolderCard.tsx
 msgid "Import only selected folders/labels"
 msgstr "Importă doar folderele/etichetele selectate"
-
-#. js-lingui-id: eECp4f
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "Import records"
-msgstr "Importă înregistrări"
-
-#. js-lingui-id: ZsIcZZ
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-msgid "Import workflows"
-msgstr "Importă fluxuri de lucru"
 
 #. js-lingui-id: wsKZ+v
 #: src/modules/spreadsheet-import/steps/components/MatchColumnsStep/components/ColumnGrid.tsx
@@ -7900,6 +7748,11 @@ msgstr "Informații"
 msgid "Input"
 msgstr "Intrare"
 
+#. js-lingui-id: /OdOC/
+#: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowAiAgentPromptTab.tsx
+msgid "Input (Prompt)"
+msgstr ""
+
 #. js-lingui-id: JE2tjr
 #: src/pages/settings/ai/SettingsSkillForm.tsx
 #: src/modules/settings/data-model/objects/forms/components/SettingsDataModelObjectAboutForm.tsx
@@ -7907,10 +7760,10 @@ msgstr "Intrare"
 msgid "Input must be in camel case and cannot start with a number"
 msgstr "Intrarea trebuie să fie în formă 'camel case' și nu poate începe cu un număr"
 
-#. js-lingui-id: ssPbxG
-#: src/pages/settings/ai/components/SettingsSystemToolTableRow.tsx
-msgid "Input Schema"
-msgstr "Schema de intrare"
+#. js-lingui-id: VmBcTm
+#: src/pages/settings/ai/SettingsToolDetail.tsx
+msgid "Input parameters accepted by this tool"
+msgstr ""
 
 #. js-lingui-id: /6i28D
 #: src/modules/workflow/workflow-steps/workflow-actions/form-action/components/WorkflowEditActionFormFieldSettings.tsx
@@ -7980,6 +7833,11 @@ msgstr "Se instalează..."
 msgid "Instances"
 msgstr "Instanțe"
 
+#. js-lingui-id: tc328m
+#: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowOutputSchemaBuilder.tsx
+msgid "Instruction for AI"
+msgstr ""
+
 #. js-lingui-id: NxHkkp
 #: src/pages/settings/ai/SettingsSkillForm.tsx
 msgid "Instructions"
@@ -7989,11 +7847,6 @@ msgstr "Instrucțiuni"
 #: src/pages/settings/ai/SettingsSkillForm.tsx
 msgid "Instructions Editor"
 msgstr "Editor de instrucțiuni"
-
-#. js-lingui-id: g+29+d
-#: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowAiAgentPromptTab.tsx
-msgid "Instructions for AI"
-msgstr "Instrucțiuni pentru AI"
 
 #. js-lingui-id: RGm66q
 #: src/utils/title-utils.ts
@@ -8534,8 +8387,11 @@ msgid "Launch manually"
 msgstr "Lansează manual"
 
 #. js-lingui-id: rdU729
+#: src/pages/settings/data-model/SettingsObjectDetailPage.tsx
 #: src/modules/side-panel/utils/getSidePanelSubPageTitle.ts
-#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutFieldsSettings.tsx
+#: src/modules/side-panel/pages/page-layout/components/record-page/SidePanelRecordPageFieldsSettings.tsx
+#: src/modules/side-panel/pages/page-layout/components/record-page/SidePanelRecordPageFieldSettings.tsx
+#: src/modules/side-panel/pages/page-layout/components/dashboard/SidePanelDashboardRecordTableSettings.tsx
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownLayoutContent.tsx
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownCustomView.tsx
 msgid "Layout"
@@ -8553,6 +8409,7 @@ msgstr "Aspecte"
 
 #. js-lingui-id: zwWKhA
 #: src/modules/workflow/workflow-steps/workflow-actions/form-action/components/WorkflowEditActionFormBuilder.tsx
+#: src/modules/information-banner/components/maintenance/InformationBannerMaintenance.tsx
 msgid "Learn more"
 msgstr "Află mai multe"
 
@@ -8607,6 +8464,11 @@ msgstr ""
 #: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
 msgid "Less than or equal"
 msgstr "Mai mic sau egal"
+
+#. js-lingui-id: oCHfGC
+#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
+msgid "Level"
+msgstr ""
 
 #. js-lingui-id: 3qg5Ro
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
@@ -8663,6 +8525,7 @@ msgstr "Grafic liniar"
 
 #. js-lingui-id: yzF66j
 #: src/modules/side-panel/components/SidePanelLinkInfo.tsx
+#: src/modules/settings/admin-panel/health-status/maintenance-mode/components/SettingsAdminMaintenanceMode.tsx
 #: src/modules/navigation-menu-item/edit/side-panel/components/SidePanelNewSidebarItemMainMenu.tsx
 msgid "Link"
 msgstr "Link"
@@ -8793,18 +8656,13 @@ msgstr "Se încarcă mai multe..."
 msgid "Loading retention configuration..."
 msgstr "Se încarcă configurația de reținere..."
 
-#. js-lingui-id: +yoeVU
-#: src/pages/settings/ai/components/SettingsSystemToolTableRow.tsx
-msgid "Loading schema..."
-msgstr "Se încarcă schema..."
-
 #. js-lingui-id: dJl485
 #: src/modules/ai/utils/getToolDisplayMessage.ts
 msgid "Loading skills..."
 msgstr "Se încarcă abilitățile..."
 
 #. js-lingui-id: 7YK6ap
-#: src/modules/side-panel/pages/message-thread/components/SidePanelMessageThreadPage.tsx
+#: src/modules/page-layout/widgets/email-thread/components/EmailThreadWidget.tsx
 msgid "Loading thread"
 msgstr "Se încarcă firul"
 
@@ -8848,6 +8706,11 @@ msgstr "Păstrarea jurnalelor"
 #: src/modules/information-banner/components/impersonate/InformationBannerIsImpersonating.tsx
 msgid "Logged in as {impersonatedUser}"
 msgstr "Conectat ca {impersonatedUser}"
+
+#. js-lingui-id: wuCnq1
+#: src/pages/settings/applications/tabs/SettingsApplicationDetailContentTab.tsx
+msgid "Logic"
+msgstr ""
 
 #. js-lingui-id: sTlKkx
 #: src/pages/settings/applications/SettingsAvailableApplicationDetails.tsx
@@ -8913,9 +8776,24 @@ msgstr "buclă"
 msgid "Mail Account"
 msgstr "Cont de E-mail"
 
+#. js-lingui-id: 6Dd2PM
+#: src/modules/settings/admin-panel/health-status/maintenance-mode/components/SettingsAdminMaintenanceMode.tsx
+msgid "Maintenance"
+msgstr ""
+
+#. js-lingui-id: /hmUGb
+#: src/modules/settings/admin-panel/health-status/maintenance-mode/components/SettingsAdminMaintenanceMode.tsx
+msgid "Maintenance mode"
+msgstr ""
+
 #. js-lingui-id: MOLprz
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useActionRolePermissionFlagConfig.ts
 msgid "Make HTTP requests to external APIs"
+msgstr ""
+
+#. js-lingui-id: wckWOP
+#: src/modules/side-panel/pages/page-layout/components/WidgetSettingsManageSection.tsx
+msgid "Manage"
 msgstr ""
 
 #. js-lingui-id: n0FHLv
@@ -8941,20 +8819,10 @@ msgstr "Gestionați informațiile de facturare"
 msgid "Manage favorite"
 msgstr "Gestionează favoritele"
 
-#. js-lingui-id: 8XlVuA
-#: src/modules/command-menu-item/record/constants/WorkspaceMembersCommandMenuItemsConfig.tsx
-msgid "Manage in settings"
-msgstr ""
-
 #. js-lingui-id: T6YjCk
 #: src/pages/settings/members/SettingsWorkspaceMembers.tsx
 msgid "Manage Members"
 msgstr "Gestionează Membrii"
-
-#. js-lingui-id: 5hEFxA
-#: src/modules/command-menu-item/record/constants/WorkspaceMembersCommandMenuItemsConfig.tsx
-msgid "Manage members in settings"
-msgstr ""
 
 #. js-lingui-id: eGGH1l
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useSettingsRolePermissionFlagConfig.ts
@@ -8990,6 +8858,11 @@ msgstr "Gestionați aplicația dvs."
 #: src/pages/settings/accounts/SettingsAccounts.tsx
 msgid "Manage your internet accounts."
 msgstr "Gestionează-ți conturile de internet."
+
+#. js-lingui-id: waFx9W
+#: src/pages/settings/ai/components/SettingsToolsTable.tsx
+msgid "Managed"
+msgstr ""
 
 #. js-lingui-id: BWTzAb
 #: src/modules/side-panel/pages/page-layout/hooks/useGraphXSortOptionLabels.ts
@@ -9031,7 +8904,7 @@ msgstr "Capacitatea maximă de import: {formatSpreadsheetMaxRecordImportCapacity
 
 #. js-lingui-id: S8w4XA
 #: src/pages/settings/admin-panel/SettingsAdminNewAiModel.tsx
-#: src/modules/settings/admin-panel/ai/components/SettingsAdminAiModelHoverCard.tsx
+#: src/modules/settings/ai/components/SettingsAiModelHoverCard.tsx
 msgid "Max output"
 msgstr "Ieșire maximă"
 
@@ -9123,7 +8996,6 @@ msgstr "Membrii - Setări"
 
 #. js-lingui-id: UODtG8
 #: src/modules/object-record/record-merge/components/MergeRecordsFooter.tsx
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
 msgid "Merge"
 msgstr "Îmbină"
 
@@ -9134,7 +9006,6 @@ msgstr "Previzualizare îmbinare"
 
 #. js-lingui-id: Cmeamd
 #: src/modules/side-panel/hooks/useOpenMergeRecordsPageInSidePanel.tsx
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
 msgid "Merge records"
 msgstr "Îmbină înregistrările"
 
@@ -9142,6 +9013,11 @@ msgstr "Îmbină înregistrările"
 #: src/modules/object-record/record-merge/components/MergeRecordsFooter.tsx
 msgid "Merging..."
 msgstr "Se îmbină..."
+
+#. js-lingui-id: xDAtGP
+#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
+msgid "Message"
+msgstr ""
 
 #. js-lingui-id: U15XwX
 #: src/modules/activities/timeline-activities/rows/message/components/EventCardMessage.tsx
@@ -9240,6 +9116,17 @@ msgstr "Lipsește permisiunea de a redacta e-mailuri."
 msgid "Mission accomplished!"
 msgstr "Misiune îndeplinită!"
 
+#. js-lingui-id: dMsM20
+#: src/modules/side-panel/pages/page-layout/components/WidgetSettingsManageSection.tsx
+#: src/modules/side-panel/pages/page-layout/components/dropdown-content/WidgetVisibilityDropdownContent.tsx
+msgid "Mobile"
+msgstr ""
+
+#. js-lingui-id: scu3wk
+#: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowAiAgentPromptTab.tsx
+msgid "Model"
+msgstr ""
+
 #. js-lingui-id: bC/dq9
 #. placeholder {0}: values.label.trim()
 #: src/pages/settings/admin-panel/SettingsAdminNewAiModel.tsx
@@ -9264,7 +9151,6 @@ msgstr "ID-ul modelului este necesar"
 
 #. js-lingui-id: //nm2/
 #: src/pages/settings/ai/SettingsAI.tsx
-#: src/pages/settings/ai/components/SettingsAIModelsTab.tsx
 #: src/pages/settings/admin-panel/SettingsAdminAiProviderDetail.tsx
 msgid "Models"
 msgstr "Modele"
@@ -9332,7 +9218,7 @@ msgstr ""
 #. js-lingui-id: 2FYpfJ
 #: src/pages/settings/ai/SettingsAI.tsx
 #: src/modules/ui/layout/tab-list/components/TabMoreButton.tsx
-#: src/modules/command-menu-item/server-items/display/components/CommandMenuItemMoreActionsButton.tsx
+#: src/modules/side-panel/components/SidePanelToggleButton.tsx
 msgid "More"
 msgstr "Mai mult"
 
@@ -9375,6 +9261,11 @@ msgstr "Versiunea cu cele mai multe instalări"
 msgid "Move down"
 msgstr "Mutați în jos"
 
+#. js-lingui-id: bAvovP
+#: src/modules/side-panel/pages/page-layout/components/WidgetSettingsPlacementSection.tsx
+msgid "Move Down"
+msgstr ""
+
 #. js-lingui-id: iSLA/r
 #: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutTabSettingsContent.tsx
 #: src/modules/object-record/record-table/record-table-header/components/RecordTableColumnHeadDropdownMenu.tsx
@@ -9394,6 +9285,11 @@ msgstr "Mută la dreapta"
 msgid "Move to a folder"
 msgstr "Mutați într-un folder"
 
+#. js-lingui-id: TH+XKl
+#: src/modules/side-panel/pages/page-layout/components/WidgetSettingsPlacementSection.tsx
+msgid "Move to another tab"
+msgstr ""
+
 #. js-lingui-id: JCPOml
 #: src/modules/navigation-menu-item/edit/side-panel/components/SidePanelEditOrganizeActions.tsx
 msgid "Move to folder"
@@ -9403,6 +9299,11 @@ msgstr "Mutați în folder"
 #: src/modules/navigation-menu-item/edit/side-panel/components/SidePanelEditOrganizeActions.tsx
 msgid "Move up"
 msgstr "Mutați în sus"
+
+#. js-lingui-id: Bpglf1
+#: src/modules/side-panel/pages/page-layout/components/WidgetSettingsPlacementSection.tsx
+msgid "Move Up"
+msgstr ""
 
 #. js-lingui-id: asWVA5
 #: src/modules/object-record/spreadsheet-import/utils/getSpreadSheetFieldValidationDefinitions.ts
@@ -9443,15 +9344,15 @@ msgstr "mySkill"
 #: src/pages/settings/developers/api-keys/SettingsDevelopersApiKeyDetail.tsx
 #: src/pages/settings/data-model/SettingsObjectFieldTable.tsx
 #: src/pages/settings/data-model/constants/SettingsObjectTableMetadata.ts
+#: src/pages/settings/applications/tabs/SettingsApplicationsDeveloperTab.tsx
 #: src/pages/settings/applications/tabs/SettingsApplicationRegistrationGeneralTab.tsx
 #: src/pages/settings/applications/components/SettingsApplicationsTable.tsx
 #: src/pages/settings/applications/components/SettingsApplicationNameDescriptionTable.tsx
-#: src/pages/settings/applications/components/SettingsApplicationDataTableRow.tsx
 #: src/pages/settings/applications/components/SettingsApplicationDataTable.tsx
 #: src/pages/settings/ai/constants/SettingsSkillTableMetadata.ts
 #: src/pages/settings/ai/constants/SettingsAiAgentTableMetadata.ts
 #: src/pages/settings/ai/components/SettingsToolsTable.tsx
-#: src/pages/settings/ai/components/SettingsToolsTable.tsx
+#: src/pages/settings/ai/components/SettingsToolParameterTable.tsx
 #: src/pages/settings/admin-panel/SettingsAdminAiProviderDetail.tsx
 #: src/pages/onboarding/CreateProfile.tsx
 #: src/modules/settings/workspace/components/NameField.tsx
@@ -9474,12 +9375,12 @@ msgstr "mySkill"
 #: src/modules/settings/data-model/object-details/components/SettingsObjectRelationsTable.tsx
 #: src/modules/settings/data-model/object-details/components/tabs/SettingsObjectSearchSection.tsx
 #: src/modules/settings/data-model/new-object/components/SettingsAvailableStandardObjectsSection.tsx
+#: src/modules/settings/ai/components/SettingsAiModelsTable.tsx
+#: src/modules/settings/ai/components/SettingsAiModelHoverCard.tsx
 #: src/modules/settings/admin-panel/config-variables/components/SettingsAdminConfigVariablesTable.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceContent.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminGeneral.tsx
 #: src/modules/settings/admin-panel/apps/components/SettingsAdminApps.tsx
-#: src/modules/settings/admin-panel/ai/components/SettingsAdminAiModelsTable.tsx
-#: src/modules/settings/admin-panel/ai/components/SettingsAdminAiModelHoverCard.tsx
 msgid "Name"
 msgstr "Nume"
 
@@ -9518,46 +9419,6 @@ msgstr "Numele spațiului tău de lucru"
 #: src/modules/workflow/workflow-trigger/components/WorkflowEditTriggerManual.tsx
 msgid "Navbar"
 msgstr "Bară de navigare"
-
-#. js-lingui-id: dVQ33h
-#: src/modules/command-menu-item/record/constants/DashboardCommandMenuItemsConfig.tsx
-msgid "Navigate to next dashboard"
-msgstr "Navighează la următorul tablou de bord"
-
-#. js-lingui-id: 2T8KCk
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "Navigate to next record"
-msgstr "Navighează la următoarea înregistrare"
-
-#. js-lingui-id: veSA19
-#: src/modules/command-menu-item/record/constants/WorkflowVersionsCommandMenuItemsConfig.tsx
-msgid "Navigate to next version"
-msgstr "Navigați la versiunea următoare"
-
-#. js-lingui-id: ZTEho+
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-msgid "Navigate to next workflow"
-msgstr "Navigați la workflow-ul următor"
-
-#. js-lingui-id: /Qu2VT
-#: src/modules/command-menu-item/record/constants/DashboardCommandMenuItemsConfig.tsx
-msgid "Navigate to previous dashboard"
-msgstr "Navighează la tabloul de bord anterior"
-
-#. js-lingui-id: 2tw9bo
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "Navigate to previous record"
-msgstr "Navigați la înregistrarea anterioară"
-
-#. js-lingui-id: I+Pm5V
-#: src/modules/command-menu-item/record/constants/WorkflowVersionsCommandMenuItemsConfig.tsx
-msgid "Navigate to previous version"
-msgstr "Navigați la versiunea anterioară"
-
-#. js-lingui-id: QVUN3K
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-msgid "Navigate to previous workflow"
-msgstr "Navigați la workflow-ul anterior"
 
 #. js-lingui-id: Vn3jYy
 #: src/pages/settings/applications/tabs/SettingsAvailableApplicationDetailContentTab.tsx
@@ -9652,6 +9513,11 @@ msgstr "Chat nou"
 msgid "New conversation"
 msgstr "Conversație nouă"
 
+#. js-lingui-id: 3RwJHq
+#: src/modules/side-panel/hooks/useOpenComposeEmailInSidePanel.ts
+msgid "New Email"
+msgstr ""
+
 #. js-lingui-id: wqoYqp
 #: src/pages/settings/emailing-domains/SettingsNewEmailingDomain.tsx
 #: src/pages/settings/emailing-domains/SettingsNewEmailingDomain.tsx
@@ -9716,15 +9582,10 @@ msgstr "Obiect nou"
 msgid "New Password"
 msgstr "Parolă nouă"
 
-#. js-lingui-id: BcCzLv
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "New record"
-msgstr "Înregistrare nouă"
-
 #. js-lingui-id: gWnSyg
 #: src/pages/settings/ai/SettingsSkillForm.tsx
 #: src/pages/settings/ai/SettingsSkillForm.tsx
-#: src/pages/settings/ai/components/SettingsAgentSkills.tsx
+#: src/pages/settings/ai/SettingsAI.tsx
 msgid "New Skill"
 msgstr "Abilitate nouă"
 
@@ -9744,7 +9605,7 @@ msgid "New task"
 msgstr "Sarcină nouă"
 
 #. js-lingui-id: IQ+GEj
-#: src/pages/settings/ai/components/SettingsToolsTable.tsx
+#: src/pages/settings/ai/SettingsAI.tsx
 msgid "New Tool"
 msgstr "Instrument nou"
 
@@ -9754,6 +9615,8 @@ msgid "New Webhook"
 msgstr "Webhook nou"
 
 #. js-lingui-id: vam7Jz
+#: src/modules/side-panel/pages/page-layout/utils/getPageLayoutPageTitle.ts
+#: src/modules/side-panel/components/hooks/usePageLayoutHeaderInfo.ts
 #: src/modules/side-panel/components/hooks/usePageLayoutHeaderInfo.ts
 msgid "New widget"
 msgstr ""
@@ -9855,6 +9718,11 @@ msgstr "Nicio cheie API disponibilă"
 msgid "No API keys match your search"
 msgstr "Nicio cheie API nu corespunde căutării"
 
+#. js-lingui-id: /VRg8Z
+#: src/pages/settings/applications/tabs/SettingsApplicationsDeveloperTab.tsx
+msgid "No application found"
+msgstr ""
+
 #. js-lingui-id: rxBnh8
 #: src/pages/settings/applications/tabs/SettingsApplicationsAvailableTab.tsx
 msgid "No applications available"
@@ -9864,6 +9732,11 @@ msgstr "Nicio aplicație disponibilă"
 #: src/modules/workflow/workflow-steps/filters/components/WorkflowStepFilterFieldSelect.tsx
 msgid "No available fields to select"
 msgstr "Nu există câmpuri disponibile de selectat"
+
+#. js-lingui-id: Yd55ZI
+#: src/modules/side-panel/pages/page-layout/components/dropdown-content/MoveToTabDropdownContent.tsx
+msgid "No available tabs"
+msgstr ""
 
 #. js-lingui-id: V/RzSE
 #: src/modules/workflow/workflow-steps/workflow-actions/http-request-action/components/BodyInput.tsx
@@ -9981,7 +9854,7 @@ msgid "No description available for this application"
 msgstr ""
 
 #. js-lingui-id: mINrlz
-#: src/modules/activities/emails/components/EmailsCard.tsx
+#: src/modules/activities/emails/components/EmptyInboxPlaceholder.tsx
 msgid "No email exchange has occurred with this record yet."
 msgstr "Nu a avut loc niciun schimb de emailuri cu acest registru încă."
 
@@ -10153,8 +10026,7 @@ msgid "No output available"
 msgstr "Nu este disponibilă nicio ieșire"
 
 #. js-lingui-id: 20ONq7
-#: src/pages/settings/ai/components/SettingsSystemToolTableRow.tsx
-#: src/pages/settings/ai/components/SettingsSystemToolTableRow.tsx
+#: src/pages/settings/ai/components/SettingsToolParameterTable.tsx
 msgid "No parameters"
 msgstr "Fără parametri"
 
@@ -10173,21 +10045,22 @@ msgstr "Nu există permisiuni configurate pentru această aplicație."
 msgid "No permissions have been set for individual objects."
 msgstr "Nu s-au setat permisiuni pentru obiectele individuale."
 
+#. js-lingui-id: V/+aTW
+#: src/modules/object-record/record-field/ui/form-types/components/FormSingleRecordPicker.tsx
+#: src/modules/object-record/record-field/ui/form-types/components/FormSingleRecordFieldChip.tsx
+msgid "No record"
+msgstr ""
+
 #. js-lingui-id: ePgApM
 #: src/modules/workflow/workflow-trigger/components/WorkflowEditTriggerManual.tsx
 msgid "No record is required to trigger this workflow"
 msgstr "Nu este necesară nicio înregistrare pentru a declanșa acest flux de lucru"
 
 #. js-lingui-id: aqUuQE
-#: src/modules/command-menu-item/server-items/edit/components/CommandMenuItemEditRecordSelectionDropdown.tsx
-#: src/modules/command-menu-item/server-items/edit/components/CommandMenuItemEditRecordSelectionDropdown.tsx
+#: src/modules/command-menu-item/edit/components/CommandMenuItemEditRecordSelectionDropdown.tsx
+#: src/modules/command-menu-item/edit/components/CommandMenuItemEditRecordSelectionDropdown.tsx
 msgid "No record selected"
 msgstr ""
-
-#. js-lingui-id: X8wJTR
-#: src/modules/object-record/record-field/ui/form-types/components/FormSingleRecordPicker.tsx
-msgid "No records"
-msgstr "Nicio înregistrare"
 
 #. js-lingui-id: EqGTpW
 #: src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateReadOnly.tsx
@@ -10284,6 +10157,7 @@ msgid "No variables found"
 msgstr "Nu s-au găsit variabile"
 
 #. js-lingui-id: OCektF
+#: src/pages/settings/applications/SettingsApplicationDetails.tsx
 #: src/pages/settings/applications/tabs/SettingsApplicationDetailEnvironmentVariablesTable.tsx
 msgid "No variables to set for this application"
 msgstr ""
@@ -10385,7 +10259,6 @@ msgstr "Notă"
 
 #. js-lingui-id: 1DBGsz
 #: src/modules/page-layout/constants/StandardPageLayoutTabTitleTranslations.ts
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
 msgid "Notes"
 msgstr "Notițe"
 
@@ -10398,6 +10271,11 @@ msgstr "acum"
 #. js-lingui-id: OduKuG
 #: src/pages/settings/applications/SettingsAvailableApplicationDetails.tsx
 msgid "Npm package"
+msgstr ""
+
+#. js-lingui-id: p7abaY
+#: src/pages/settings/applications/tabs/SettingsApplicationsDeveloperTab.tsx
+msgid "NPM packages"
 msgstr ""
 
 #. js-lingui-id: VVexZo
@@ -10473,7 +10351,6 @@ msgstr "obiect"
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionUpdateRecord.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionDeleteRecord.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionCreateRecord.tsx
-#: src/modules/side-panel/pages/root/components/SidePanelRootPage.tsx
 #: src/modules/side-panel/components/SidePanelObjectViewRecordInfo.tsx
 #: src/modules/side-panel/components/SidePanelObjectFilterDropdownContent.tsx
 #: src/modules/settings/developers/components/WebhookEntitySelect.tsx
@@ -10497,7 +10374,7 @@ msgid "Object Events"
 msgstr "Evenimente obiect"
 
 #. js-lingui-id: 79D4Az
-#: src/pages/settings/security/event-logs/components/EventLogResultsTable.tsx
+#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
 msgid "Object ID"
 msgstr "ID-ul obiectului"
 
@@ -10714,6 +10591,11 @@ msgstr "Deschide Gmail"
 msgid "Open in"
 msgstr "Deschide în"
 
+#. js-lingui-id: noLjKT
+#: src/modules/settings/data-model/fields/forms/components/SettingsDataModelFieldOnClickActionForm.tsx
+msgid "Open in app"
+msgstr ""
+
 #. js-lingui-id: DP5C7w
 #: src/modules/settings/members/components/MemberPermissionsTab.tsx
 msgid "Open in Roles"
@@ -10726,7 +10608,7 @@ msgstr "Deschide Outlook"
 
 #. js-lingui-id: bY2Xkv
 #: src/modules/ui/layout/page-header/components/PageHeaderToggleSidePanelButton.tsx
-#: src/modules/command-menu-item/server-items/display/components/CommandMenuItemMoreActionsButton.tsx
+#: src/modules/side-panel/components/SidePanelToggleButton.tsx
 msgid "Open side panel"
 msgstr "Deschide panoul lateral"
 
@@ -10739,11 +10621,6 @@ msgstr "Deschis"
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminHealthStatusRightContainer.tsx
 msgid "Operational"
 msgstr "Operațional"
-
-#. js-lingui-id: 4MyDFl
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "Opportunities"
-msgstr "Oportunități"
 
 #. js-lingui-id: lVa1Xn
 #: src/modules/settings/data-model/fields/forms/select/hooks/useSelectSettingsFormInitialValues.ts
@@ -10824,8 +10701,8 @@ msgstr "Organizare"
 #: src/modules/page-layout/widgets/fields/hooks/useFieldsWidgetGroups.ts
 #: src/modules/navigation-menu-item/edit/side-panel/components/SidePanelNewSidebarItemMainMenu.tsx
 #: src/modules/navigation/components/NavigationDrawerOtherSection.tsx
-#: src/modules/command-menu-item/server-items/edit/components/SidePanelCommandMenuItemEditPage.tsx
-#: src/modules/command-menu-item/server-items/display/components/SidePanelCommandMenuItemDisplayPage.tsx
+#: src/modules/command-menu-item/edit/components/SidePanelCommandMenuItemEditPage.tsx
+#: src/modules/command-menu-item/display/components/SidePanelCommandMenuItemDisplayPage.tsx
 msgid "Other"
 msgstr "Altul"
 
@@ -10867,6 +10744,7 @@ msgstr "Întrerupere"
 
 #. js-lingui-id: gh06VD
 #: src/pages/settings/admin-panel/SettingsAdminNewAiModel.tsx
+#: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowOutputSchemaBuilder.tsx
 #: src/modules/workflow/components/WorkflowStepExecutionResult.tsx
 #: src/modules/side-panel/pages/workflow/step/view-run/components/SidePanelWorkflowRunViewStepContent.tsx
 #: src/modules/logic-functions/components/LogicFunctionExecutionResult.tsx
@@ -10876,11 +10754,6 @@ msgstr "Întrerupere"
 #: src/modules/ai/components/CodeExecutionDisplay.tsx
 msgid "Output"
 msgstr "Ieșire"
-
-#. js-lingui-id: xvfn7l
-#: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowOutputSchemaBuilder.tsx
-msgid "Output Field {fieldNumber}"
-msgstr "Câmp ieșire {fieldNumber}"
 
 #. js-lingui-id: i1+tKD
 #: src/modules/ai/components/internal/AIChatContextUsageButton.tsx
@@ -10975,6 +10848,11 @@ msgstr ""
 msgid "Paragraph"
 msgstr "Paragraf"
 
+#. js-lingui-id: F18WP3
+#: src/pages/settings/ai/SettingsToolDetail.tsx
+msgid "Parameters"
+msgstr ""
+
 #. js-lingui-id: 8ZsakT
 #: src/modules/settings/security/components/SettingsSecurityAuthProvidersOptionsList.tsx
 #: src/modules/settings/security/components/SettingsSecurityAuthBypassOptionsList.tsx
@@ -11040,12 +10918,6 @@ msgstr "PDF"
 msgid "Pending"
 msgstr "În așteptare"
 
-#. js-lingui-id: 1wdjme
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/mock/command-menu-items.mock.tsx
-msgid "People"
-msgstr "Persoane"
-
 #. js-lingui-id: PxBA+g
 #: src/modules/settings/accounts/components/SettingsAccountsMessageAutoCreationCard.tsx
 msgid "People I’ve sent emails to and received emails from."
@@ -11100,49 +10972,15 @@ msgstr ""
 msgid "Permanent deletion. Enter the number of days."
 msgstr "Ștergere permanentă. Introduceți numărul de zile."
 
-#. js-lingui-id: rDky0a
-#: src/modules/command-menu-item/record/constants/DashboardCommandMenuItemsConfig.tsx
-msgid "Permanently destroy dashboard"
-msgstr "Distrugere definitivă a tabloului de bord"
+#. js-lingui-id: EPkrPQ
+#: src/modules/command-menu-item/engine-command/record/components/DestroyRecordsCommand.tsx
+msgid "Permanently Destroy"
+msgstr ""
 
-#. js-lingui-id: n7S2Oo
-#: src/modules/command-menu-item/record/constants/DashboardCommandMenuItemsConfig.tsx
-msgid "Permanently destroy dashboards"
-msgstr "Distrugere definitivă a tablourilor de bord"
-
-#. js-lingui-id: Bv3y5w
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "Permanently destroy record"
-msgstr "Distrugere definitivă a înregistrării"
-
-#. js-lingui-id: 35dBYb
-#: src/modules/command-menu-item/record/single-record/components/DestroySingleRecordCommand.tsx
-#: src/modules/command-menu-item/record/single-record/components/DestroySingleRecordCommand.tsx
-#: src/modules/command-menu-item/engine-command/record/single-record/components/DestroySingleRecordCommand.tsx
-#: src/modules/command-menu-item/engine-command/record/single-record/components/DestroySingleRecordCommand.tsx
-msgid "Permanently Destroy Record"
-msgstr "Distruge definitiv Înregistrarea"
-
-#. js-lingui-id: xjWlSJ
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "Permanently destroy records"
-msgstr "Distrugere definitivă a înregistrărilor"
-
-#. js-lingui-id: YyP8vD
-#: src/modules/command-menu-item/record/multiple-records/components/DestroyMultipleRecordsCommand.tsx
-#: src/modules/command-menu-item/engine-command/record/multiple-records/components/DestroyMultipleRecordsCommand.tsx
-msgid "Permanently Destroy Records"
-msgstr "Distrugere permanentă a înregistrărilor"
-
-#. js-lingui-id: 0bQ5ba
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-msgid "Permanently destroy workflow"
-msgstr "Distruge definitiv workflow"
-
-#. js-lingui-id: uKWXhB
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-msgid "Permanently destroy workflows"
-msgstr "Distrugere definitivă a workflow-urilor"
+#. js-lingui-id: 64gHBj
+#: src/modules/command-menu-item/engine-command/record/components/DestroyRecordsCommand.tsx
+msgid "Permanently Destroy {objectLabel}"
+msgstr ""
 
 #. js-lingui-id: yWmZKk
 #: src/modules/metadata-error-handler/hooks/useMetadataErrorHandler.ts
@@ -11217,8 +11055,8 @@ msgid "Pink"
 msgstr "Roz"
 
 #. js-lingui-id: kNiQp6
-#: src/modules/command-menu-item/server-items/edit/components/SidePanelCommandMenuItemEditPage.tsx
-#: src/modules/command-menu-item/server-items/display/components/SidePanelCommandMenuItemDisplayPage.tsx
+#: src/modules/command-menu-item/edit/components/SidePanelCommandMenuItemEditPage.tsx
+#: src/modules/command-menu-item/display/components/SidePanelCommandMenuItemDisplayPage.tsx
 msgid "Pinned"
 msgstr ""
 
@@ -11227,6 +11065,11 @@ msgstr ""
 #: src/modules/workflow/workflow-steps/workflow-actions/form-action/components/WorkflowFormFieldSettingsNumber.tsx
 msgid "Placeholder"
 msgstr "Text sugestiv"
+
+#. js-lingui-id: MFTZK8
+#: src/modules/side-panel/pages/page-layout/components/WidgetSettingsPlacementSection.tsx
+msgid "Placement"
+msgstr ""
 
 #. js-lingui-id: fQtTho
 #: src/modules/advanced-text-editor/extensions/slash-command/DefaultSlashCommands.ts
@@ -11243,6 +11086,12 @@ msgstr "Plan"
 msgid "Plan switching has been cancelled."
 msgstr "Schimbarea planului a fost anulată."
 
+#. js-lingui-id: QLv09h
+#: src/modules/settings/admin-panel/health-status/maintenance-mode/components/SettingsAdminMaintenanceMode.tsx
+#: src/modules/settings/admin-panel/health-status/maintenance-mode/components/SettingsAdminMaintenanceMode.tsx
+msgid "Planned for {formattedStartDate}"
+msgstr ""
+
 #. js-lingui-id: VUi6Nf
 #: src/modules/workflow/workflow-trigger/components/CronExpressionHelper.tsx
 msgid "Please check your cron expression syntax."
@@ -11255,7 +11104,7 @@ msgstr "Vă rugăm să verificați e-mailul pentru un link de verificare."
 
 #. js-lingui-id: jEw0Mr
 #: src/pages/settings/applications/tabs/SettingsApplicationRegistrationOAuthTab.tsx
-#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutIframeSettings.tsx
+#: src/modules/side-panel/pages/page-layout/components/dashboard/SidePanelDashboardIframeSettings.tsx
 msgid "Please enter a valid URL"
 msgstr "Vă rugăm să introduceți un URL valid"
 
@@ -11389,11 +11238,6 @@ msgstr "Previzualizare indisponibilă"
 msgid "Previous"
 msgstr "Anterior"
 
-#. js-lingui-id: 2WAUd8
-#: src/modules/command-menu-item/record-agnostic/constants/RecordAgnosticCommandMenuItemsConfig.tsx
-msgid "Previous AI Chats"
-msgstr "Chat-urile AI Anterioare"
-
 #. js-lingui-id: jmc+FY
 #: src/modules/settings/billing/components/internal/MeteredPriceSelector.tsx
 msgid "Price updated."
@@ -11484,8 +11328,8 @@ msgid "Prompt"
 msgstr ""
 
 #. js-lingui-id: l/UFPv
-#: src/pages/settings/security/event-logs/components/EventLogResultsTable.tsx
-#: src/pages/settings/security/event-logs/components/EventLogResultsTable.tsx
+#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
+#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
 msgid "Properties"
 msgstr "Proprietăți"
 
@@ -11508,8 +11352,8 @@ msgstr "Furnizați detaliile furnizorului OIDC"
 
 #. js-lingui-id: aemBRq
 #: src/pages/settings/admin-panel/SettingsAdminNewAiProvider.tsx
-#: src/modules/settings/admin-panel/ai/components/SettingsAdminAiModelsTable.tsx
-#: src/modules/settings/admin-panel/ai/components/SettingsAdminAiModelHoverCard.tsx
+#: src/modules/settings/ai/components/SettingsAiModelsTable.tsx
+#: src/modules/settings/ai/components/SettingsAiModelHoverCard.tsx
 msgid "Provider"
 msgstr "Furnizor"
 
@@ -11662,10 +11506,11 @@ msgstr ""
 msgid "Read your profile"
 msgstr "Citiți profilul dvs."
 
-#. js-lingui-id: tCXcL7
+#. js-lingui-id: 6pSHJ5
 #: src/pages/settings/ai/SettingsAIPrompts.tsx
-msgid "Read-only — managed by Twenty"
-msgstr "Numai pentru citire — gestionat de Twenty"
+#: src/pages/settings/ai/SettingsAIPrompts.tsx
+msgid "Read-only"
+msgstr ""
 
 #. js-lingui-id: W+ApAD
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionEmailBase.tsx
@@ -11686,6 +11531,11 @@ msgstr "Primește un email cu linkul de actualizare a parolei"
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminWorkerMetricsGraph.tsx
 msgid "Recent Events (oldest → newest)"
 msgstr "Evenimente recente (cel mai vechi → cel mai nou)"
+
+#. js-lingui-id: yPrbsy
+#: src/modules/activities/emails/components/EmailComposerFields.tsx
+msgid "Recipients"
+msgstr ""
 
 #. js-lingui-id: b2+5uV
 #: src/modules/settings/admin-panel/ai/components/SettingsAdminAI.tsx
@@ -11729,7 +11579,7 @@ msgid "Record filter rule options"
 msgstr "Opțiuni pentru regulile de filtrare a înregistrărilor"
 
 #. js-lingui-id: xSAYIn
-#: src/pages/settings/security/event-logs/components/EventLogResultsTable.tsx
+#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
 #: src/pages/settings/security/event-logs/components/EventLogFilters.tsx
 msgid "Record ID"
 msgstr "ID-ul înregistrării"
@@ -11757,12 +11607,6 @@ msgstr "Pagina de înregistrare"
 msgid "Record Selection"
 msgstr "Selecția înregistrărilor"
 
-#. js-lingui-id: J9Cfll
-#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutWidgetTypeSelect.tsx
-#: src/modules/side-panel/components/hooks/usePageLayoutHeaderInfo.ts
-msgid "Record Table"
-msgstr "Tabel de înregistrări"
-
 #. js-lingui-id: NxW0+c
 #: src/modules/side-panel/pages/page-layout/utils/getPageLayoutPageTitle.ts
 msgid "Record Table Settings"
@@ -11785,8 +11629,8 @@ msgid "Records"
 msgstr "Înregistrări"
 
 #. js-lingui-id: J+Qyf2
-#: src/modules/command-menu-item/server-items/edit/components/CommandMenuItemEditRecordSelectionDropdown.tsx
-#: src/modules/command-menu-item/server-items/edit/components/CommandMenuItemEditRecordSelectionDropdown.tsx
+#: src/modules/command-menu-item/edit/components/CommandMenuItemEditRecordSelectionDropdown.tsx
+#: src/modules/command-menu-item/edit/components/CommandMenuItemEditRecordSelectionDropdown.tsx
 msgid "Records selected"
 msgstr ""
 
@@ -11947,12 +11791,6 @@ msgstr "Elimină ca implicită"
 msgid "Remove Deleted filter"
 msgstr "Elimină filtrul de ștergere"
 
-#. js-lingui-id: T/pF0Z
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "Remove from favorites"
-msgstr "Elimină din favorite"
-
 #. js-lingui-id: 9VZ6f0
 #: src/modules/navigation-menu-item/edit/side-panel/components/SidePanelEditOrganizeActions.tsx
 msgid "Remove from sidebar"
@@ -12043,8 +11881,14 @@ msgstr "Reordonare câmp"
 msgid "Reorder options"
 msgstr "Reordonează opțiunile"
 
+#. js-lingui-id: q8Id6J
+#: src/modules/side-panel/pages/page-layout/components/WidgetSettingsManageSection.tsx
+msgid "Replace widget"
+msgstr ""
+
 #. js-lingui-id: ImOQa9
-#: src/modules/side-panel/pages/message-thread/components/SidePanelMessageThreadPage.tsx
+#: src/modules/side-panel/hooks/useOpenComposeEmailInSidePanel.ts
+#: src/modules/page-layout/widgets/email-thread/components/EmailThreadComposer.tsx
 #: src/modules/activities/emails/components/EmailThreadBottomBar.tsx
 msgid "Reply"
 msgstr "Răspunde"
@@ -12053,6 +11897,11 @@ msgstr "Răspunde"
 #: src/modules/activities/emails/components/EmailThreadBottomBar.tsx
 msgid "Reply to all"
 msgstr "Răspunde tuturor"
+
+#. js-lingui-id: fiPYZo
+#: src/modules/page-layout/widgets/email-thread/components/EmailThreadComposer.tsx
+msgid "Reply..."
+msgstr ""
 
 #. js-lingui-id: tbmZmI
 #: src/pages/settings/applications/SettingsAvailableApplicationDetails.tsx
@@ -12066,6 +11915,7 @@ msgstr "Cererea a eșuat"
 
 #. js-lingui-id: TMLAx2
 #: src/pages/settings/applications/tabs/SettingsApplicationRegistrationGeneralTab.tsx
+#: src/pages/settings/ai/components/SettingsToolParameterTable.tsx
 msgid "Required"
 msgstr "Obligatoriu"
 
@@ -12078,6 +11928,8 @@ msgstr "Retrimite email"
 #. js-lingui-id: OfhWJH
 #: src/pages/settings/admin-panel/SettingsAdminConfigVariableDetails.tsx
 #: src/modules/views/components/ViewBarDetails.tsx
+#: src/modules/side-panel/pages/page-layout/components/WidgetSettingsManageSection.tsx
+#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutTabSettingsContent.tsx
 msgid "Reset"
 msgstr "Resetează"
 
@@ -12088,7 +11940,7 @@ msgid "Reset 2FA"
 msgstr "Resetează 2FA"
 
 #. js-lingui-id: YdI8A2
-#: src/modules/command-menu-item/server-items/edit/components/CommandMenuItemOptionsDropdown.tsx
+#: src/modules/command-menu-item/edit/components/CommandMenuItemOptionsDropdown.tsx
 msgid "Reset label to default"
 msgstr ""
 
@@ -12098,8 +11950,12 @@ msgid "Reset to"
 msgstr "Resetează la"
 
 #. js-lingui-id: L+rMC9
+#: src/modules/side-panel/pages/page-layout/components/WidgetSettingsManageSection.tsx
+#: src/modules/side-panel/pages/page-layout/components/WidgetSettingsManageSection.tsx
+#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutTabSettingsContent.tsx
+#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutTabSettingsContent.tsx
 #: src/modules/settings/data-model/fields/forms/address/components/SettingsDataModelFieldAddressForm.tsx
-#: src/modules/command-menu-item/server-items/edit/components/SidePanelCommandMenuItemEditPage.tsx
+#: src/modules/command-menu-item/edit/components/SidePanelCommandMenuItemEditPage.tsx
 msgid "Reset to default"
 msgstr "Resetați la implicit"
 
@@ -12119,7 +11975,7 @@ msgid "Reset variable"
 msgstr "Resetați variabila"
 
 #. js-lingui-id: esl+Tv
-#: src/pages/settings/security/event-logs/components/EventLogResultsTable.tsx
+#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
 msgid "Resource Type"
 msgstr "Tip de resursă"
 
@@ -12157,46 +12013,13 @@ msgstr "restaurează"
 
 #. js-lingui-id: yKu/3Y
 #: src/modules/information-banner/components/deleted-record/InformationBannerDeletedRecord.tsx
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
 msgid "Restore"
 msgstr "Restaurează"
 
-#. js-lingui-id: XRAM5d
-#: src/modules/command-menu-item/record/constants/DashboardCommandMenuItemsConfig.tsx
-msgid "Restore dashboard"
-msgstr "Restaurează tabloul de bord"
-
-#. js-lingui-id: jC7v7d
-#: src/modules/command-menu-item/record/constants/DashboardCommandMenuItemsConfig.tsx
-msgid "Restore dashboards"
-msgstr "Restaurează tablourile de bord"
-
-#. js-lingui-id: y4Ib1n
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "Restore record"
-msgstr "Restaurează înregistrarea"
-
-#. js-lingui-id: NzMNOA
-#: src/modules/command-menu-item/record/single-record/components/RestoreSingleRecordCommand.tsx
-#: src/modules/command-menu-item/record/single-record/components/RestoreSingleRecordCommand.tsx
-#: src/modules/command-menu-item/engine-command/record/single-record/components/RestoreSingleRecordCommand.tsx
-#: src/modules/command-menu-item/engine-command/record/single-record/components/RestoreSingleRecordCommand.tsx
-msgid "Restore Record"
-msgstr "Restaurează înregistrarea"
-
-#. js-lingui-id: Vw369F
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "Restore records"
-msgstr "Restaurează înregistrările"
-
-#. js-lingui-id: Xqj0Cb
-#: src/modules/command-menu-item/record/multiple-records/components/RestoreMultipleRecordsCommand.tsx
-#: src/modules/command-menu-item/record/multiple-records/components/RestoreMultipleRecordsCommand.tsx
-#: src/modules/command-menu-item/engine-command/record/multiple-records/components/RestoreMultipleRecordsCommand.tsx
-#: src/modules/command-menu-item/engine-command/record/multiple-records/components/RestoreMultipleRecordsCommand.tsx
-msgid "Restore Records"
-msgstr "Restaurează înregistrările"
+#. js-lingui-id: 8KyDbM
+#: src/modules/command-menu-item/engine-command/record/components/RestoreRecordsCommand.tsx
+msgid "Restore {objectLabel}"
+msgstr ""
 
 #. js-lingui-id: hO3AfV
 #: src/pages/settings/ai/components/SettingsAIModelsTab.tsx
@@ -12209,7 +12032,7 @@ msgid "Result"
 msgstr "Rezultat"
 
 #. js-lingui-id: kx0s+n
-#: src/modules/side-panel/pages/search/hooks/useSidePanelSearchRecords.tsx
+#: src/modules/side-panel/pages/search/components/SidePanelSearchRecordsPage.tsx
 #: src/modules/navigation-menu-item/edit/side-panel/components/SidePanelNewSidebarItemRecordSubPage.tsx
 msgid "Results"
 msgstr "Rezultate"
@@ -12222,7 +12045,6 @@ msgstr "Reluare"
 #. js-lingui-id: 6gRgw8
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminRetryJobsConfirmationModal.tsx
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminQueueJobRowDropdownMenu.tsx
-#: src/modules/ai/components/AIChatErrorMessage.tsx
 msgid "Retry"
 msgstr "Reîncercare"
 
@@ -12248,7 +12070,7 @@ msgid "Revoked for this object"
 msgstr "Revocat pentru acest obiect"
 
 #. js-lingui-id: NP5Nbf
-#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutWidgetTypeSelect.tsx
+#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutDashboardWidgetTypeSelect.tsx
 #: src/modules/side-panel/hooks/useOpenRichTextInSidePanel.ts
 #: src/modules/page-layout/utils/getWidgetTitle.ts
 msgid "Rich Text"
@@ -12402,11 +12224,6 @@ msgstr "Se rulează funcția"
 msgid "Running..."
 msgstr "Se execută..."
 
-#. js-lingui-id: eo1n1s
-#: src/modules/settings/logic-functions/components/SettingsLogicFunctionsTable.tsx
-msgid "Runtime"
-msgstr "Mediu de rulare"
-
 #. js-lingui-id: nji0/X
 #: src/pages/settings/profile/appearance/components/LocalePicker.tsx
 msgid "Russian"
@@ -12422,7 +12239,6 @@ msgstr "Sâmbătă"
 #: src/pages/settings/applications/tabs/SettingsApplicationRegistrationOAuthTab.tsx
 #: src/modules/settings/components/SaveAndCancelButtons/SaveButton.tsx
 #: src/modules/settings/admin-panel/config-variables/components/ConfigVariableActionButtons.tsx
-#: src/modules/command-menu-item/record/constants/DashboardCommandMenuItemsConfig.tsx
 msgid "Save"
 msgstr "Salvează"
 
@@ -12431,20 +12247,20 @@ msgstr "Salvează"
 msgid "Save as new view"
 msgstr "Salvează ca nouă vizualizare"
 
-#. js-lingui-id: 7GK4Vt
-#: src/modules/command-menu-item/record/constants/DashboardCommandMenuItemsConfig.tsx
-msgid "Save Dashboard"
-msgstr "Salvează tabloul de bord"
-
-#. js-lingui-id: veLq3R
-#: src/pages/settings/applications/tabs/SettingsApplicationsDeveloperTab.tsx
-msgid "Scaffold a new app, then use the CLI to develop, publish, and distribute"
-msgstr "Inițializează o aplicație nouă, apoi folosește CLI-ul pentru a dezvolta, publica și distribui"
-
 #. js-lingui-id: gmB6oO
 #: src/modules/workflow/workflow-trigger/components/CronExpressionHelper.tsx
 msgid "Schedule"
 msgstr "Program"
+
+#. js-lingui-id: Ys/D8h
+#: src/modules/settings/admin-panel/health-status/maintenance-mode/components/SettingsAdminMaintenanceMode.tsx
+msgid "Schedule a maintenance window and notify all users"
+msgstr ""
+
+#. js-lingui-id: f5yMQc
+#: src/modules/information-banner/components/maintenance/InformationBannerMaintenance.tsx
+msgid "Scheduled maintenance: {startFormatted} — {endFormatted}"
+msgstr ""
 
 #. js-lingui-id: QJ8HBJ
 #: src/modules/settings/playground/components/PlaygroundSetupForm.tsx
@@ -12482,10 +12298,6 @@ msgstr "SDK"
 #: src/modules/settings/roles/role-assignment/components/SettingsRoleAssignmentWorkspaceMemberPickerDropdown.tsx
 #: src/modules/settings/data-model/object-details/components/tabs/ObjectSettings.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminGeneral.tsx
-#: src/modules/command-menu-item/record-agnostic/constants/RecordAgnosticCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record-agnostic/constants/RecordAgnosticCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record-agnostic/constants/RecordAgnosticCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record-agnostic/constants/RecordAgnosticCommandMenuItemsConfig.tsx
 #: src/modules/command-menu-item/engine-command/constants/EngineComponentKeyHeadlessComponentMap.tsx
 #: src/modules/command-menu-item/engine-command/constants/EngineComponentKeyHeadlessComponentMap.tsx
 msgid "Search"
@@ -12505,16 +12317,6 @@ msgstr "Caută 1 câmp de tip {fieldTypeLabelLowercase}"
 #: src/modules/settings/roles/role-permissions/object-level-permissions/record-level-permissions/components/SettingsRolePermissionsObjectLevelRecordLevelPermissionMeValueSelect.tsx
 msgid "Search 1 field"
 msgstr "Caută 1 câmp"
-
-#. js-lingui-id: n9V88v
-#: src/pages/settings/ai/components/SettingsToolsTable.tsx
-msgid "Search a built-in tool..."
-msgstr "Căutați un instrument integrat..."
-
-#. js-lingui-id: V8n1cR
-#: src/pages/settings/ai/components/SettingsToolsTable.tsx
-msgid "Search a custom tool..."
-msgstr "Căutați un instrument personalizat..."
 
 #. js-lingui-id: l1/uy2
 #: src/pages/settings/data-model/SettingsObjectFieldTable.tsx
@@ -12555,6 +12357,11 @@ msgstr "Căutați un obiect de sistem..."
 msgid "Search a team member..."
 msgstr "Caută un membru al echipei..."
 
+#. js-lingui-id: VNmPqQ
+#: src/pages/settings/ai/components/SettingsToolsTable.tsx
+msgid "Search a tool..."
+msgstr ""
+
 #. js-lingui-id: lnDfeK
 #: src/modules/settings/data-model/fields/forms/components/SettingsObjectNewFieldSelector.tsx
 msgid "Search a type"
@@ -12581,6 +12388,7 @@ msgid "Search an agent..."
 msgstr "Caută un agent..."
 
 #. js-lingui-id: fGTI3o
+#: src/pages/settings/applications/tabs/SettingsApplicationsDeveloperTab.tsx
 #: src/pages/settings/applications/tabs/SettingsApplicationsAvailableTab.tsx
 #: src/pages/settings/applications/components/SettingsApplicationsTable.tsx
 msgid "Search an application"
@@ -12628,7 +12436,7 @@ msgid "Search colors"
 msgstr "Caută culori"
 
 #. js-lingui-id: AR3FV/
-#: src/modules/navigation-menu-item/edit/side-panel/components/SidePanelEditColorOption.tsx
+#: src/modules/ui/input/components/ThemeColorPickerMenu.tsx
 msgid "Search colors..."
 msgstr "Caută culori..."
 
@@ -12650,6 +12458,7 @@ msgstr "Caută moneda"
 #. js-lingui-id: 7taA9j
 #: src/modules/views/components/ViewBarFilterDropdownFieldSelectMenu.tsx
 #: src/modules/spreadsheet-import/components/MatchColumnSelectFieldSelectDropdownContent.tsx
+#: src/modules/side-panel/pages/page-layout/components/dropdown-content/FieldWidgetFieldDropdownContent.tsx
 #: src/modules/side-panel/pages/page-layout/components/dropdown-content/ChartGroupByFieldSelectionRelationFieldView.tsx
 #: src/modules/side-panel/pages/page-layout/components/dropdown-content/ChartGroupByFieldSelectionDropdownContentBase.tsx
 #: src/modules/side-panel/pages/page-layout/components/dropdown-content/ChartFieldSelectionForAggregateOperationDropdownContent.tsx
@@ -12695,12 +12504,6 @@ msgstr "Caută operațiuni"
 #: src/modules/side-panel/pages/page-layout/components/dropdown-content/ChartRatioOptionValueSelectionDropdownContent.tsx
 msgid "Search options"
 msgstr "Opțiuni de căutare"
-
-#. js-lingui-id: IMeaSJ
-#: src/modules/command-menu-item/record-agnostic/constants/RecordAgnosticCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record-agnostic/constants/RecordAgnosticCommandMenuItemsConfig.tsx
-msgid "Search records"
-msgstr "Caută înregistrări"
 
 #. js-lingui-id: rRklUH
 #: src/modules/navigation-menu-item/edit/side-panel/components/SidePanelNewSidebarItemRecordSubPage.tsx
@@ -12811,12 +12614,6 @@ msgstr "Vezi"
 msgid "See {objectLabelPlural}"
 msgstr "Vezi {objectLabelPlural}"
 
-#. js-lingui-id: QREcJS
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-msgid "See active version"
-msgstr "Vezi versiunea activă"
-
 #. js-lingui-id: R+sqCn
 #: src/modules/page-layout/widgets/components/WidgetActionFieldSeeAll.tsx
 msgid "See all {relationLabelPlural} linked to this record"
@@ -12827,35 +12624,15 @@ msgstr "Vezi toate {relationLabelPlural} asociate cu această înregistrare"
 msgid "See data model settings"
 msgstr ""
 
-#. js-lingui-id: f4Lu+X
-#: src/modules/command-menu-item/record/constants/DashboardCommandMenuItemsConfig.tsx
-msgid "See deleted dashboards"
-msgstr "Afișează tablourile de bord șterse"
-
-#. js-lingui-id: 8O9AJI
-#: src/modules/command-menu-item/record/constants/WorkspaceMembersCommandMenuItemsConfig.tsx
-msgid "See deleted members"
-msgstr ""
-
-#. js-lingui-id: BxIUpp
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "See deleted records"
-msgstr "Vezi înregistrările șterse"
-
-#. js-lingui-id: Z+SGGW
-#: src/modules/command-menu-item/record/constants/WorkflowRunsCommandMenuItemsConfig.tsx
-msgid "See deleted runs"
-msgstr "Vezi rulări șterse"
-
-#. js-lingui-id: 5jZIe5
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-msgid "See deleted workflows"
-msgstr "Vezi fluxuri de lucru șterse"
-
 #. js-lingui-id: oGROXc
 #: src/modules/settings/roles/role-permissions/object-level-permissions/components/SettingsRolePermissionsObjectLevelTableHeader.tsx
 msgid "See Fields"
 msgstr "Vezi câmpuri"
+
+#. js-lingui-id: RpeN29
+#: src/pages/settings/ai/components/SettingsToolParameterTable.tsx
+msgid "See function"
+msgstr ""
 
 #. js-lingui-id: vn4aKq
 #: src/pages/settings/members/SettingsWorkspaceMembers.tsx
@@ -12867,47 +12644,6 @@ msgstr ""
 #: src/modules/settings/roles/role-permissions/objects-permissions/components/SettingsRolePermissionsObjectsSection.tsx
 msgid "See Records on All Objects"
 msgstr "Vezi înregistrări pentru toate obiectele"
-
-#. js-lingui-id: OpPn5Z
-#: src/modules/command-menu-item/record/constants/WorkflowVersionsCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/WorkflowVersionsCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/WorkflowVersionsCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-msgid "See runs"
-msgstr "Vezi rulările"
-
-#. js-lingui-id: gGEfj/
-#: src/modules/command-menu-item/record/constants/WorkflowRunsCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/WorkflowRunsCommandMenuItemsConfig.tsx
-msgid "See version"
-msgstr "Vezi versiuni"
-
-#. js-lingui-id: EtyY4+
-#: src/modules/command-menu-item/record/constants/WorkflowVersionsCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-msgid "See versions"
-msgstr "Vezi versiunile"
-
-#. js-lingui-id: lYhPN0
-#: src/modules/command-menu-item/record/constants/WorkflowVersionsCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-msgid "See versions history"
-msgstr "Vezi istoricul versiunilor"
-
-#. js-lingui-id: qEKLJV
-#: src/modules/command-menu-item/record/constants/WorkflowVersionsCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/WorkflowVersionsCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/WorkflowRunsCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/WorkflowRunsCommandMenuItemsConfig.tsx
-msgid "See workflow"
-msgstr "Vezi flux de lucru"
-
-#. js-lingui-id: MVYiTN
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
-msgid "See Workflows"
-msgstr "Vezi fluxuri de lucru"
 
 #. js-lingui-id: rG3WVm
 #: src/modules/spreadsheet-import/steps/components/ValidationStep/components/columns.tsx
@@ -12991,7 +12727,7 @@ msgid "Select column..."
 msgstr "Selectează coloana..."
 
 #. js-lingui-id: U+WOF9
-#: src/pages/settings/security/event-logs/components/EventLogDatePickerInput.tsx
+#: src/modules/settings/components/SettingsDatePickerInput.tsx
 msgid "Select date & time"
 msgstr "Selectați data și ora"
 
@@ -13107,6 +12843,13 @@ msgstr "Selectați ce modele apar ca recomandate în selectorul de modele al spa
 msgid "Select your preferred language"
 msgstr "Selectează limba preferată"
 
+#. js-lingui-id: JlFcis
+#: src/modules/side-panel/pages/compose-email/components/SidePanelComposeEmailPage.tsx
+#: src/modules/page-layout/widgets/email-thread/components/EmailThreadComposer.tsx
+#: src/modules/activities/emails/components/EmailComposer.tsx
+msgid "Send"
+msgstr ""
+
 #. js-lingui-id: mjK8F3
 #: src/pages/settings/members/SettingsWorkspaceMembers.tsx
 msgid "Send an invite email to your team"
@@ -13114,6 +12857,7 @@ msgstr "Trimite un email de invitație echipei tale"
 
 #. js-lingui-id: i/TzEU
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useActionRolePermissionFlagConfig.ts
+#: src/modules/activities/emails/components/EmptyInboxPlaceholder.tsx
 msgid "Send Email"
 msgstr "Trimite Email"
 
@@ -13248,12 +12992,12 @@ msgstr "Configurarea bazei tale de date..."
 #: src/modules/ui/navigation/navigation-drawer/components/MultiWorkspaceDropdown/internal/MultiWorkspaceDropdownDefaultComponents.tsx
 #: src/modules/sign-in-background-mock/components/SignInAppNavigationDrawerMock.tsx
 #: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutTabSettingsContent.tsx
+#: src/modules/side-panel/pages/page-layout/components/dashboard/SidePanelDashboardRecordTableSettings.tsx
 #: src/modules/settings/roles/role-permissions/permission-flags/components/SettingsRolePermissionsSettingsSection.tsx
 #: src/modules/settings/roles/role/components/SettingsRole.tsx
 #: src/modules/settings/accounts/components/SettingsAccountsSettingsSection.tsx
 #: src/modules/object-record/record-merge/hooks/useMergeRecordsContainerTabs.ts
 #: src/modules/navigation/components/NavigationDrawerOtherSection.tsx
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
 msgid "Settings"
 msgstr "Setări"
 
@@ -13384,6 +13128,11 @@ msgstr "Autentificare sau Creează un cont"
 #: src/modules/auth/sign-in-up/components/internal/SignInUpWithCredentials.tsx
 msgid "Sign up"
 msgstr "Înregistrare"
+
+#. js-lingui-id: mHC57v
+#: src/modules/auth/sign-in-up/components/internal/SignInUpWithCredentials.tsx
+msgid "Sign-up is temporarily unavailable during maintenance."
+msgstr ""
 
 #. js-lingui-id: BZdVGR
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectForm.tsx
@@ -13578,7 +13327,7 @@ msgstr "Ne pare rău, a apărut o eroare"
 
 #. js-lingui-id: f6Hub0
 #: src/modules/workflow/workflow-steps/workflow-actions/find-records-action/components/WorkflowEditActionFindRecords.tsx
-#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutRecordTableSettings.tsx
+#: src/modules/side-panel/pages/page-layout/components/dashboard/SidePanelDashboardRecordTableSettings.tsx
 #: src/modules/object-record/record-table/record-table-header/components/RecordTableColumnHeadDropdownMenu.tsx
 #: src/modules/object-record/object-sort-dropdown/components/ObjectSortDropdownButton.tsx
 #: src/modules/object-record/object-sort-dropdown/components/ObjectSortDropdownButton.tsx
@@ -13613,7 +13362,7 @@ msgstr "Sortări"
 #: src/pages/settings/applications/tabs/SettingsApplicationRegistrationGeneralTab.tsx
 #: src/pages/settings/applications/tabs/SettingsApplicationRegistrationGeneralTab.tsx
 #: src/modules/side-panel/pages/page-layout/constants/settings/ChartConfigurationSettingLabels.ts
-#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutRecordTableSettings.tsx
+#: src/modules/side-panel/pages/page-layout/components/dashboard/SidePanelDashboardRecordTableSettings.tsx
 #: src/modules/settings/admin-panel/config-variables/components/ConfigVariableOptionsDropdownContent.tsx
 #: src/modules/settings/admin-panel/apps/components/SettingsAdminApps.tsx
 msgid "Source"
@@ -13675,14 +13424,11 @@ msgid "Stages"
 msgstr "Etape"
 
 #. js-lingui-id: TJBHlP
+#: src/pages/settings/ai/components/SettingsToolsTable.tsx
+#: src/pages/settings/ai/components/SettingsToolsTable.tsx
 #: src/modules/settings/roles/role-permissions/object-level-permissions/components/SettingsRolePermissionsObjectLevelObjectPicker.tsx
 msgid "Standard"
 msgstr "Standard"
-
-#. js-lingui-id: mLu2Pd
-#: src/pages/settings/ai/components/SettingsToolsTable.tsx
-msgid "Standard tools available to AI agents"
-msgstr "Instrumente standard disponibile pentru agenții AI"
 
 #. js-lingui-id: tXkhj/
 #: src/pages/onboarding/PaymentSuccess.tsx
@@ -13698,6 +13444,11 @@ msgstr "Începeți un nou abonament Enterprise pentru a reactiva funcționalită
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
 msgid "Start a new enterprise subscription."
 msgstr "Începeți un nou abonament Enterprise."
+
+#. js-lingui-id: WAjFYI
+#: src/modules/settings/admin-panel/health-status/maintenance-mode/components/SettingsAdminMaintenanceMode.tsx
+msgid "Start date"
+msgstr ""
 
 #. js-lingui-id: D3iCkb
 #: src/pages/settings/security/event-logs/components/EventLogFilters.tsx
@@ -13745,12 +13496,6 @@ msgstr "Opțiuni pentru grupul de filtrare al pasului"
 #: src/modules/workflow/workflow-steps/filters/components/WorkflowStepFilterOptionsDropdown.tsx
 msgid "Step filter options"
 msgstr "Opțiuni de filtrare ale pasului"
-
-#. js-lingui-id: ygCKqB
-#: src/modules/command-menu-item/record/constants/WorkflowRunsCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/WorkflowRunsCommandMenuItemsConfig.tsx
-msgid "Stop"
-msgstr "Opreste"
 
 #. js-lingui-id: I8EmDx
 #: src/modules/information-banner/components/impersonate/InformationBannerIsImpersonating.tsx
@@ -13822,6 +13567,8 @@ msgstr ""
 
 #. js-lingui-id: UJmAAK
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionEmailBase.tsx
+#: src/modules/activities/emails/components/EmailComposerFields.tsx
+#: src/modules/activities/emails/components/EmailComposerFields.tsx
 msgid "Subject"
 msgstr "Subiect"
 
@@ -14062,11 +13809,6 @@ msgstr ""
 msgid "System Prompt"
 msgstr "Prompt de Sistem"
 
-#. js-lingui-id: BXGTWI
-#: src/pages/settings/ai/SettingsAIPrompts.tsx
-msgid "System Prompt ({totalTokenCount})"
-msgstr "Prompt de sistem ({totalTokenCount})"
-
 #. js-lingui-id: k+7QWO
 #: src/modules/settings/data-model/object-details/components/SettingsObjectRelationsTable.tsx
 msgid "System relations"
@@ -14107,6 +13849,7 @@ msgstr "Setări Tab"
 #. js-lingui-id: 4hJhzz
 #: src/pages/settings/security/event-logs/components/EventLogTableSelector.tsx
 #: src/modules/views/view-picker/constants/ViewPickerTypeSelectOptions.ts
+#: src/modules/side-panel/pages/page-layout/components/dashboard/SidePanelDashboardRecordTableSettings.tsx
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownLayoutContent.tsx
 #: src/modules/keyboard-shortcut-menu/components/KeyboardShortcutMenuOpenContent.tsx
 msgid "Table"
@@ -14140,7 +13883,6 @@ msgstr "Titlul sarcinii"
 
 #. js-lingui-id: GtycJ/
 #: src/modules/page-layout/constants/StandardPageLayoutTabTitleTranslations.ts
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
 msgid "Tasks"
 msgstr "Sarcini"
 
@@ -14167,14 +13909,8 @@ msgstr "Termeni și Condiții"
 #: src/modules/workflow/workflow-steps/workflow-actions/code-action/components/WorkflowEditActionCode.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/code-action/components/WorkflowEditActionCode.tsx
 #: src/modules/settings/logic-functions/components/tabs/SettingsLogicFunctionCodeEditorTab.tsx
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
 msgid "Test"
 msgstr "Test"
-
-#. js-lingui-id: bU9B27
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-msgid "Test Workflow"
-msgstr "Test Workflows"
 
 #. js-lingui-id: 3nWPN6
 #: src/modules/settings/logic-functions/components/tabs/SettingsLogicFunctionTestTab.tsx
@@ -14560,6 +14296,16 @@ msgstr ""
 msgid "This week"
 msgstr "Săptămâna aceasta"
 
+#. js-lingui-id: DF2voz
+#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutTabSettingsContent.tsx
+msgid "This will cancel all modifications done on the tab and its widgets. Edit mode will be canceled and the page will refresh. This action cannot be undone."
+msgstr ""
+
+#. js-lingui-id: VbVocX
+#: src/modules/side-panel/pages/page-layout/components/WidgetSettingsManageSection.tsx
+msgid "This will cancel all modifications done on the widget. This action cannot be undone."
+msgstr ""
+
 #. js-lingui-id: h4VeOo
 #: src/modules/settings/billing/hooks/useBillingWording.ts
 msgid "This will cancel the scheduled interval change and keep your current billing interval ({currentIntervalLabel})."
@@ -14610,14 +14356,8 @@ msgstr "Aceasta va reveni valoarea bazei de date la valoarea implicită/mediu. S
 msgid "Thought"
 msgstr ""
 
-#. js-lingui-id: 5g/sE8
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
-msgid "Tidy up"
-msgstr "Curăță"
-
 #. js-lingui-id: Vqn9Z1
 #: src/modules/workflow/workflow-diagram/components/WorkflowDiagramRightClickCommandMenu.tsx
-#: src/modules/command-menu-item/record/constants/WorkflowCommandMenuItemsConfig.tsx
 msgid "Tidy up workflow"
 msgstr "Aranjează fluxul de lucru"
 
@@ -14652,9 +14392,10 @@ msgid "Timeout"
 msgstr "Timp de expirare"
 
 #. js-lingui-id: 8TMaZI
-#: src/pages/settings/security/event-logs/components/EventLogResultsTable.tsx
-#: src/pages/settings/security/event-logs/components/EventLogResultsTable.tsx
-#: src/pages/settings/security/event-logs/components/EventLogResultsTable.tsx
+#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
+#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
+#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
+#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminQueueJobsTable.tsx
 msgid "Timestamp"
 msgstr "Marcaj temporal"
@@ -14681,6 +14422,7 @@ msgstr "titlu"
 
 #. js-lingui-id: /jQctM
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionEmailBase.tsx
+#: src/modules/activities/emails/components/EmailComposerFields.tsx
 msgid "To"
 msgstr "Către"
 
@@ -14728,6 +14470,13 @@ msgstr "Tomată"
 msgid "Tomorrow"
 msgstr "Mâine"
 
+#. js-lingui-id: x+3/CM
+#. placeholder {0}: composerState.recipientCount
+#. placeholder {1}: composerState.maxRecipients
+#: src/modules/activities/emails/components/EmailComposer.tsx
+msgid "Too many recipients ({0}/{1})."
+msgstr ""
+
 #. js-lingui-id: WrMXsY
 #: src/modules/spreadsheet-import/steps/components/UploadStep/UploadStep.tsx
 #: src/modules/spreadsheet-import/steps/components/SelectSheetStep/SelectSheetStep.tsx
@@ -14740,9 +14489,14 @@ msgid "Tool calls made"
 msgstr "Apeluri de instrumente efectuate"
 
 #. js-lingui-id: SrWh42
-#: src/pages/settings/ai/components/SettingsToolsTable.tsx
+#: src/pages/settings/ai/SettingsAI.tsx
 msgid "Tool created"
 msgstr "Instrument creat"
+
+#. js-lingui-id: i5A3/7
+#: src/pages/settings/ai/SettingsToolDetail.tsx
+msgid "Tool deleted"
+msgstr ""
 
 #. js-lingui-id: OvFVjH
 #: src/modules/ai/components/ToolStepRenderer.tsx
@@ -14756,6 +14510,7 @@ msgstr "Generarea instrumentului"
 
 #. js-lingui-id: xdA/+p
 #: src/pages/settings/ai/SettingsAI.tsx
+#: src/pages/settings/ai/components/SettingsToolsTable.tsx
 msgid "Tools"
 msgstr "Instrumente"
 
@@ -14830,6 +14585,7 @@ msgstr "Perioada de probă a expirat. Vă rugăm să actualizați detaliile de f
 #: src/modules/side-panel/components/SidePanelWorkflowStepInfo.tsx
 #: src/modules/side-panel/components/SidePanelWorkflowStepInfo.tsx
 #: src/modules/side-panel/components/SidePanelWorkflowStepInfo.tsx
+#: src/modules/settings/logic-functions/components/SettingsLogicFunctionsTable.tsx
 msgid "Trigger"
 msgstr "Declanșator"
 
@@ -14947,7 +14703,7 @@ msgid "Twenty fields"
 msgstr "Câmpuri Twenty"
 
 #. js-lingui-id: YIjS4q
-#: src/pages/settings/ai/components/SettingsAgentModelCapabilities.tsx
+#: src/modules/ai/components/SettingsAgentModelCapabilities.tsx
 msgid "Twitter/X Search"
 msgstr "Căutare Twitter/X"
 
@@ -14976,12 +14732,11 @@ msgstr "Configurarea autentificării în doi pași a fost finalizată cu succes!
 
 #. js-lingui-id: +zy2Nq
 #: src/pages/settings/data-model/SettingsObjectIndexTable.tsx
-#: src/pages/settings/applications/components/SettingsApplicationDataTableRow.tsx
 #: src/pages/settings/ai/constants/SettingsSkillTableMetadata.ts
 #: src/pages/settings/ai/constants/SettingsAiAgentTableMetadata.ts
-#: src/pages/settings/ai/components/SettingsToolsTable.tsx
-#: src/pages/settings/ai/components/SettingsToolsTable.tsx
+#: src/pages/settings/ai/components/SettingsToolParameterTable.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/form-action/components/WorkflowEditActionFormFieldSettings.tsx
+#: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowOutputFieldTypeSelector.tsx
 #: src/modules/settings/security/components/SSO/SettingsSSOIdentitiesProvidersForm.tsx
 #: src/modules/settings/data-model/object-details/components/SettingsObjectRelationsTable.tsx
 #: src/modules/settings/components/SettingsDnsRecordsTable.tsx
@@ -14998,6 +14753,11 @@ msgstr "Tastați '/' pentru comenzi, '@' pentru mențiuni"
 #: src/modules/side-panel/components/SidePanelTopBar.tsx
 msgid "Type anything..."
 msgstr "Tastează orice..."
+
+#. js-lingui-id: LaEX5I
+#: src/modules/activities/emails/components/EmailComposerFields.tsx
+msgid "Type something or press \"/\" to see commands"
+msgstr ""
 
 #. js-lingui-id: UhqKcC
 #: src/modules/navigation-menu-item/edit/side-panel/components/SidePanelNewSidebarItemRecordSubPage.tsx
@@ -15205,8 +14965,13 @@ msgstr "Neintitulat"
 msgid "Untitled {labelSingular}"
 msgstr "{labelSingular} fără titlu"
 
+#. js-lingui-id: zJsHrW
+#: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowOutputSchemaBuilder.tsx
+msgid "Untitled field"
+msgstr ""
+
 #. js-lingui-id: RBz20h
-#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutWidgetTypeSelect.tsx
+#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutDashboardWidgetTypeSelect.tsx
 msgid "Untitled iFrame"
 msgstr "iFrame fără titlu"
 
@@ -15236,7 +15001,6 @@ msgstr "actualizează"
 #: src/pages/settings/applications/components/SettingsApplicationTableRow.tsx
 #: src/modules/information-banner/components/billing/InformationBannerFailPaymentInfo.tsx
 #: src/modules/information-banner/components/billing/InformationBannerBillingSubscriptionPaused.tsx
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
 msgid "Update"
 msgstr "Actualizează"
 
@@ -15252,8 +15016,8 @@ msgstr "Actualizați metoda de plată"
 
 #. js-lingui-id: 0KAL3W
 #: src/modules/side-panel/hooks/useOpenUpdateMultipleRecordsPageInSidePanel.tsx
+#: src/modules/side-panel/components/SidePanelMultipleRecordsInfo.tsx
 #: src/modules/object-record/record-update-multiple/components/UpdateMultipleRecordsContainer.tsx
-#: src/modules/command-menu-item/record/constants/DefaultRecordCommandMenuItemsConfig.tsx
 msgid "Update records"
 msgstr "Actualizați înregistrările"
 
@@ -15322,6 +15086,11 @@ msgstr "Treci la un plan superior pentru a avea acces"
 msgid "Upgrade to Enterprise to access audit logs."
 msgstr ""
 
+#. js-lingui-id: D+7y/3
+#: src/pages/settings/applications/tabs/SettingsApplicationRegistrationDistributionTab.tsx
+msgid "Upgrade to Enterprise to share private applications."
+msgstr ""
+
 #. js-lingui-id: +Gi3x1
 #: src/pages/settings/applications/SettingsAvailableApplicationDetails.tsx
 #: src/pages/settings/applications/components/SettingsApplicationVersionContainer.tsx
@@ -15342,6 +15111,7 @@ msgstr "Încarcă fișier .xlsx, .xls sau .csv"
 #: src/modules/settings/security/components/SSO/SettingsSSOSAMLForm.tsx
 #: src/modules/object-record/record-field/ui/meta-types/input/components/FilesFieldInput.tsx
 #: src/modules/advanced-text-editor/components/WorkflowSendEmailAttachments.tsx
+#: src/modules/activities/emails/components/EmailAttachmentsField.tsx
 msgid "Upload file"
 msgstr "Încărcați fișierul"
 
@@ -15383,7 +15153,7 @@ msgid "URL"
 msgstr "URL"
 
 #. js-lingui-id: pphDjD
-#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutIframeSettings.tsx
+#: src/modules/side-panel/pages/page-layout/components/dashboard/SidePanelDashboardIframeSettings.tsx
 msgid "URL to Embed"
 msgstr "URL de încorporat"
 
@@ -15433,12 +15203,6 @@ msgstr "Utilizare după utilizator"
 msgid "Usage Events"
 msgstr "Evenimente de utilizare"
 
-#. js-lingui-id: 6dMpmz
-#: src/modules/command-menu-item/record/constants/WorkflowVersionsCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record/constants/WorkflowVersionsCommandMenuItemsConfig.tsx
-msgid "Use as draft"
-msgstr "Utilizează ca schiță"
-
 #. js-lingui-id: 6kLyt5
 #: src/modules/auth/sign-in-up/components/internal/SignInUpTwoFactorAuthenticationProvision.tsx
 msgid "Use authenticator apps and browser extensions like 1Password, Authy, Microsoft Authenticator to generate one-time passwords"
@@ -15450,6 +15214,7 @@ msgid "Use best models only"
 msgstr "Folosește doar cele mai bune modele"
 
 #. js-lingui-id: cVOIgV
+#: src/pages/settings/ai/components/SettingsToolsTable.tsx
 #: src/pages/settings/ai/components/SettingsAgentSkills.tsx
 msgid "Use filter to see existing tools or create your own"
 msgstr ""
@@ -15482,9 +15247,9 @@ msgstr "Util pentru tabele pivot/de legătură"
 #. js-lingui-id: 7PzzBU
 #: src/pages/settings/SettingsTwoFactorAuthenticationMethod.tsx
 #: src/pages/settings/SettingsProfile.tsx
-#: src/pages/settings/security/event-logs/components/EventLogResultsTable.tsx
-#: src/pages/settings/security/event-logs/components/EventLogResultsTable.tsx
-#: src/pages/settings/security/event-logs/components/EventLogResultsTable.tsx
+#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
+#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
+#: src/pages/settings/security/event-logs/utils/getColumnsForEventLogTable.ts
 #: src/pages/settings/profile/appearance/components/SettingsExperience.tsx
 #: src/pages/settings/ai/SettingsAgentTurnDetail.tsx
 #: src/pages/settings/ai/SettingsAIPrompts.tsx
@@ -15600,6 +15365,11 @@ msgstr "Variabila {variableKey} a fost actualizată"
 msgid "Variable deleted successfully."
 msgstr "Variabila a fost ștearsă cu succes."
 
+#. js-lingui-id: +woNYv
+#: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowOutputSchemaBuilder.tsx
+msgid "Variable Name"
+msgstr ""
+
 #. js-lingui-id: dY/1ir
 #: src/modules/object-record/record-field/ui/form-types/components/VariableChip.tsx
 msgid "Variable not found"
@@ -15662,7 +15432,9 @@ msgid "view"
 msgstr "vizualizare"
 
 #. js-lingui-id: jpctdh
+#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutDashboardWidgetTypeSelect.tsx
 #: src/modules/side-panel/components/SidePanelObjectViewRecordInfo.tsx
+#: src/modules/side-panel/components/hooks/usePageLayoutHeaderInfo.ts
 #: src/modules/settings/developers/components/WebhookEntitySelect.tsx
 #: src/modules/settings/data-model/object-details/components/SettingsObjectFieldDisabledActionDropdown.tsx
 #: src/modules/navigation-menu-item/edit/side-panel/components/SidePanelNewSidebarItemMainMenu.tsx
@@ -15758,7 +15530,6 @@ msgstr "Vizualizați jurnalele"
 
 #. js-lingui-id: 7PrSCy
 #: src/pages/settings/applications/tabs/SettingsApplicationRegistrationDistributionTab.tsx
-#: src/pages/settings/applications/tabs/SettingsApplicationRegistrationDistributionTab.tsx
 msgid "View marketplace page"
 msgstr "Vizualizați pagina din marketplace"
 
@@ -15768,11 +15539,14 @@ msgid "View not shared"
 msgstr ""
 
 #. js-lingui-id: ecVcAx
-#: src/modules/command-menu-item/record-agnostic/constants/RecordAgnosticCommandMenuItemsConfig.tsx
-#: src/modules/command-menu-item/record-agnostic/constants/RecordAgnosticCommandMenuItemsConfig.tsx
 #: src/modules/command-menu-item/engine-command/constants/EngineComponentKeyHeadlessComponentMap.tsx
 msgid "View Previous AI Chats"
 msgstr "Vizualizează Chat-urile AI Anterioare"
+
+#. js-lingui-id: NnJpTN
+#: src/pages/settings/applications/tabs/SettingsApplicationRegistrationDistributionTab.tsx
+msgid "View private application page"
+msgstr ""
 
 #. js-lingui-id: hAAsm/
 #: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowEditActionAiAgent.tsx
@@ -15827,6 +15601,11 @@ msgstr "Violet"
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownCustomView.tsx
 msgid "Visibility"
 msgstr "Vizibilitate"
+
+#. js-lingui-id: gkAApJ
+#: src/modules/side-panel/pages/page-layout/components/WidgetSettingsManageSection.tsx
+msgid "Visibility Restriction"
+msgstr ""
 
 #. js-lingui-id: zYTdqe
 #: src/modules/views/components/ViewBarFilterDropdownFieldSelectMenu.tsx
@@ -15930,7 +15709,7 @@ msgstr ""
 "Vă rugăm să încercați din nou peste câteva secunde."
 
 #. js-lingui-id: LnnVIT
-#: src/pages/settings/ai/components/SettingsAgentModelCapabilities.tsx
+#: src/modules/ai/components/SettingsAgentModelCapabilities.tsx
 msgid "Web Search"
 msgstr "Căutare pe web"
 
@@ -16075,7 +15854,8 @@ msgid "widget"
 msgstr ""
 
 #. js-lingui-id: fANaAS
-#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutWidgetTypeSelect.tsx
+#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutRecordPageWidgetTypeSelect.tsx
+#: src/modules/side-panel/pages/page-layout/components/SidePanelPageLayoutDashboardWidgetTypeSelect.tsx
 msgid "Widget type"
 msgstr "Tip widget"
 
@@ -16115,7 +15895,6 @@ msgid "Workflow agents"
 msgstr ""
 
 #. js-lingui-id: 2jzcC5
-#: src/modules/command-menu-item/record/single-record/workflow/components/DuplicateWorkflowSingleRecordCommand.tsx
 #: src/modules/command-menu-item/engine-command/record/single-record/workflow/components/DuplicateWorkflowSingleRecordCommand.tsx
 msgid "Workflow duplicated successfully"
 msgstr ""
@@ -16164,9 +15943,9 @@ msgstr "Fluxuri de lucru"
 #: src/pages/settings/data-model/new-field/SettingsObjectNewFieldConfigure.tsx
 #: src/pages/settings/applications/SettingsAvailableApplicationDetails.tsx
 #: src/pages/settings/applications/SettingsApplications.tsx
-#: src/pages/settings/applications/SettingsApplications.tsx
 #: src/pages/settings/applications/SettingsApplicationRegistrationDetails.tsx
 #: src/pages/settings/applications/SettingsApplicationDetails.tsx
+#: src/pages/settings/ai/SettingsToolDetail.tsx
 #: src/pages/settings/ai/SettingsSkillForm.tsx
 #: src/pages/settings/ai/SettingsAgentTurnDetail.tsx
 #: src/pages/settings/ai/SettingsAgentTurnDetail.tsx
@@ -16262,6 +16041,7 @@ msgid "Wrap on record pages"
 msgstr "Înfășurare pe paginile de înregistrare"
 
 #. js-lingui-id: Q9pNST
+#: src/pages/settings/ai/SettingsToolDetail.tsx
 #: src/pages/settings/ai/SettingsSkillForm.tsx
 #: src/modules/settings/roles/role-settings/components/SettingsRoleSettings.tsx
 #: src/modules/settings/developers/components/SettingsDevelopersWebhookForm.tsx
@@ -16340,6 +16120,7 @@ msgid "yes"
 msgstr "da"
 
 #. js-lingui-id: l75CjT
+#: src/pages/settings/ai/components/SettingsToolParameterTable.tsx
 #: src/modules/settings/admin-panel/apps/components/SettingsAdminApps.tsx
 #: src/modules/settings/admin-panel/apps/components/SettingsAdminApps.tsx
 msgid "Yes"
@@ -16365,6 +16146,11 @@ msgstr "Aparții deja acestui spațiu de lucru"
 #: src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateReadOnly.tsx
 msgid "You are not allowed to create records for this object"
 msgstr "Nu aveți permisiunea de a crea înregistrări pentru acest obiect"
+
+#. js-lingui-id: iibZbD
+#: src/pages/settings/applications/tabs/SettingsApplicationsDeveloperTab.tsx
+msgid "You can either create a private app or share it to others"
+msgstr ""
 
 #. js-lingui-id: CNAoaw
 #: src/modules/workflow/workflow-steps/workflow-actions/logic-function-action/components/WorkflowEditActionLogicFunction.tsx
@@ -16397,7 +16183,6 @@ msgid "You have scheduled a metered tier change. Do you want to cancel it?"
 msgstr "Ați programat o schimbare a nivelului măsurat. Doriți să o anulați?"
 
 #. js-lingui-id: qXzOWu
-#: src/modules/command-menu-item/record/workflow/hooks/useRunWorkflowRecordCommands.tsx
 #: src/modules/command-menu-item/engine-command/hooks/useEnrichHeadlessCommandContextApiWithWorkflowVersionTriggerInformation.ts
 msgid "You selected {selectedCountFormatted} records but manual triggers can run on at most {limitFormatted} records at once. Only the first {limitFormatted} records will be processed."
 msgstr ""
@@ -16442,10 +16227,10 @@ msgstr "Contul dvs. a fost activat."
 msgid "Your app version is out of date. Please refresh the page."
 msgstr "Versiunea aplicației tale este depășită. Te rog să reîmprospătezi pagina."
 
-#. js-lingui-id: oNUh7z
+#. js-lingui-id: 9pWhO+
 #: src/pages/settings/applications/tabs/SettingsApplicationsDeveloperTab.tsx
-msgid "Your Apps"
-msgstr "Aplicațiile tale"
+msgid "Your apps"
+msgstr ""
 
 #. js-lingui-id: +5YqGH
 #: src/modules/onboarding/constants/OnboardingSyncEmailsOptions.ts

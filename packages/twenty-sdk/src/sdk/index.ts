@@ -35,13 +35,14 @@ export type {
   FrontComponentConfig,
   FrontComponentType,
 } from './front-component-config';
+export { getPublicAssetUrl } from './get-public-asset-url';
 export { defineLogicFunction } from './logic-functions/define-logic-function';
 export { definePostInstallLogicFunction } from './logic-functions/define-post-install-logic-function';
 export { definePreInstallLogicFunction } from './logic-functions/define-pre-install-logic-function';
 export type {
-  InstallLogicFunctionHandler,
-  InstallLogicFunctionPayload,
-} from './logic-functions/install-logic-function-payload-type';
+  InstallHandler,
+  InstallPayload,
+} from '@/sdk/logic-functions/install-payload-type';
 export type {
   LogicFunctionConfig,
   LogicFunctionHandler,

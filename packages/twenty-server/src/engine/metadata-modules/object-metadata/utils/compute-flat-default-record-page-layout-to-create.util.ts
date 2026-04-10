@@ -38,8 +38,6 @@ export const computeFlatDefaultRecordPageLayoutToCreate = ({
     { key: 'tasks' as const, widgetKey: 'tasks' as const },
     { key: 'notes' as const, widgetKey: 'notes' as const },
     { key: 'files' as const, widgetKey: 'files' as const },
-    { key: 'emails' as const, widgetKey: 'emails' as const },
-    { key: 'calendar' as const, widgetKey: 'calendar' as const },
   ];
 
   const pageLayoutTabs: FlatPageLayoutTab[] = [];
@@ -65,6 +63,7 @@ export const computeFlatDefaultRecordPageLayoutToCreate = ({
       pageLayoutUniversalIdentifier,
       widgetIds: [widgetId],
       widgetUniversalIdentifiers: [widgetUniversalIdentifier],
+      isActive: true,
       createdAt: now,
       updatedAt: now,
       deletedAt: null,
@@ -117,6 +116,7 @@ export const computeFlatDefaultRecordPageLayoutToCreate = ({
       universalConfiguration,
       objectMetadataId: objectMetadata.id,
       objectMetadataUniversalIdentifier: objectMetadata.universalIdentifier,
+      isActive: true,
       createdAt: now,
       updatedAt: now,
       deletedAt: null,
