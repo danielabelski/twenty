@@ -3,7 +3,7 @@ import { type ReactNode } from 'react';
 import { t } from '@lingui/core/macro';
 import { TableCell } from '@/ui/layout/table/components/TableCell';
 import { TableRow } from '@/ui/layout/table/components/TableRow';
-import { OverflowingTextWithTooltip } from 'twenty-ui/display';
+import { Avatar, OverflowingTextWithTooltip } from 'twenty-ui/display';
 import { Tag } from 'twenty-ui/components';
 import { themeCssVariables } from 'twenty-ui/theme-constants';
 import { type ApplicationWithoutRelation } from '~/pages/settings/applications/types/applicationWithoutRelation';
@@ -36,6 +36,13 @@ export const SettingsApplicationTableRow = ({
         minWidth="0"
         overflow="hidden"
       >
+        <Avatar
+          avatarUrl={application.applicationRegistration?.logoUrl || null}
+          placeholder={application.name}
+          placeholderColorSeed={application.name}
+          size="md"
+          type="squared"
+        />
         <OverflowingTextWithTooltip text={application.name} />
       </TableCell>
       <TableCell gap={themeCssVariables.spacing[2]} minWidth="0">

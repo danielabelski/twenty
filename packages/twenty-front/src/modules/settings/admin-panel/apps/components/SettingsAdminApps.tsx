@@ -9,7 +9,12 @@ import { t } from '@lingui/core/macro';
 import { useState } from 'react';
 import { getSettingsPath } from 'twenty-shared/utils';
 import { SettingsPath } from 'twenty-shared/types';
-import { H2Title, Status } from 'twenty-ui/display';
+import {
+  Avatar,
+  H2Title,
+  OverflowingTextWithTooltip,
+  Status,
+} from 'twenty-ui/display';
 import { SearchInput } from 'twenty-ui/input';
 import { Section } from 'twenty-ui/layout';
 import { UndecoratedLink } from 'twenty-ui/navigation';
@@ -90,7 +95,21 @@ export const SettingsAdminApps = () => {
                   mobileGridAutoColumns={TABLE_GRID_MOBILE}
                   isClickable
                 >
-                  <TableCell>{registration.name}</TableCell>
+                  <TableCell
+                    color={themeCssVariables.font.color.secondary}
+                    gap={themeCssVariables.spacing[2]}
+                    minWidth="0"
+                    overflow="hidden"
+                  >
+                    <Avatar
+                      avatarUrl={registration.logoUrl || null}
+                      placeholder={registration.name}
+                      placeholderColorSeed={registration.name}
+                      size="md"
+                      type="squared"
+                    />
+                    <OverflowingTextWithTooltip text={registration.name} />
+                  </TableCell>
                   <TableCell overflow="hidden">
                     {registration.sourcePackage ?? registration.sourceType}
                   </TableCell>
