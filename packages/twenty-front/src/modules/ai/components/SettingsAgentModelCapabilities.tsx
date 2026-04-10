@@ -1,39 +1,11 @@
 import { aiModelsState } from '@/client-config/states/aiModelsState';
 import { InputLabel } from '@/ui/input/components/InputLabel';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
-import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
-import { useContext } from 'react';
 import { isDefined } from 'twenty-shared/utils';
 import { IconBrandX, IconWorld } from 'twenty-ui/display';
-import { Checkbox } from 'twenty-ui/input';
 import { Section } from 'twenty-ui/layout';
-import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
-
-const StyledCheckboxContainer = styled.div<{ disabled: boolean }>`
-  align-items: center;
-  border-radius: ${themeCssVariables.border.radius.sm};
-  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
-  display: flex;
-  height: ${themeCssVariables.spacing[8]};
-  justify-content: space-between;
-  padding-inline: ${themeCssVariables.spacing[2]};
-  transition: background-color
-    calc(${themeCssVariables.animation.duration.normal} * 1s) ease;
-
-  &:hover {
-    background-color: ${({ disabled }) =>
-      disabled
-        ? 'transparent'
-        : themeCssVariables.background.transparent.light};
-  }
-`;
-
-const StyledCheckboxLabel = styled.div`
-  align-items: center;
-  display: flex;
-  gap: ${themeCssVariables.spacing[1]};
-`;
+import { MenuItemToggle } from 'twenty-ui/navigation';
 
 type ModelConfiguration = {
   webSearch?: {
@@ -59,7 +31,6 @@ export const SettingsAgentModelCapabilities = ({
   onConfigurationChange,
   disabled = false,
 }: SettingsAgentModelCapabilitiesProps) => {
-  const { theme } = useContext(ThemeContext);
   const aiModels = useAtomStateValue(aiModelsState);
 
   const selectedModel = aiModels.find((m) => m.modelId === selectedModelId);
@@ -118,26 +89,16 @@ export const SettingsAgentModelCapabilities = ({
       <InputLabel>{t`Enable model-specific features`}</InputLabel>
       <div>
         {capabilities.map((capability) => (
-          <StyledCheckboxContainer
-            disabled={disabled}
+          <MenuItemToggle
             key={capability.key}
-            onClick={() =>
-              handleCapabilityToggle(capability.key, !capability.enabled)
+            LeftIcon={capability.Icon}
+            text={capability.label}
+            toggled={capability.enabled}
+            onToggleChange={(toggled) =>
+              handleCapabilityToggle(capability.key, toggled)
             }
-          >
-            <StyledCheckboxLabel>
-              <capability.Icon size={theme.icon.size.sm} />
-              <span>{capability.label}</span>
-            </StyledCheckboxLabel>
-            <Checkbox
-              checked={capability.enabled}
-              onChange={(event) => {
-                event.stopPropagation();
-                handleCapabilityToggle(capability.key, event.target.checked);
-              }}
-              disabled={disabled}
-            />
-          </StyledCheckboxContainer>
+            disabled={disabled}
+          />
         ))}
       </div>
     </Section>
