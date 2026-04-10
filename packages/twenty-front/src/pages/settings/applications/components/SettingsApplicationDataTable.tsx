@@ -25,6 +25,7 @@ export type ApplicationDataTableRow = {
     isCustom?: boolean;
     isRemote?: boolean;
     applicationId?: string | null;
+    logoUrl?: string;
   };
 };
 

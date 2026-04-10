@@ -29,7 +29,11 @@ export const SettingsItemTypeTag = ({
 }: SettingsItemTypeTagProps) => {
   const currentWorkspace = useAtomStateValue(currentWorkspaceState);
   const itemTagInfo = getItemTagInfo({
-    item: { isCustom, isRemote, applicationId },
+    item: {
+      isCustom,
+      isRemote,
+      applicationId,
+    },
     workspaceCustomApplicationId:
       currentWorkspace?.workspaceCustomApplication?.id,
   });
@@ -39,6 +43,7 @@ export const SettingsItemTypeTag = ({
   return (
     <StyledContainer className={className}>
       <Avatar
+        avatarUrl={itemTagInfo?.logoUrl}
         placeholder={itemTagInfo.labelText}
         placeholderColorSeed={itemTagInfo.labelText}
         type="squared"

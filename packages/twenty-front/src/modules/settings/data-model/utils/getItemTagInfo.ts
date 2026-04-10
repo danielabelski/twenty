@@ -1,10 +1,19 @@
 import { isDefined } from 'twenty-shared/utils';
+import { useParams } from 'react-router-dom';
+import { ApplicationDataTableRow } from '~/pages/settings/applications/components/SettingsApplicationDataTable';
 
-export type ItemTagInfo =
+export type ItemTagInfo = (
+  | ThisAppItemTagInfo
   | StandardItemTagInfo
   | CustomItemTagInfo
   | RemoteItemTagInfo
-  | ManagedItemTagInfo;
+  | ManagedItemTagInfo
+) & { logoUrl?: string };
+
+type ThisAppItemTagInfo = {
+  labelText: 'This app';
+  labelColor: 'sky';
+};
 
 type StandardItemTagInfo = {
   labelText: 'Standard';
@@ -27,16 +36,28 @@ type ManagedItemTagInfo = {
 };
 
 export const getItemTagInfo = ({
-  item: { isCustom, isRemote, applicationId },
+  item: { isCustom, isRemote, applicationId, logoUrl },
   workspaceCustomApplicationId,
 }: {
-  item: {
-    isCustom?: boolean;
-    isRemote?: boolean;
-    applicationId?: string | null;
-  };
+  item: ApplicationDataTableRow['tagItem'];
   workspaceCustomApplicationId?: string;
 }): ItemTagInfo => {
+  const { applicationId: currentApplicationId = '' } = useParams<{
+    applicationId: string;
+  }>();
+
+  if (
+    isDefined(applicationId) &&
+    isDefined(currentApplicationId) &&
+    applicationId === currentApplicationId
+  ) {
+    return {
+      labelText: 'This app',
+      labelColor: 'sky',
+      logoUrl: logoUrl ?? undefined,
+    };
+  }
+
   if (
     isDefined(applicationId) &&
     applicationId !== workspaceCustomApplicationId
