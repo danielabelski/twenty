@@ -1,4 +1,3 @@
-import { SettingsTextInput } from '@/ui/input/components/SettingsTextInput';
 import { t } from '@lingui/core/macro';
 import { isDefined } from 'twenty-shared/utils';
 import { H2Title, IconTrash } from 'twenty-ui/display';
@@ -17,15 +16,14 @@ import {
 } from '~/generated-metadata/graphql';
 import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
 import { useNavigateSettings } from '~/hooks/useNavigateSettings';
+import { ApplicationWithoutRelation } from '~/pages/settings/applications/types/applicationWithoutRelation';
 
 const UNINSTALL_APPLICATION_MODAL_ID = 'uninstall-application-modal';
 
 export const SettingsApplicationDetailAboutTab = ({
   application,
 }: {
-  application?: Omit<Application, 'objects'> & {
-    objects: { id: string }[];
-  };
+  application?: ApplicationWithoutRelation;
 }) => {
   const { openModal } = useModal();
 

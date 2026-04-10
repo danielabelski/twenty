@@ -7,11 +7,9 @@ import { t } from '@lingui/core/macro';
 import { isDefined } from 'twenty-shared/utils';
 import { IconCircleDot, IconStatusChange, IconUpload } from 'twenty-ui/display';
 import { Button } from 'twenty-ui/input';
-import {
-  ApplicationRegistrationSourceType,
-  type Application,
-} from '~/generated-metadata/graphql';
+import { ApplicationRegistrationSourceType } from '~/generated-metadata/graphql';
 import { isNewerSemver } from '~/pages/settings/applications/utils/isNewerSemver';
+import { ApplicationWithoutRelation } from '~/pages/settings/applications/types/applicationWithoutRelation';
 
 const StyledContainer = styled.div`
   display: flex;
@@ -24,9 +22,7 @@ export const SettingsApplicationVersionContainer = ({
   latestAvailableVersion,
   appRegistrationId,
 }: {
-  application?: Omit<Application, 'objects' | 'universalIdentifier'> & {
-    objects: { id: string }[];
-  };
+  application?: ApplicationWithoutRelation;
   latestAvailableVersion?: string | null;
   appRegistrationId?: string | null;
 }) => {

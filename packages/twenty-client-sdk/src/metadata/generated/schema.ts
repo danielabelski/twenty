@@ -230,14 +230,6 @@ export interface Role {
     __typename: 'Role'
 }
 
-export interface ApplicationRegistrationSummary {
-    id: Scalars['UUID']
-    latestAvailableVersion?: Scalars['String']
-    sourceType: ApplicationRegistrationSourceType
-    logoUrl?: Scalars['String']
-    __typename: 'ApplicationRegistrationSummary'
-}
-
 export interface ApplicationVariable {
     id: Scalars['UUID']
     key: Scalars['String']
@@ -399,7 +391,7 @@ export interface Application {
     logicFunctions: LogicFunction[]
     objects: Object[]
     applicationVariables: ApplicationVariable[]
-    applicationRegistration?: ApplicationRegistrationSummary
+    applicationRegistration?: ApplicationRegistration
     __typename: 'Application'
 }
 
@@ -3345,15 +3337,6 @@ export interface RoleGenqlSelection{
     __scalar?: boolean | number
 }
 
-export interface ApplicationRegistrationSummaryGenqlSelection{
-    id?: boolean | number
-    latestAvailableVersion?: boolean | number
-    sourceType?: boolean | number
-    logoUrl?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
 export interface ApplicationVariableGenqlSelection{
     id?: boolean | number
     key?: boolean | number
@@ -3553,7 +3536,7 @@ export interface ApplicationGenqlSelection{
     logicFunctions?: LogicFunctionGenqlSelection
     objects?: ObjectGenqlSelection
     applicationVariables?: ApplicationVariableGenqlSelection
-    applicationRegistration?: ApplicationRegistrationSummaryGenqlSelection
+    applicationRegistration?: ApplicationRegistrationGenqlSelection
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -6888,14 +6871,6 @@ export interface LogicFunctionLogsInput {applicationId?: (Scalars['UUID'] | null
     export const isRole = (obj?: { __typename?: any } | null): obj is Role => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isRole"')
       return Role_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
-    const ApplicationRegistrationSummary_possibleTypes: string[] = ['ApplicationRegistrationSummary']
-    export const isApplicationRegistrationSummary = (obj?: { __typename?: any } | null): obj is ApplicationRegistrationSummary => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isApplicationRegistrationSummary"')
-      return ApplicationRegistrationSummary_possibleTypes.includes(obj.__typename)
     }
     
 

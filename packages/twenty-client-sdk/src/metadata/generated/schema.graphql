@@ -281,13 +281,6 @@ type Role {
   rowLevelPermissionPredicateGroups: [RowLevelPermissionPredicateGroup!]
 }
 
-type ApplicationRegistrationSummary {
-  id: UUID!
-  latestAvailableVersion: String
-  sourceType: ApplicationRegistrationSourceType!
-  logoUrl: String
-}
-
 type ApplicationVariable {
   id: UUID!
   key: String!
@@ -568,7 +561,7 @@ type Application {
   logicFunctions: [LogicFunction!]!
   objects: [Object!]!
   applicationVariables: [ApplicationVariable!]!
-  applicationRegistration: ApplicationRegistrationSummary
+  applicationRegistration: ApplicationRegistration
 }
 
 type ViewField {
