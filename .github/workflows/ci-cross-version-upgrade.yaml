@@ -1,0 +1,196 @@
+name: CI Cross-Version Upgrade
+
+permissions:
+  contents: read
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  cross-version-upgrade:
+    timeout-minutes: 45
+    runs-on: ubuntu-latest
+    env:
+      OLDEST_SUPPORTED_VERSION: v1.20.0
+      API_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMDIwMjAyMC05ZTNiLTQ2ZDQtYTU1Ni04OGI5ZGRjMmIwMzQiLCJ1c2VySWQiOiIyMDIwMjAyMC05ZTNiLTQ2ZDQtYTU1Ni04OGI5ZGRjMmIwMzQiLCJ3b3Jrc3BhY2VJZCI6IjIwMjAyMDIwLTFjMjUtNGQwMi1iZjI1LTZhZWNjZjdlYTQxOSIsIndvcmtzcGFjZU1lbWJlcklkIjoiMjAyMDIwMjAtMDY4Ny00YzQxLWI3MDctZWQxYmZjYTk3MmE3IiwidXNlcldvcmtzcGFjZUlkIjoiMjAyMDIwMjAtOWUzYi00NmQ0LWE1NTYtODhiOWRkYzJiMDM1IiwidHlwZSI6IkFDQ0VTUyIsImF1dGhQcm92aWRlciI6InBhc3N3b3JkIiwiaWF0IjoxNzUxMjgxNzA0LCJleHAiOjQ5MDQ4ODE3MDR9.9S4wc0MOr5iczsomlFxZdOHD1IRDS4dnRSwNVNpctF4
+
+    steps:
+      # ================================================================
+      # Phase 1 — Initialize old version
+      # ================================================================
+
+      - name: Old version / Start container
+        run: |
+          docker volume create twenty-pg-data
+          docker run -d \
+            --name twenty-old \
+            -p 2021:2021 \
+            -e NODE_PORT=2021 \
+            -e SERVER_URL=http://localhost:2021 \
+            -v twenty-pg-data:/data/postgres \
+            twentycrm/twenty-app-dev:${{ env.OLDEST_SUPPORTED_VERSION }}
+
+      - name: Old version / Wait for healthy
+        run: |
+          echo "Waiting for old version to become healthy..."
+          TIMEOUT=180
+          ELAPSED=0
+          while true; do
+            status=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:2021/healthz 2>/dev/null || echo "000")
+            if [ "$status" = "200" ]; then
+              echo "Old version is healthy! (took ~${ELAPSED}s)"
+              break
+            fi
+
+            container_status=$(docker inspect --format='{{.State.Status}}' twenty-old 2>/dev/null || echo "unknown")
+            if [ "$container_status" = "exited" ]; then
+              echo "Container exited unexpectedly"
+              docker logs twenty-old
+              exit 1
+            fi
+
+            ELAPSED=$((ELAPSED + 3))
+            if [ "$ELAPSED" -ge "$TIMEOUT" ]; then
+              echo "Old version did not become healthy within ${TIMEOUT}s"
+              docker logs twenty-old
+              exit 1
+            fi
+            echo "  … waited ${ELAPSED}s [HTTP ${status}]"
+            sleep 3
+          done
+
+      - name: Old version / Sanity check seeded data
+        run: |
+          RESPONSE=$(curl -sf http://localhost:2021/api \
+            -H "Authorization: Bearer ${API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d '{"query":"{ companies { edges { node { id name } } } }"}')
+
+          echo "$RESPONSE" | jq .
+          echo "$RESPONSE" | jq -e '.data.companies.edges | length > 0' \
+            || { echo "Sanity check failed: no companies found in old version"; exit 1; }
+
+      - name: Old version / Stop container
+        run: |
+          docker stop twenty-old
+          docker rm twenty-old
+
+      # ================================================================
+      # Phase 2 — Build and start current version
+      # ================================================================
+
+      - name: Current version / Checkout
+        uses: actions/checkout@v4
+
+      - name: Current version / Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Current version / Create frontend placeholder
+        run: |
+          mkdir -p packages/twenty-front/build
+          echo '<html><body>CI placeholder</body></html>' > packages/twenty-front/build/index.html
+
+      - name: Current version / Build image
+        run: |
+          docker build \
+            --target twenty-app-dev \
+            -f packages/twenty-docker/twenty/Dockerfile \
+            -t twenty-app-dev-upgrade-test \
+            .
+
+      - name: Current version / Start container
+        run: |
+          docker run -d \
+            --name twenty-new \
+            -p 2021:2021 \
+            -e NODE_PORT=2021 \
+            -e SERVER_URL=http://localhost:2021 \
+            -v twenty-pg-data:/data/postgres \
+            twenty-app-dev-upgrade-test
+
+      - name: Current version / Wait for healthy
+        run: |
+          echo "Waiting for current version to become healthy (upgrade may take a while)..."
+          TIMEOUT=300
+          ELAPSED=0
+          while true; do
+            status=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:2021/healthz 2>/dev/null || echo "000")
+            if [ "$status" = "200" ]; then
+              echo "Current version is healthy! (took ~${ELAPSED}s)"
+              break
+            fi
+
+            container_status=$(docker inspect --format='{{.State.Status}}' twenty-new 2>/dev/null || echo "unknown")
+            if [ "$container_status" = "exited" ]; then
+              echo "Container exited unexpectedly"
+              docker logs twenty-new
+              exit 1
+            fi
+
+            ELAPSED=$((ELAPSED + 3))
+            if [ "$ELAPSED" -ge "$TIMEOUT" ]; then
+              echo "Current version did not become healthy within ${TIMEOUT}s"
+              docker logs twenty-new
+              exit 1
+            fi
+            echo "  … waited ${ELAPSED}s [HTTP ${status}]"
+            sleep 3
+          done
+
+      # ================================================================
+      # Phase 3 — Smoke tests
+      # ================================================================
+
+      - name: Smoke / Health check
+        run: curl -sf http://localhost:2021/healthz
+
+      - name: Smoke / Query companies
+        run: |
+          RESPONSE=$(curl -sf http://localhost:2021/api \
+            -H "Authorization: Bearer ${API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d '{"query":"{ companies { edges { node { id name } } } }"}')
+
+          echo "$RESPONSE" | jq .
+          echo "$RESPONSE" | jq -e '.data.companies.edges | length > 0' \
+            || { echo "FAIL: expected companies with edges"; docker logs twenty-new; exit 1; }
+
+      - name: Smoke / Query people
+        run: |
+          RESPONSE=$(curl -sf http://localhost:2021/api \
+            -H "Authorization: Bearer ${API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d '{"query":"{ people { edges { node { id } } } }"}')
+
+          echo "$RESPONSE" | jq .
+          echo "$RESPONSE" | jq -e '.data.people.edges != null' \
+            || { echo "FAIL: expected people edges to be non-null"; docker logs twenty-new; exit 1; }
+
+      - name: Smoke / Query metadata objects
+        run: |
+          RESPONSE=$(curl -sf http://localhost:2021/metadata \
+            -H "Authorization: Bearer ${API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d '{"query":"{ objects { edges { node { id nameSingular } } } }"}')
+
+          echo "$RESPONSE" | jq .
+          echo "$RESPONSE" | jq -e '.data.objects.edges | length > 0' \
+            || { echo "FAIL: expected metadata objects"; docker logs twenty-new; exit 1; }
+
+      # ================================================================
+      # Phase 4 — Cleanup
+      # ================================================================
+
+      - name: Cleanup
+        if: always()
+        run: |
+          docker stop twenty-new 2>/dev/null || true
+          docker rm twenty-new 2>/dev/null || true
+          docker stop twenty-old 2>/dev/null || true
+          docker rm twenty-old 2>/dev/null || true
+          docker volume rm twenty-pg-data 2>/dev/null || true
