@@ -14,7 +14,7 @@ import { createPortal } from 'react-dom';
 
 const TAB_LABEL_WIDTH = 72;
 
-export const PanelShell = styled.aside`
+export const PanelShell = styled.aside<{ $collapsed?: boolean }>`
   background: rgba(18, 18, 22, 0.88);
   backdrop-filter: blur(24px) saturate(1.4);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -27,22 +27,24 @@ export const PanelShell = styled.aside`
   flex-direction: column;
   font-family: ${theme.font.family.sans};
   font-size: 11px;
-  height: 100%;
+  height: ${(props) => (props.$collapsed ? 'auto' : '100%')};
   overflow: hidden;
-  width: min(320px, calc(100vw - 32px));
+  width: ${(props) =>
+    props.$collapsed ? 'auto' : 'min(320px, calc(100vw - 32px))'};
 
   @media (max-width: ${theme.breakpoints.md - 1}px) {
-    height: 100%;
-    width: 100%;
+    height: ${(props) => (props.$collapsed ? 'auto' : '100%')};
+    width: ${(props) => (props.$collapsed ? 'auto' : '100%')};
   }
 `;
 
-export const TabsBar = styled.div`
+export const TabsBar = styled.div<{ $collapsed?: boolean }>`
+  align-items: center;
   display: flex;
   flex-shrink: 0;
   gap: 6px;
   margin: 0;
-  padding: 12px 12px 0;
+  padding: ${(props) => (props.$collapsed ? '12px' : '12px 12px 0')};
 `;
 
 export const TabButton = styled.button<{ $active: boolean }>`
@@ -65,9 +67,7 @@ export const TabButton = styled.button<{ $active: boolean }>`
 
   &:hover {
     background: ${(props) =>
-      props.$active
-        ? 'rgba(255, 255, 255, 0.1)'
-        : 'rgba(255, 255, 255, 0.04)'};
+      props.$active ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.04)'};
     color: ${(props) =>
       props.$active
         ? 'rgba(255, 255, 255, 0.94)'
@@ -527,7 +527,9 @@ export function ColorField({ ariaLabel, onChange, value }: ColorFieldProps) {
         aria-label={`${ariaLabel} hex value`}
         maxLength={7}
         onBlur={commitDraftValue}
+        onClick={(event) => event.currentTarget.select()}
         onChange={(event) => setDraftValue(event.target.value.toUpperCase())}
+        onFocus={(event) => event.currentTarget.select()}
         onKeyDown={(event) => {
           if (event.key === 'Enter') {
             event.preventDefault();
@@ -629,30 +631,53 @@ export const ExportPreview = styled.div`
 export const ExportButton = styled.button<{ $primary?: boolean }>`
   align-items: center;
   background: ${(props) =>
-    props.$primary ? '#4A38F5' : 'rgba(255, 255, 255, 0.08)'};
-  border: 1px solid
-    ${(props) =>
-      props.$primary ? 'rgba(116, 98, 255, 0.7)' : 'rgba(255, 255, 255, 0.12)'};
+    props.$primary ? 'rgba(255, 255, 255, 0.24)' : 'rgba(255, 255, 255, 0.2)'};
+  border: none;
   border-radius: 8px;
-  color: ${(props) => (props.$primary ? '#fff' : 'rgba(255, 255, 255, 0.8)')};
+  color: ${(props) =>
+    props.$primary ? 'rgba(255, 255, 255, 0.92)' : 'rgba(255, 255, 255, 0.8)'};
   cursor: pointer;
   display: flex;
   font-family: ${theme.font.family.sans};
   font-size: 11px;
-  font-weight: 600;
+  font-weight: ${theme.font.weight.medium};
   gap: 8px;
   justify-content: center;
+  line-height: normal;
   margin-top: ${(props) => (props.$primary ? '0' : '8px')};
-  min-height: 31px;
   padding: 7px 12px;
-  transition: all 0.2s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.15s ease;
   width: 100%;
 
   &:hover {
     background: ${(props) =>
-      props.$primary ? '#5a4af7' : 'rgba(255, 255, 255, 0.14)'};
-    border-color: ${(props) =>
-      props.$primary ? 'rgba(130, 114, 255, 0.9)' : 'rgba(255, 255, 255, 0.22)'};
+      props.$primary
+        ? 'rgba(255, 255, 255, 0.28)'
+        : 'rgba(255, 255, 255, 0.24)'};
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  &:active {
+    background: ${(props) =>
+      props.$primary
+        ? 'rgba(255, 255, 255, 0.3)'
+        : 'rgba(255, 255, 255, 0.28)'};
+    transform: translateY(1px);
+  }
+
+  &:focus-visible {
+    outline: 1px solid rgba(255, 255, 255, 0.36);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.36);
+    cursor: not-allowed;
+    transform: none;
   }
 `;
 
@@ -721,9 +746,7 @@ function clampAndSnapValue(
   const precision = getStepPrecision(step);
   const snappedValue = Math.round((clampedValue - min) / step) * step + min;
 
-  return Number(
-    Math.min(Math.max(snappedValue, min), max).toFixed(precision),
-  );
+  return Number(Math.min(Math.max(snappedValue, min), max).toFixed(precision));
 }
 
 export function SliderControl({

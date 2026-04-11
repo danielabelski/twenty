@@ -1,10 +1,18 @@
-type HalftoneTabId = 'design' | 'animations' | 'export';
-type HalftoneSourceMode = 'shape' | 'image';
-type HalftoneRotateAxis = 'x' | 'y' | 'z' | 'xy' | '-x' | '-y' | '-z' | '-xy';
-type HalftoneRotatePreset = 'axis' | 'lissajous' | 'orbit' | 'tumble';
-type HalftoneModelLoader = 'fbx' | 'glb';
+export type HalftoneTabId = 'design' | 'animations' | 'export';
+export type HalftoneSourceMode = 'shape' | 'image';
+export type HalftoneRotateAxis =
+  | 'x'
+  | 'y'
+  | 'z'
+  | 'xy'
+  | '-x'
+  | '-y'
+  | '-z'
+  | '-xy';
+export type HalftoneRotatePreset = 'axis' | 'lissajous' | 'orbit' | 'tumble';
+export type HalftoneModelLoader = 'fbx' | 'glb';
 
-interface HalftoneLightingSettings {
+export interface HalftoneLightingSettings {
   intensity: number;
   fillIntensity: number;
   ambientIntensity: number;
@@ -12,34 +20,26 @@ interface HalftoneLightingSettings {
   height: number;
 }
 
-interface HalftoneMaterialSettings {
+export interface HalftoneMaterialSettings {
   roughness: number;
   metalness: number;
 }
 
-interface HalftoneEffectSettings {
+export interface HalftoneEffectSettings {
   enabled: boolean;
-  numRows: number;
-  contrast: number;
+  scale: number;
   power: number;
-  shading: number;
-  baseInk: number;
-  maxBar: number;
-  rowMerge: number;
-  cellRatio: number;
-  cutoff: number;
-  highlightOpen: number;
-  shadowGrouping: number;
-  shadowCrush: number;
+  width: number;
+  imageContrast: number;
   dashColor: string;
 }
 
-interface HalftoneBackgroundSettings {
+export interface HalftoneBackgroundSettings {
   transparent: boolean;
   color: string;
 }
 
-interface HalftoneAnimationSettings {
+export interface HalftoneAnimationSettings {
   autoRotateEnabled: boolean;
   breatheEnabled: boolean;
   cameraParallaxEnabled: boolean;
@@ -88,7 +88,7 @@ interface HalftoneAnimationSettings {
   waveAmount: number;
 }
 
-interface HalftoneStudioSettings {
+export interface HalftoneStudioSettings {
   sourceMode: HalftoneSourceMode;
   shapeKey: string;
   lighting: HalftoneLightingSettings;
@@ -98,7 +98,7 @@ interface HalftoneStudioSettings {
   animation: HalftoneAnimationSettings;
 }
 
-interface HalftoneGeometrySpec {
+export interface HalftoneGeometrySpec {
   key: string;
   label: string;
   kind: 'builtin' | 'imported';
@@ -109,7 +109,7 @@ interface HalftoneGeometrySpec {
   userProvided?: boolean;
 }
 
-interface HalftoneStudioState {
+export interface HalftoneStudioState {
   activeTab: HalftoneTabId;
   geometrySpecs: HalftoneGeometrySpec[];
   importedFiles: Record<string, File>;
@@ -119,7 +119,18 @@ interface HalftoneStudioState {
   statusIsError: boolean;
 }
 
-type HalftoneStudioAction =
+export interface HalftoneExportPose {
+  autoElapsed: number;
+  rotateElapsed: number;
+  rotationX: number;
+  rotationY: number;
+  rotationZ: number;
+  targetRotationX: number;
+  targetRotationY: number;
+  timeElapsed: number;
+}
+
+export type HalftoneStudioAction =
   | { type: 'setTab'; value: HalftoneTabId }
   | { type: 'setSourceMode'; value: HalftoneSourceMode }
   | { type: 'setShapeKey'; value: string }
@@ -135,7 +146,6 @@ type HalftoneStudioAction =
       file: File;
       activate: boolean;
     }
-  | { type: 'setImportedFile'; key: string; file: File }
   | { type: 'setStatus'; message: string; isError?: boolean }
   | { type: 'clearStatus' }
   | { type: 'hideHint' };
@@ -172,64 +182,77 @@ export const DEFAULT_GEOMETRY_SPECS: HalftoneGeometrySpec[] = [
   { key: 'lotusCoin', label: 'Lotus Coin', kind: 'builtin' },
   { key: 'arrowTarget', label: 'Arrow Target', kind: 'builtin' },
   { key: 'dollarCoin', label: 'Dollar Coin', kind: 'builtin' },
-  {
-    key: 'wheel',
-    label: 'Wheel.fbx',
-    kind: 'imported',
-    loader: 'fbx',
-    filename: 'Wheel.fbx',
-    description: 'FBX model',
-    extensions: ['.fbx'],
-  },
-  {
-    key: 'twoGlb',
-    label: 'two.glb',
-    kind: 'imported',
-    loader: 'glb',
-    filename: 'two.glb',
-    description: 'GLB model',
-    extensions: ['.glb'],
-  },
 ];
 
 export const DEFAULT_SHAPE_HALFTONE_SETTINGS: HalftoneEffectSettings = {
   enabled: true,
-  numRows: 45,
-  contrast: 1.3,
-  power: 1.1,
-  shading: 1.6,
-  baseInk: 0.12,
-  maxBar: 0.24,
-  rowMerge: 0.06,
-  cellRatio: 2.2,
-  cutoff: 0.02,
-  highlightOpen: 0.05,
-  shadowGrouping: 0.18,
-  shadowCrush: 0.14,
+  scale: 24.72,
+  power: -0.07,
+  width: 0.46,
+  imageContrast: 1,
   dashColor: '#4A38F5',
 };
 
 export const DEFAULT_IMAGE_HALFTONE_SETTINGS: HalftoneEffectSettings = {
   enabled: true,
-  numRows: 80,
-  contrast: 1.5,
-  power: 1.2,
-  shading: 0.8,
-  baseInk: 0.06,
-  maxBar: 0.32,
-  rowMerge: 0.18,
-  cellRatio: 2.0,
-  cutoff: 0.02,
-  highlightOpen: 0.14,
-  shadowGrouping: 0.38,
-  shadowCrush: 0.24,
+  scale: 24.72,
+  power: -0.07,
+  width: 0.46,
+  imageContrast: 1,
   dashColor: '#4A38F5',
 };
+
+export const LEGACY_HALFTONE_SETTING_KEYS = [
+  'numRows',
+  'contrast',
+  'shading',
+  'baseInk',
+  'maxBar',
+  'rowMerge',
+  'cellRatio',
+  'cutoff',
+  'highlightOpen',
+  'shadowGrouping',
+  'shadowCrush',
+] as const;
+
+export function isRoundedBandHalftoneSettings(
+  value: unknown,
+): value is HalftoneEffectSettings {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  const candidate = value as Record<string, unknown>;
+
+  return (
+    typeof candidate.enabled === 'boolean' &&
+    typeof candidate.scale === 'number' &&
+    typeof candidate.power === 'number' &&
+    typeof candidate.width === 'number' &&
+    typeof candidate.imageContrast === 'number' &&
+    typeof candidate.dashColor === 'string'
+  );
+}
 
 export function getDefaultHalftoneSettings(sourceMode: HalftoneSourceMode) {
   return sourceMode === 'image'
     ? DEFAULT_IMAGE_HALFTONE_SETTINGS
     : DEFAULT_SHAPE_HALFTONE_SETTINGS;
+}
+
+function normalizeHalftoneEffectSettings(
+  defaults: HalftoneEffectSettings,
+  settings?: Partial<HalftoneEffectSettings>,
+): HalftoneEffectSettings {
+  return {
+    enabled: settings?.enabled ?? defaults.enabled,
+    scale: settings?.scale ?? defaults.scale,
+    power: settings?.power ?? defaults.power,
+    width: settings?.width ?? defaults.width,
+    imageContrast: settings?.imageContrast ?? defaults.imageContrast,
+    dashColor: settings?.dashColor ?? defaults.dashColor,
+  };
 }
 
 export const DEFAULT_HALFTONE_SETTINGS: HalftoneStudioSettings = {
@@ -262,7 +285,7 @@ export const DEFAULT_HALFTONE_SETTINGS: HalftoneStudioSettings = {
     dragFlowEnabled: false,
     lightSweepEnabled: false,
     rotateEnabled: false,
-    autoSpeed: 0.3,
+    autoSpeed: 4,
     autoWobble: 0.3,
     breatheAmount: 0.04,
     breatheSpeed: 0.8,
@@ -277,7 +300,7 @@ export const DEFAULT_HALFTONE_SETTINGS: HalftoneStudioSettings = {
     dragMomentum: true,
     rotateAxis: 'y',
     rotatePreset: 'axis',
-    rotateSpeed: 1,
+    rotateSpeed: 0.2,
     rotatePingPong: false,
     floatAmplitude: 0.16,
     floatSpeed: 0.8,
@@ -319,10 +342,10 @@ export function normalizeHalftoneStudioSettings(
       ...DEFAULT_HALFTONE_SETTINGS.material,
       ...settings?.material,
     },
-    halftone: {
-      ...getDefaultHalftoneSettings(sourceMode),
-      ...settings?.halftone,
-    },
+    halftone: normalizeHalftoneEffectSettings(
+      getDefaultHalftoneSettings(sourceMode),
+      settings?.halftone,
+    ),
     background: {
       ...DEFAULT_HALFTONE_SETTINGS.background,
       ...settings?.background,
@@ -448,14 +471,6 @@ export function halftoneStudioReducer(
               shapeKey: action.spec.key,
             }
           : state.settings,
-      };
-    case 'setImportedFile':
-      return {
-        ...state,
-        importedFiles: {
-          ...state.importedFiles,
-          [action.key]: action.file,
-        },
       };
     case 'setStatus':
       return {
