@@ -14,10 +14,9 @@ import { SettingsPageContainer } from '@/settings/components/SettingsPageContain
 import { SettingsSkeletonLoader } from '@/settings/components/SettingsSkeletonLoader';
 import { SubMenuTopBarContainer } from '@/ui/layout/page/components/SubMenuTopBarContainer';
 import { styled } from '@linaria/react';
-import { Card } from 'twenty-ui/layout';
+import { Card, Section } from 'twenty-ui/layout';
 import { TableCell } from '@/ui/layout/table/components/TableCell';
 import { TableRow } from '@/ui/layout/table/components/TableRow';
-import { Section } from 'twenty-ui/layout';
 import { H2Title } from 'twenty-ui/display';
 import { themeCssVariables } from 'twenty-ui/theme-constants';
 
@@ -160,7 +159,8 @@ export const SettingsAdminWorkspaceChatThread = () => {
                     .join('\n');
 
                   const toolParts = message.parts.filter(
-                    (part) => part.type === 'tool-call' && part.toolName,
+                    (part) =>
+                      part.type === 'tool-call' && part.toolName !== null,
                   );
 
                   if (!textParts && toolParts.length === 0) {
