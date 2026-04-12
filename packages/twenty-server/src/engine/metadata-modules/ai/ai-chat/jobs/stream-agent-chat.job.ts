@@ -9,9 +9,12 @@ import type {
 } from 'twenty-shared/ai';
 import { Repository } from 'typeorm';
 
+import { BillingProductKey } from 'src/engine/core-modules/billing/enums/billing-product-key.enum';
+import { BillingService } from 'src/engine/core-modules/billing/services/billing.service';
 import { Process } from 'src/engine/core-modules/message-queue/decorators/process.decorator';
 import { Processor } from 'src/engine/core-modules/message-queue/decorators/processor.decorator';
 import { MessageQueue } from 'src/engine/core-modules/message-queue/message-queue.constants';
+import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
 import { toDisplayCredits } from 'src/engine/core-modules/usage/utils/to-display-credits.util';
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { AgentMessageRole } from 'src/engine/metadata-modules/ai/ai-agent-execution/entities/agent-message.entity';
@@ -46,6 +49,8 @@ export class StreamAgentChatJob {
     private readonly eventPublisherService: AgentChatEventPublisherService,
     private readonly cancelSubscriberService: AgentChatCancelSubscriberService,
     private readonly agentChatStreamingService: AgentChatStreamingService,
+    private readonly billingService: BillingService,
+    private readonly twentyConfigService: TwentyConfigService,
   ) {}
 
   @Process(STREAM_AGENT_CHAT_JOB_NAME)
@@ -67,6 +72,30 @@ export class StreamAgentChatJob {
       });
 
       return;
+    }
+
+    if (this.twentyConfigService.get('IS_BILLING_ENABLED')) {
+      const canBill = await this.billingService.canBillMeteredProduct(
+        data.workspaceId,
+        BillingProductKey.WORKFLOW_NODE_EXECUTION,
+      );
+
+      if (!canBill) {
+        this.logger.warn(
+          `Credits exhausted for workspace ${data.workspaceId}, aborting stream ${data.streamId}`,
+        );
+        await this.eventPublisherService.publish({
+          threadId: data.threadId,
+          workspaceId: data.workspaceId,
+          event: {
+            type: 'stream-error',
+            code: 'BILLING_CREDITS_EXHAUSTED',
+            message: 'Credits exhausted',
+          },
+        });
+
+        return;
+      }
     }
 
     const abortController = new AbortController();

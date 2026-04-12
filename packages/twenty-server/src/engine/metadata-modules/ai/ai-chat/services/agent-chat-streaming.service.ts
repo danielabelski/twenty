@@ -10,11 +10,14 @@ import {
 import { FileFolder } from 'twenty-shared/types';
 import { In, Like, type Repository } from 'typeorm';
 
+import { BillingProductKey } from 'src/engine/core-modules/billing/enums/billing-product-key.enum';
+import { BillingService } from 'src/engine/core-modules/billing/services/billing.service';
 import { FileEntity } from 'src/engine/core-modules/file/entities/file.entity';
 import { FileUrlService } from 'src/engine/core-modules/file/file-url/file-url.service';
 import { InjectMessageQueue } from 'src/engine/core-modules/message-queue/decorators/message-queue.decorator';
 import { MessageQueue } from 'src/engine/core-modules/message-queue/message-queue.constants';
 import { MessageQueueService } from 'src/engine/core-modules/message-queue/services/message-queue.service';
+import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
 import { type WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import {
   AgentMessageRole,
@@ -57,6 +60,8 @@ export class AgentChatStreamingService {
     private readonly agentChatService: AgentChatService,
     private readonly eventPublisherService: AgentChatEventPublisherService,
     private readonly fileUrlService: FileUrlService,
+    private readonly billingService: BillingService,
+    private readonly twentyConfigService: TwentyConfigService,
   ) {}
 
   async streamAgentChat({
@@ -139,6 +144,30 @@ export class AgentChatStreamingService {
     workspaceId: string,
     hasTitle: boolean,
   ): Promise<void> {
+    if (this.twentyConfigService.get('IS_BILLING_ENABLED')) {
+      const canBill = await this.billingService.canBillMeteredProduct(
+        workspaceId,
+        BillingProductKey.WORKFLOW_NODE_EXECUTION,
+      );
+
+      if (!canBill) {
+        this.logger.warn(
+          `Credits exhausted for workspace ${workspaceId}, skipping queued message flush for thread ${threadId}`,
+        );
+        await this.eventPublisherService.publish({
+          threadId,
+          workspaceId,
+          event: {
+            type: 'stream-error',
+            code: 'BILLING_CREDITS_EXHAUSTED',
+            message: 'Credits exhausted',
+          },
+        });
+
+        return;
+      }
+    }
+
     const queuedMessages =
       await this.agentChatService.getQueuedMessages(threadId);
 
