@@ -257,24 +257,50 @@ export class LogicFunctionResourceService {
     workspaceId: string;
     inMemoryFolderPath: string;
   }) {
-    const yarnLockExists = await this.fileStorageService.checkFileExists({
-      workspaceId,
-      applicationUniversalIdentifier,
-      fileFolder: FileFolder.Dependencies,
-      resourcePath: 'yarn.lock',
-    });
-
-    const promises = [];
-
-    promises.push(
-      this.fileStorageService.downloadFile({
+    const [packageJsonExists, yarnLockExists] = await Promise.all([
+      this.fileStorageService.checkFileExists({
         workspaceId,
         applicationUniversalIdentifier,
         fileFolder: FileFolder.Dependencies,
         resourcePath: 'package.json',
-        localPath: join(inMemoryFolderPath, 'package.json'),
       }),
-    );
+      this.fileStorageService.checkFileExists({
+        workspaceId,
+        applicationUniversalIdentifier,
+        fileFolder: FileFolder.Dependencies,
+        resourcePath: 'yarn.lock',
+      }),
+    ]);
+
+    const promises = [];
+
+    if (packageJsonExists) {
+      promises.push(
+        this.fileStorageService.downloadFile({
+          workspaceId,
+          applicationUniversalIdentifier,
+          fileFolder: FileFolder.Dependencies,
+          resourcePath: 'package.json',
+          localPath: join(inMemoryFolderPath, 'package.json'),
+        }),
+      );
+    } else {
+      const packageJsonPath = join(inMemoryFolderPath, 'package.json');
+
+      promises.push(
+        fs.mkdir(dirname(packageJsonPath), { recursive: true }).then(() =>
+          fs.writeFile(
+            packageJsonPath,
+            JSON.stringify({
+              name: 'logic-function-dependencies',
+              version: '1.0.0',
+              dependencies: {},
+            }),
+            'utf-8',
+          ),
+        ),
+      );
+    }
 
     if (yarnLockExists) {
       promises.push(
