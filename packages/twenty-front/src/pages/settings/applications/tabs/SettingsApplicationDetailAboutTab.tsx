@@ -1,6 +1,6 @@
 import { t } from '@lingui/core/macro';
 import { isDefined } from 'twenty-shared/utils';
-import { H2Title, IconTrash } from 'twenty-ui/display';
+import { H2Title, IconTrash, AppTooltip } from 'twenty-ui/display';
 import { Section } from 'twenty-ui/layout';
 import { SettingsApplicationVersionContainer } from '~/pages/settings/applications/components/SettingsApplicationVersionContainer';
 import { Button } from 'twenty-ui/input';
@@ -73,38 +73,49 @@ export const SettingsApplicationDetailAboutTab = ({
           appRegistrationId={registrationId}
         />
       </Section>
-      {application.canBeUninstalled && (
-        <>
-          <Section>
-            <H2Title
-              title={t`Manage your app`}
-              description={t`Uninstall this application`}
-            />
-            <Button
-              accent="danger"
-              variant="secondary"
-              title={t`Uninstall`}
-              Icon={IconTrash}
-              onClick={() => openModal(UNINSTALL_APPLICATION_MODAL_ID)}
-            />
-          </Section>
-          <ConfirmationModal
-            confirmationPlaceholder={confirmationValue}
-            confirmationValue={confirmationValue}
-            modalInstanceId={UNINSTALL_APPLICATION_MODAL_ID}
-            title={t`Uninstall Application?`}
-            subtitle={
-              <Trans>
-                Please type {`"${confirmationValue}"`} to confirm you want to
-                uninstall this application.
-              </Trans>
-            }
-            onConfirmClick={handleUninstallApplication}
-            confirmButtonText={t`Uninstall`}
-            loading={isLoading}
+      <>
+        <Section>
+          <H2Title
+            title={t`Manage your app`}
+            description={t`Uninstall this application`}
           />
-        </>
-      )}
+          <Button
+            accent="danger"
+            id={'uninstall-button-anchor'}
+            variant="secondary"
+            title={t`Uninstall`}
+            Icon={IconTrash}
+            disabled={!application.canBeUninstalled}
+            onClick={() =>
+              application.canBeUninstalled
+                ? openModal(UNINSTALL_APPLICATION_MODAL_ID)
+                : null
+            }
+          />
+          {!application.canBeUninstalled && (
+            <AppTooltip
+              anchorSelect={`#uninstall-button-anchor`}
+              content={t`This application is required for your workspace to function properly and cannot be uninstalled.`}
+              place="bottom-start"
+            />
+          )}
+        </Section>
+        <ConfirmationModal
+          confirmationPlaceholder={confirmationValue}
+          confirmationValue={confirmationValue}
+          modalInstanceId={UNINSTALL_APPLICATION_MODAL_ID}
+          title={t`Uninstall Application?`}
+          subtitle={
+            <Trans>
+              Please type {`"${confirmationValue}"`} to confirm you want to
+              uninstall this application.
+            </Trans>
+          }
+          onConfirmClick={handleUninstallApplication}
+          confirmButtonText={t`Uninstall`}
+          loading={isLoading}
+        />
+      </>
     </>
   );
 };
