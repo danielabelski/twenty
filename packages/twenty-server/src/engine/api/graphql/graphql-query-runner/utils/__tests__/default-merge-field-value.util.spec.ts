@@ -1,6 +1,6 @@
-import { selectFallbackFieldValue } from 'src/engine/api/graphql/graphql-query-runner/utils/select-fallback-field-value.util';
+import { defaultMergeFieldValue } from 'src/engine/api/graphql/graphql-query-runner/utils/default-merge-field-value.util';
 
-describe('selectFallbackFieldValue', () => {
+describe('defaultMergeFieldValue', () => {
   it('should return priority record value when available', () => {
     const recordsWithValues = [
       {
@@ -13,7 +13,7 @@ describe('selectFallbackFieldValue', () => {
       },
     ];
 
-    const result = selectFallbackFieldValue(recordsWithValues, '1');
+    const result = defaultMergeFieldValue(recordsWithValues, '1');
 
     expect(result).toBe('priority value');
   });
@@ -30,7 +30,7 @@ describe('selectFallbackFieldValue', () => {
       },
     ];
 
-    const result = selectFallbackFieldValue(recordsWithValues, '1');
+    const result = defaultMergeFieldValue(recordsWithValues, '1');
 
     expect(result).toBe('first value');
   });
@@ -47,7 +47,7 @@ describe('selectFallbackFieldValue', () => {
       },
     ];
 
-    const result = selectFallbackFieldValue(recordsWithValues, '1');
+    const result = defaultMergeFieldValue(recordsWithValues, '1');
 
     expect(result).toBe('fallback value');
   });
@@ -64,7 +64,7 @@ describe('selectFallbackFieldValue', () => {
       },
     ];
 
-    const result = selectFallbackFieldValue(recordsWithValues, '1');
+    const result = defaultMergeFieldValue(recordsWithValues, '1');
 
     expect(result).toBe('fallback value');
   });
@@ -81,13 +81,13 @@ describe('selectFallbackFieldValue', () => {
       },
     ];
 
-    const result = selectFallbackFieldValue(recordsWithValues, '1');
+    const result = defaultMergeFieldValue(recordsWithValues, '1');
 
     expect(result).toBe('fallback value');
   });
 
   it('should return null when no records exist', () => {
-    const result = selectFallbackFieldValue([], '1');
+    const result = defaultMergeFieldValue([], '1');
 
     expect(result).toBeNull();
   });
@@ -104,7 +104,7 @@ describe('selectFallbackFieldValue', () => {
       },
     ];
 
-    const result = selectFallbackFieldValue(recordsWithValues, '1');
+    const result = defaultMergeFieldValue(recordsWithValues, '1');
 
     expect(result).toBeNull();
   });
@@ -121,7 +121,7 @@ describe('selectFallbackFieldValue', () => {
       },
     ];
 
-    const result = selectFallbackFieldValue(recordsWithValues, '1');
+    const result = defaultMergeFieldValue(recordsWithValues, '1');
 
     expect(result).toEqual({ name: 'priority object', id: 1 });
   });

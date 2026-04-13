@@ -11,7 +11,7 @@ import { mergeEmailsFieldValues } from './merge-emails-field-values.util';
 import { mergeLinksFieldValues } from './merge-links-field-values.util';
 import { mergePhonesFieldValues } from './merge-phones-field-values.util';
 import { mergeRelationFieldValuesForDryRunRecord } from './merge-relation-field-values-for-dry-run-record.util';
-import { selectFallbackFieldValue } from './select-fallback-field-value.util';
+import { defaultMergeFieldValue } from './default-merge-field-value.util';
 
 export const mergeFieldValues = (
   fieldType: FieldMetadataType,
@@ -34,7 +34,7 @@ export const mergeFieldValues = (
         );
       }
 
-      return selectFallbackFieldValue(recordsWithValues, priorityRecordId);
+      return defaultMergeFieldValue(recordsWithValues, priorityRecordId);
 
     case FieldMetadataType.EMAILS:
       return mergeEmailsFieldValues(
@@ -55,6 +55,6 @@ export const mergeFieldValues = (
       );
 
     default:
-      return selectFallbackFieldValue(recordsWithValues, priorityRecordId);
+      return defaultMergeFieldValue(recordsWithValues, priorityRecordId);
   }
 };

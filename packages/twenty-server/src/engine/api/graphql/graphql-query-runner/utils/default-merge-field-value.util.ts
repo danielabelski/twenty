@@ -2,7 +2,7 @@ import { isDefined } from 'twenty-shared/utils';
 
 import { hasRecordFieldValue } from 'src/engine/api/graphql/graphql-query-runner/utils/has-record-field-value.util';
 
-export const selectFallbackFieldValue = <T>(
+export const defaultMergeFieldValue = <T>(
   recordsWithValues: { value: T; recordId: string }[],
   priorityRecordId: string,
 ): T | null => {
