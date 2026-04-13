@@ -19,7 +19,10 @@ export const formatDateISOStringToRelativeDate = ({
   localeCatalog: Locale;
 }) => {
   const now = new Date();
-  const targetDate = new Date(isoDate);
+  // For date-only strings (yyyy-MM-dd), append T00:00:00 without Z
+  // to force local-time parsing instead of the spec's default UTC midnight
+  const targetDate =
+    isoDate.length === 10 ? new Date(isoDate + 'T00:00:00') : new Date(isoDate);
 
   if (isDayMaximumPrecision && isToday(targetDate)) return t`Today`;
   if (isDayMaximumPrecision && isYesterday(targetDate)) return t`Yesterday`;
