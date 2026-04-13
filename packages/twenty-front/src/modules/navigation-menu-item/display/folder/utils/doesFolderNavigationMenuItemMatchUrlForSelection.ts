@@ -39,32 +39,23 @@ export const doesFolderNavigationMenuItemMatchUrlForSelection = ({
     computedLink,
   );
 
-  const objectMetadataForRecordShowMatch =
-    !matchesByLink &&
-    folderChildNavigationMenuItem.type === NavigationMenuItemType.OBJECT
-      ? getObjectMetadataForNavigationMenuItem(
-          folderChildNavigationMenuItem,
-          objectMetadataItems,
-          views,
-        )
-      : undefined;
-
-  const matchesByRecordShow =
-    isDefined(objectMetadataForRecordShowMatch) &&
-    matchesRecordShowPathForObject(
-      currentPath,
-      objectMetadataForRecordShowMatch.nameSingular,
-    );
-
-  if (!matchesByLink && !matchesByRecordShow) {
-    return false;
-  }
-
   const objectMetadataForFolderChild = getObjectMetadataForNavigationMenuItem(
     folderChildNavigationMenuItem,
     objectMetadataItems,
     views,
   );
+
+  const matchesByRecordShow =
+    !matchesByLink &&
+    isDefined(objectMetadataForFolderChild) &&
+    matchesRecordShowPathForObject(
+      currentPath,
+      objectMetadataForFolderChild.nameSingular,
+    );
+
+  if (!matchesByLink && !matchesByRecordShow) {
+    return false;
+  }
 
   if (!isDefined(objectMetadataForFolderChild)) {
     return true;
