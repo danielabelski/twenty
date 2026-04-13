@@ -33,6 +33,17 @@ describe('resolveRelativeDateFilterStringified', () => {
     expect(result).not.toBeNull();
     expect(result?.direction).toBe('NEXT');
   });
+
+  it('should resolve a JSON-stringified filter as fallback', () => {
+    const result = resolveRelativeDateFilterStringified(
+      JSON.stringify({ direction: 'PAST', amount: 7, unit: 'DAY' }),
+    );
+
+    expect(result).not.toBeNull();
+    expect(result?.direction).toBe('PAST');
+    expect(result?.start).toBeDefined();
+    expect(result?.end).toBeDefined();
+  });
 });
 
 describe('resolveRelativeDateTimeFilterStringified', () => {
@@ -53,6 +64,17 @@ describe('resolveRelativeDateTimeFilterStringified', () => {
 
     expect(result).not.toBeNull();
     expect(result?.direction).toBe('PAST');
+    expect(result?.start).toBeDefined();
+    expect(result?.end).toBeDefined();
+  });
+
+  it('should resolve a JSON-stringified filter as fallback', () => {
+    const result = resolveRelativeDateTimeFilterStringified(
+      JSON.stringify({ direction: 'NEXT', amount: 7, unit: 'DAY' }),
+    );
+
+    expect(result).not.toBeNull();
+    expect(result?.direction).toBe('NEXT');
     expect(result?.start).toBeDefined();
     expect(result?.end).toBeDefined();
   });

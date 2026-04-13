@@ -108,7 +108,7 @@ export const WorkflowStepFilterValueInput = ({
     upsertStepFilterSettings({
       stepFilterToUpsert: {
         ...stepFilter,
-        value: JSON.stringify(newRelativeDateFilter),
+        value: stringifyRelativeDateFilter(newRelativeDateFilter),
       },
     });
   };
