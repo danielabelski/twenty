@@ -54,6 +54,11 @@ export const SentryInitEffect = () => {
             tracesSampleRate: 1.0,
             replaysSessionSampleRate: 0.1,
             replaysOnErrorSampleRate: 1.0,
+            denyUrls: [
+              // Errors from third-party CDN scripts are not actionable
+              /cdn\.jsdelivr\.net/i,
+              /unpkg\.com/i,
+            ],
           });
 
           setIsSentryInitialized(true);
