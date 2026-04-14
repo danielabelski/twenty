@@ -14,6 +14,7 @@ export type CalendarEvent = {
   isCanceled?: boolean;
   isFullDay: boolean;
   location?: string;
+  recurrence?: string;
   startsAt: string;
   title?: string;
   visibility: CalendarChannelVisibility;

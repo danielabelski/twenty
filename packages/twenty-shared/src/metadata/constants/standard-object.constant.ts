@@ -595,6 +595,9 @@ export const STANDARD_OBJECTS = {
       conferenceSolution: {
         universalIdentifier: '20202020-1c3f-4b5a-b526-5411a82179eb',
       },
+      recurrence: {
+        universalIdentifier: '20202020-a1b2-4c3d-8e4f-f5a6b7c8d9e0',
+      },
       conferenceLink: {
         universalIdentifier: '20202020-35da-43ef-9ca0-e936e9dc237b',
       },

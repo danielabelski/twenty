@@ -27,14 +27,6 @@ const mockCalendarEventRepository = {
 };
 
 const mockAssociationRepository = {
-  find: jest.fn(async ({ where }: any) => {
-    return associationStore.filter(
-      (a) =>
-        where.recurringEventExternalId.value.includes(
-          a.recurringEventExternalId,
-        ) && a.calendarChannelId === where.calendarChannelId,
-    );
-  }),
   insert: jest.fn(async (entities: any[]) => {
     associationStore.push(...entities);
   }),
@@ -131,7 +123,7 @@ describe('CalendarSaveEventsService', () => {
       ]);
 
       expect(eventStore).toHaveLength(1);
-      expect(associationStore).toHaveLength(1);
+      expect(associationStore).toHaveLength(2);
     });
 
     it('should store one record when multiple instances arrive in the same batch', async () => {

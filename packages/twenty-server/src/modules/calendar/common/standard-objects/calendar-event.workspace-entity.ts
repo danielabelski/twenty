@@ -24,6 +24,7 @@ export class CalendarEventWorkspaceEntity extends BaseWorkspaceEntity {
   location: string | null;
   iCalUid: string | null;
   conferenceSolution: string | null;
+  recurrence: string | null;
   conferenceLink: LinksMetadata;
   calendarChannelEventAssociations: EntityRelation<
     CalendarChannelEventAssociationWorkspaceEntity[]

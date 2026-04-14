@@ -383,6 +383,23 @@ export const buildCalendarEventStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  recurrence: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'recurrence',
+      type: FieldMetadataType.TEXT,
+      label: i18nLabel(msg`Recurrence`),
+      description: i18nLabel(msg`Recurrence pattern`),
+      icon: 'IconRepeat',
+      isNullable: true,
+      isUIReadOnly: true,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
   conferenceLink: createStandardFieldFlatMetadata({
     objectName,
     workspaceId,

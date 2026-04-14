@@ -52,11 +52,21 @@ export class CalendarSaveEventsService {
 
       await workspaceDataSource.transaction(
         async (transactionManager: WorkspaceEntityManager) => {
+          const deduplicatedByICalUid = new Map<string, FetchedCalendarEvent>();
+
+          for (const event of fetchedCalendarEvents) {
+            if (!deduplicatedByICalUid.has(event.iCalUid) || event.recurrence) {
+              deduplicatedByICalUid.set(event.iCalUid, event);
+            }
+          }
+
+          const eventsToProcess = [...deduplicatedByICalUid.values()];
+
           const existingCalendarEvents = await calendarEventRepository.find(
             {
               where: {
                 iCalUid: Any(
-                  fetchedCalendarEvents.map((event) => event.iCalUid as string),
+                  eventsToProcess.map((event) => event.iCalUid as string),
                 ),
               },
             },
@@ -64,7 +74,7 @@ export class CalendarSaveEventsService {
           );
 
           const fetchedCalendarEventsWithDBEvents: FetchedCalendarEventWithDBEvent[] =
-            fetchedCalendarEvents.map(
+            eventsToProcess.map(
               (event): FetchedCalendarEventWithDBEvent => {
                 const existingEventWithSameiCalUid =
                   existingCalendarEvents.find(
@@ -94,6 +104,7 @@ export class CalendarSaveEventsService {
               isFullDay: fetchedCalendarEvent.isFullDay,
               isCanceled: fetchedCalendarEvent.isCanceled,
               conferenceSolution: fetchedCalendarEvent.conferenceSolution,
+              recurrence: fetchedCalendarEvent.recurrence ?? null,
               conferenceLink: {
                 primaryLinkLabel: fetchedCalendarEvent.conferenceLinkLabel,
                 primaryLinkUrl: fetchedCalendarEvent.conferenceLinkUrl,
@@ -155,6 +166,9 @@ export class CalendarSaveEventsService {
                     isFullDay: fetchedCalendarEvent.isFullDay,
                     isCanceled: fetchedCalendarEvent.isCanceled,
                     conferenceSolution: fetchedCalendarEvent.conferenceSolution,
+                    ...(fetchedCalendarEvent.recurrence
+                      ? { recurrence: fetchedCalendarEvent.recurrence }
+                      : {}),
                     conferenceLink: {
                       primaryLinkLabel:
                         fetchedCalendarEvent.conferenceLinkLabel,

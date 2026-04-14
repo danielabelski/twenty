@@ -1,5 +1,6 @@
 import { type calendar_v3 as calendarV3 } from 'googleapis';
 
+import { parseRRule } from 'src/modules/calendar/calendar-event-import-manager/drivers/utils/parse-rrule.util';
 import { sanitizeCalendarEvent } from 'src/modules/calendar/calendar-event-import-manager/drivers/utils/sanitizeCalendarEvent';
 import { CalendarEventParticipantResponseStatus } from 'src/modules/calendar/common/standard-objects/calendar-event-participant.workspace-entity';
 import { type FetchedCalendarEvent } from 'src/modules/calendar/common/types/fetched-calendar-event';
@@ -44,6 +45,7 @@ const formatGoogleCalendarEvent = (
     conferenceLinkLabel: event.conferenceData?.entryPoints?.[0]?.uri ?? '',
     conferenceLinkUrl: event.conferenceData?.entryPoints?.[0]?.uri ?? '',
     recurringEventExternalId: event.recurringEventId ?? '',
+    recurrence: parseRRule(event.recurrence?.[0] ?? ''),
     participants:
       event.attendees?.map((attendee) => ({
         handle: attendee.email ?? '',

@@ -58,6 +58,12 @@ const StyledTime = styled.div`
   width: ${themeCssVariables.spacing[26]};
 `;
 
+const StyledRecurrence = styled.span`
+  color: ${themeCssVariables.font.color.tertiary};
+  font-weight: ${themeCssVariables.font.weight.regular};
+  text-decoration: none;
+`;
+
 const StyledTitle = styled.div<{ active: boolean; canceled: boolean }>`
   color: ${({ active }) =>
     active ? themeCssVariables.font.color.primary : 'inherit'};
@@ -120,6 +126,9 @@ export const CalendarEventRow = ({
         {showTitle ? (
           <StyledTitle active={!hasEnded} canceled={!!calendarEvent.isCanceled}>
             {calendarEvent.title}
+            {calendarEvent.recurrence && (
+              <StyledRecurrence>{` · ${calendarEvent.recurrence}`}</StyledRecurrence>
+            )}
           </StyledTitle>
         ) : (
           <CalendarEventNotSharedContent />

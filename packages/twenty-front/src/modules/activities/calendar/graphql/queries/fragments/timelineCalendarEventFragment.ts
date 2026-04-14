@@ -10,6 +10,7 @@ export const timelineCalendarEventFragment = gql`
     startsAt
     endsAt
     isFullDay
+    recurrence
     visibility
     participants {
       ...TimelineCalendarEventParticipantFragment

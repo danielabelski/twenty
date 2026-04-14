@@ -12,7 +12,9 @@ describe('parseRRule', () => {
   });
 
   it('should parse a daily rule with COUNT', () => {
-    expect(parseRRule('RRULE:FREQ=DAILY;COUNT=5')).toBe('every day for 5 times');
+    expect(parseRRule('RRULE:FREQ=DAILY;COUNT=5')).toBe(
+      'every day for 5 times',
+    );
   });
 
   it('should parse a weekly rule with multiple days', () => {

@@ -54,6 +54,9 @@ export class TimelineCalendarEventDTO {
   @Field()
   conferenceSolution: string;
 
+  @Field({ nullable: true })
+  recurrence: string;
+
   @Field(() => LinksMetadataDTO)
   conferenceLink: LinksMetadataDTO;
 
