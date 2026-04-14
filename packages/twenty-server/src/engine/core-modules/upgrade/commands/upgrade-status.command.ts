@@ -43,11 +43,15 @@ export class UpgradeStatusCommand extends CommandRunner {
         '',
       ];
 
-      lines.push(...this.formatInstanceStatus(
-        await this.upgradeStatusService.getInstanceStatus(),
-      ));
+      lines.push(
+        ...this.formatInstanceStatus(
+          await this.upgradeStatusService.getInstanceStatus(),
+        ),
+      );
 
-      lines.push(...await this.formatWorkspaceStatuses(options.workspaceId));
+      lines.push(
+        ...(await this.formatWorkspaceStatuses(options.workspaceId)),
+      );
 
       console.log(lines.join('\n'));
     } catch (error) {
@@ -59,7 +63,7 @@ export class UpgradeStatusCommand extends CommandRunner {
 
   private formatInstanceStatus(status: MigrationCursorStatus): string[] {
     return [
-      chalk.bold.underline('Instance Commands'),
+      chalk.bold.underline('Instance'),
       ...this.formatCursorStatus(status),
       '',
     ];
@@ -71,7 +75,7 @@ export class UpgradeStatusCommand extends CommandRunner {
     const workspaceStatuses =
       await this.upgradeStatusService.getWorkspaceStatuses(workspaceId);
 
-    const lines: string[] = [chalk.bold.underline('Workspace Commands')];
+    const lines: string[] = [chalk.bold.underline('Workspace')];
 
     if (workspaceStatuses.length === 0) {
       lines.push(chalk.dim('  No active/suspended workspaces found'));
@@ -79,22 +83,58 @@ export class UpgradeStatusCommand extends CommandRunner {
       return lines;
     }
 
-    for (const workspaceStatus of workspaceStatuses) {
+    const upToDate = workspaceStatuses.filter(
+      (status) => status.latestCommand?.status !== 'failed',
+    );
+    const failed = workspaceStatuses.filter(
+      (status) => status.latestCommand?.status === 'failed',
+    );
+
+    for (const workspaceStatus of upToDate) {
       lines.push(...this.formatWorkspaceStatus(workspaceStatus));
+    }
+
+    if (failed.length > 0) {
+      const groupedByCommand = new Map<string, WorkspaceStatus[]>();
+
+      for (const workspaceStatus of failed) {
+        const commandName =
+          workspaceStatus.latestCommand?.name ?? 'unknown';
+
+        if (!groupedByCommand.has(commandName)) {
+          groupedByCommand.set(commandName, []);
+        }
+
+        groupedByCommand.get(commandName)!.push(workspaceStatus);
+      }
+
+      for (const [commandName, statuses] of groupedByCommand) {
+        lines.push(
+          chalk.red.bold(`  Failed at: ${commandName}`),
+        );
+
+        for (const workspaceStatus of statuses) {
+          lines.push(...this.formatWorkspaceStatus(workspaceStatus, true));
+        }
+      }
     }
 
     return lines;
   }
 
-  private formatWorkspaceStatus(status: WorkspaceStatus): string[] {
+  private formatWorkspaceStatus(
+    status: WorkspaceStatus,
+    nested = false,
+  ): string[] {
+    const baseIndent = nested ? '    ' : '  ';
+    const detailIndent = nested ? '      ' : '    ';
     const label = status.displayName
       ? `${status.displayName} (${status.workspaceId})`
       : status.workspaceId;
 
     return [
-      chalk.bold(`  ${label}`),
-      `    Stored version:   ${status.storedVersion ?? chalk.dim('null')}`,
-      ...this.formatCursorStatus(status, '    '),
+      chalk.bold(`${baseIndent}${label}`),
+      ...this.formatCursorStatus(status, detailIndent),
       '',
     ];
   }
@@ -103,30 +143,32 @@ export class UpgradeStatusCommand extends CommandRunner {
     status: MigrationCursorStatus,
     indent = '  ',
   ): string[] {
-    const lines: string[] = [
-      `${indent}Inferred version: ${status.inferredVersion ?? chalk.dim('no completed commands')}`,
-      `${indent}Latest completed: ${status.latestCompletedCommand ?? chalk.dim('none')}`,
-    ];
-
-    if (status.latestCompletedAt) {
-      lines.push(
-        `${indent}Completed at:     ${status.latestCompletedAt.toISOString()}`,
-      );
+    if (!status.latestCommand) {
+      return [
+        `${indent}Inferred version: ${chalk.dim('no commands found')}`,
+      ];
     }
 
-    if (status.lastFailure) {
-      lines.push(
-        chalk.red(`${indent}LAST COMMAND FAILED:`),
-        chalk.red(`${indent}  Command:     ${status.lastFailure.name}`),
-        chalk.red(`${indent}  Executed by: ${status.lastFailure.executedByVersion}`),
-        chalk.red(`${indent}  At:          ${status.lastFailure.createdAt.toISOString()}`),
-      );
+    const { latestCommand } = status;
+    const statusLabel =
+      latestCommand.status === 'completed'
+        ? chalk.green('Up to date')
+        : chalk.red('Failed');
 
-      if (status.lastFailure.errorMessage) {
-        lines.push(
-          chalk.red(`${indent}  Error:       ${status.lastFailure.errorMessage}`),
-        );
-      }
+    const lines: string[] = [
+      `${indent}Inferred version: ${status.inferredVersion ?? chalk.dim('unknown')}`,
+      `${indent}Latest command:   ${latestCommand.name}`,
+      `${indent}Status:           ${statusLabel}`,
+      `${indent}Executed by:      ${latestCommand.executedByVersion}`,
+      `${indent}At:               ${latestCommand.createdAt.toISOString()}`,
+    ];
+
+    if (latestCommand.status === 'failed' && latestCommand.errorMessage) {
+      lines.push(
+        chalk.red(
+          `${indent}Error:            ${latestCommand.errorMessage}`,
+        ),
+      );
     }
 
     return lines;

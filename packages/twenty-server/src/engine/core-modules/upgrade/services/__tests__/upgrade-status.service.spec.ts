@@ -1,28 +1,12 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 
-import { UpgradeMigrationEntity } from 'src/engine/core-modules/upgrade/upgrade-migration.entity';
+import { UpgradeMigrationService } from 'src/engine/core-modules/upgrade/services/upgrade-migration.service';
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import {
   UpgradeStatusService,
   extractVersionFromCommandName,
 } from 'src/engine/core-modules/upgrade/services/upgrade-status.service';
-
-const buildMigrationEntity = (
-  overrides: Partial<UpgradeMigrationEntity>,
-): UpgradeMigrationEntity =>
-  ({
-    id: 'some-uuid',
-    name: '',
-    status: 'completed',
-    attempt: 1,
-    executedByVersion: '1.21.0',
-    errorMessage: null,
-    workspaceId: null,
-    workspace: null,
-    createdAt: new Date('2025-01-01T00:00:00Z'),
-    ...overrides,
-  }) as UpgradeMigrationEntity;
 
 describe('extractVersionFromCommandName', () => {
   it('should extract version from standard command name', () => {
@@ -35,9 +19,7 @@ describe('extractVersionFromCommandName', () => {
 
   it('should extract version with different version numbers', () => {
     expect(
-      extractVersionFromCommandName(
-        '1.22.0_SomeCommand_1780000001000',
-      ),
+      extractVersionFromCommandName('1.22.0_SomeCommand_1780000001000'),
     ).toBe('1.22.0');
   });
 
@@ -52,19 +34,24 @@ describe('extractVersionFromCommandName', () => {
 
 describe('UpgradeStatusService', () => {
   let service: UpgradeStatusService;
-  let upgradeMigrationFindOne: jest.Mock;
+  let getLatestInstanceMigration: jest.Mock;
+  let getWorkspaceLastAttemptedCommandName: jest.Mock;
   let workspaceFind: jest.Mock;
 
   beforeEach(async () => {
-    upgradeMigrationFindOne = jest.fn();
+    getLatestInstanceMigration = jest.fn();
+    getWorkspaceLastAttemptedCommandName = jest.fn();
     workspaceFind = jest.fn();
 
     const module = await Test.createTestingModule({
       providers: [
         UpgradeStatusService,
         {
-          provide: getRepositoryToken(UpgradeMigrationEntity),
-          useValue: { findOne: upgradeMigrationFindOne },
+          provide: UpgradeMigrationService,
+          useValue: {
+            getLatestInstanceMigration,
+            getWorkspaceLastAttemptedCommandName,
+          },
         },
         {
           provide: getRepositoryToken(WorkspaceEntity),
@@ -78,95 +65,86 @@ describe('UpgradeStatusService', () => {
 
   describe('getInstanceStatus', () => {
     it('should return inferred version from latest completed instance command', async () => {
-      const completedMigration = buildMigrationEntity({
+      getLatestInstanceMigration.mockResolvedValue({
         name: '1.21.0_SomeCommand_1775500003000',
         status: 'completed',
+        executedByVersion: '1.21.0',
+        errorMessage: null,
         createdAt: new Date('2025-06-01T00:00:00Z'),
       });
-
-      upgradeMigrationFindOne
-        .mockResolvedValueOnce(completedMigration)
-        .mockResolvedValueOnce(completedMigration);
 
       const result = await service.getInstanceStatus();
 
       expect(result.inferredVersion).toBe('1.21.0');
-      expect(result.latestCompletedCommand).toBe(
-        '1.21.0_SomeCommand_1775500003000',
+      expect(result.latestCommand).toEqual(
+        expect.objectContaining({
+          name: '1.21.0_SomeCommand_1775500003000',
+          status: 'completed',
+        }),
       );
-      expect(result.lastFailure).toBeNull();
     });
 
-    it('should report last failure when most recent command failed', async () => {
-      const completedMigration = buildMigrationEntity({
-        name: '1.21.0_FirstCommand_1775500001000',
-        status: 'completed',
-        createdAt: new Date('2025-06-01T00:00:00Z'),
-      });
-
-      const failedMigration = buildMigrationEntity({
+    it('should report failure when most recent command failed', async () => {
+      getLatestInstanceMigration.mockResolvedValue({
         name: '1.21.0_SecondCommand_1775500002000',
         status: 'failed',
-        errorMessage: 'column does not exist',
         executedByVersion: '1.21.0',
+        errorMessage: 'column does not exist',
         createdAt: new Date('2025-06-01T01:00:00Z'),
       });
 
-      upgradeMigrationFindOne
-        .mockResolvedValueOnce(completedMigration)
-        .mockResolvedValueOnce(failedMigration);
-
       const result = await service.getInstanceStatus();
 
       expect(result.inferredVersion).toBe('1.21.0');
-      expect(result.lastFailure).toEqual({
-        name: '1.21.0_SecondCommand_1775500002000',
-        errorMessage: 'column does not exist',
-        executedByVersion: '1.21.0',
-        createdAt: failedMigration.createdAt,
-      });
+      expect(result.latestCommand?.status).toBe('failed');
+      expect(result.latestCommand?.errorMessage).toBe(
+        'column does not exist',
+      );
     });
 
     it('should return nulls when no migrations exist', async () => {
-      upgradeMigrationFindOne
-        .mockResolvedValueOnce(null)
-        .mockResolvedValueOnce(null);
+      getLatestInstanceMigration.mockResolvedValue(null);
 
       const result = await service.getInstanceStatus();
 
       expect(result.inferredVersion).toBeNull();
-      expect(result.latestCompletedCommand).toBeNull();
-      expect(result.latestCompletedAt).toBeNull();
-      expect(result.lastFailure).toBeNull();
+      expect(result.latestCommand).toBeNull();
     });
   });
 
   describe('getWorkspaceStatuses', () => {
     it('should return status for each active workspace', async () => {
       workspaceFind.mockResolvedValue([
-        { id: 'ws-1', version: '1.21.0', displayName: 'Apple' },
-        { id: 'ws-2', version: '1.20.0', displayName: 'Google' },
+        { id: 'ws-1', displayName: 'Apple' },
+        { id: 'ws-2', displayName: 'Google' },
       ]);
 
-      const completedMigrationWs1 = buildMigrationEntity({
-        name: '1.21.0_SomeCommand_1775500003000',
-        status: 'completed',
-        workspaceId: 'ws-1',
-        createdAt: new Date('2025-06-01T00:00:00Z'),
-      });
-
-      const completedMigrationWs2 = buildMigrationEntity({
-        name: '1.20.0_OldCommand_1770000001000',
-        status: 'completed',
-        workspaceId: 'ws-2',
-        createdAt: new Date('2025-05-01T00:00:00Z'),
-      });
-
-      upgradeMigrationFindOne
-        .mockResolvedValueOnce(completedMigrationWs1)
-        .mockResolvedValueOnce(completedMigrationWs1)
-        .mockResolvedValueOnce(completedMigrationWs2)
-        .mockResolvedValueOnce(completedMigrationWs2);
+      getWorkspaceLastAttemptedCommandName.mockResolvedValue(
+        new Map([
+          [
+            'ws-1',
+            {
+              workspaceId: 'ws-1',
+              name: '1.21.0_SomeCommand_1775500003000',
+              status: 'completed',
+              executedByVersion: '1.21.0',
+              errorMessage: null,
+              createdAt: new Date('2025-06-01T00:00:00Z'),
+            },
+          ],
+          [
+            'ws-2',
+            {
+              workspaceId: 'ws-2',
+              name: '1.20.0_OldCommand_1770000001000',
+              status: 'completed',
+              executedByVersion: '1.20.0',
+              errorMessage: null,
+              createdAt: new Date('2025-05-01T00:00:00Z'),
+            },
+          ],
+        ]),
+      );
 
       const results = await service.getWorkspaceStatuses();
 
@@ -174,29 +152,33 @@ describe('UpgradeStatusService', () => {
 
       expect(results[0].workspaceId).toBe('ws-1');
       expect(results[0].displayName).toBe('Apple');
-      expect(results[0].storedVersion).toBe('1.21.0');
       expect(results[0].inferredVersion).toBe('1.21.0');
 
       expect(results[1].workspaceId).toBe('ws-2');
       expect(results[1].displayName).toBe('Google');
-      expect(results[1].storedVersion).toBe('1.20.0');
       expect(results[1].inferredVersion).toBe('1.20.0');
     });
 
     it('should filter by workspace ID when provided', async () => {
       workspaceFind.mockResolvedValue([
-        { id: 'ws-1', version: '1.21.0', displayName: 'Apple' },
+        { id: 'ws-1', displayName: 'Apple' },
       ]);
 
-      const completedMigration = buildMigrationEntity({
-        name: '1.21.0_SomeCommand_1775500003000',
-        status: 'completed',
-        workspaceId: 'ws-1',
-      });
-
-      upgradeMigrationFindOne
-        .mockResolvedValueOnce(completedMigration)
-        .mockResolvedValueOnce(completedMigration);
+      getWorkspaceLastAttemptedCommandName.mockResolvedValue(
+        new Map([
+          [
+            'ws-1',
+            {
+              workspaceId: 'ws-1',
+              name: '1.21.0_SomeCommand_1775500003000',
+              status: 'completed',
+              executedByVersion: '1.21.0',
+              errorMessage: null,
+              createdAt: new Date('2025-06-01T00:00:00Z'),
+            },
+          ],
+        ]),
+      );
 
       const results = await service.getWorkspaceStatuses('ws-1');
 
@@ -212,8 +194,23 @@ describe('UpgradeStatusService', () => {
       );
     });
 
+    it('should handle workspace with no migration history', async () => {
+      workspaceFind.mockResolvedValue([
+        { id: 'ws-1', displayName: 'Apple' },
+      ]);
+
+      getWorkspaceLastAttemptedCommandName.mockResolvedValue(new Map());
+
+      const results = await service.getWorkspaceStatuses();
+
+      expect(results).toHaveLength(1);
+      expect(results[0].inferredVersion).toBeNull();
+      expect(results[0].latestCommand).toBeNull();
+    });
+
     it('should return empty array when no workspaces exist', async () => {
       workspaceFind.mockResolvedValue([]);
+      getWorkspaceLastAttemptedCommandName.mockResolvedValue(new Map());
 
       const results = await service.getWorkspaceStatuses();
 

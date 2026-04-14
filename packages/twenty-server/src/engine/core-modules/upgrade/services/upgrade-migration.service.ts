@@ -10,6 +10,15 @@ import {
 } from 'src/engine/core-modules/upgrade/upgrade-migration.entity';
 import { formatUpgradeErrorForStorage } from 'src/engine/core-modules/upgrade/utils/format-upgrade-error-for-storage.util';
 
+export type WorkspaceLastAttemptedCommandCursor = {
+  workspaceId: string;
+  name: string;
+  status: UpgradeMigrationStatus;
+  executedByVersion: string;
+  errorMessage: string | null;
+  createdAt: Date;
+};
+
 @Injectable()
 export class UpgradeMigrationService {
   constructor(
@@ -165,9 +174,11 @@ export class UpgradeMigrationService {
     return { name: migration.name, status: migration.status };
   }
 
-  async getWorkspaceLastAttemptedCommandNameOrThrow(
+  async getWorkspaceLastAttemptedCommandName(
     workspaceIds: string[],
-  ): Promise<Map<string, { name: string; status: UpgradeMigrationStatus }>> {
+  ): Promise<
+    Map<string, WorkspaceLastAttemptedCommandCursor>
+  > {
     if (workspaceIds.length === 0) {
       return new Map();
     }
@@ -177,6 +188,9 @@ export class UpgradeMigrationService {
       .select('migration.workspaceId', 'workspaceId')
       .addSelect('migration.name', 'name')
       .addSelect('migration.status', 'status')
+      .addSelect('migration.executedByVersion', 'executedByVersion')
+      .addSelect('migration.errorMessage', 'errorMessage')
+      .addSelect('migration.createdAt', 'createdAt')
       .where({
         workspaceId: In(workspaceIds),
       })
@@ -191,20 +205,27 @@ export class UpgradeMigrationService {
       .orderBy('migration.workspaceId')
       .addOrderBy('migration.createdAt', 'DESC')
       .distinctOn(['migration.workspaceId'])
-      .getRawMany<{
-        workspaceId: string;
-        name: string;
-        status: UpgradeMigrationStatus;
-      }>();
+      .getRawMany<WorkspaceLastAttemptedCommandCursor>();
 
     const cursors = new Map<
       string,
-      { name: string; status: UpgradeMigrationStatus }
+      WorkspaceLastAttemptedCommandCursor
     >();
 
     for (const row of results) {
-      cursors.set(row.workspaceId, { name: row.name, status: row.status });
+      cursors.set(row.workspaceId, row);
     }
+
+    return cursors;
+  }
+
+  async getWorkspaceLastAttemptedCommandNameOrThrow(
+    workspaceIds: string[],
+  ): Promise<
+    Map<string, WorkspaceLastAttemptedCommandCursor>
+  > {
+    const cursors =
+      await this.getWorkspaceLastAttemptedCommandName(workspaceIds);
 
     const missingWorkspaceIds = workspaceIds.filter(
       (workspaceId) => !cursors.has(workspaceId),
@@ -217,6 +238,24 @@ export class UpgradeMigrationService {
     }
 
     return cursors;
+  }
+
+  async getLatestInstanceMigration(): Promise<UpgradeMigrationEntity | null> {
+    return this.upgradeMigrationRepository
+      .createQueryBuilder('migration')
+      .andWhere(
+        `migration.attempt = (
+          SELECT MAX(sub.attempt)
+          FROM core."upgradeMigration" sub
+          WHERE sub.name = migration.name
+          AND sub."workspaceId" IS NULL
+          AND migration."workspaceId" IS NULL
+        )`,
+      )
+      .andWhere('migration."workspaceId" IS NULL')
+      .orderBy('migration.createdAt', 'DESC')
+      .limit(1)
+      .getOne();
   }
 
   async areAllWorkspacesAtCommand({
