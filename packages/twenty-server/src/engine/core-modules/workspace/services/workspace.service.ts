@@ -68,6 +68,7 @@ import { prefillWorkflows } from 'src/engine/workspace-manager/standard-objects-
 import { WorkspaceManagerService } from 'src/engine/workspace-manager/workspace-manager.service';
 import { DEFAULT_FEATURE_FLAGS } from 'src/engine/workspace-manager/workspace-migration/constant/default-feature-flags';
 import { WorkspaceMigrationValidateBuildAndRunService } from 'src/engine/workspace-manager/workspace-migration/services/workspace-migration-validate-build-and-run-service';
+import { extractVersionMajorMinorPatch } from 'src/utils/version/extract-version-major-minor-patch';
 
 @Injectable()
 // oxlint-disable-next-line twenty/inject-workspace-repository
@@ -386,8 +387,7 @@ export class WorkspaceService extends TypeOrmQueryService<WorkspaceEntity> {
     const lastWorkspaceCommand =
       this.upgradeSequenceReaderService.getLastWorkspaceCommand();
 
-    const executedByVersion =
-      this.twentyConfigService.get('APP_VERSION') ?? 'unknown';
+    const appVersion = this.twentyConfigService.get('APP_VERSION');
 
     const queryRunner = this.coreDataSource.createQueryRunner();
 
@@ -398,12 +398,13 @@ export class WorkspaceService extends TypeOrmQueryService<WorkspaceEntity> {
       await queryRunner.manager.update(WorkspaceEntity, workspaceId, {
         displayName,
         activationStatus: WorkspaceActivationStatus.ACTIVE,
+        version: extractVersionMajorMinorPatch(appVersion),
       });
 
       await this.upgradeMigrationService.markAsInitial({
         name: lastWorkspaceCommand.name,
         workspaceId,
-        executedByVersion,
+        executedByVersion: appVersion ?? 'unknown',
         queryRunner,
       });
 
