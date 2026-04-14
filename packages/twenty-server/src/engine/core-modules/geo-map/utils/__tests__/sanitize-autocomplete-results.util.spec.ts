@@ -44,9 +44,7 @@ describe('sanitizeAutocompleteResults', () => {
     const result = sanitizeAutocompleteResults([GOOGLE_PREDICTIONS[0]]);
 
     expect(result).toHaveLength(1);
-    expect(result[0].text).toBe(
-      '48 Pirrama Road, Pyrmont NSW 2009, Australia',
-    );
+    expect(result[0].text).toBe('48 Pirrama Road, Pyrmont NSW 2009, Australia');
     expect(result[0].placeId).toBe('ChIJN1t_tDeuEmsRUsoyG83frY4');
   });
 });

@@ -126,9 +126,7 @@ const LANDMARK: GeoMapAddressComponent[] = [
 
 describe('sanitizePlaceDetailsResults', () => {
   it('should return empty object for empty array', () => {
-    expect(
-      sanitizePlaceDetailsResults({ addressComponents: [] }),
-    ).toEqual({});
+    expect(sanitizePlaceDetailsResults({ addressComponents: [] })).toEqual({});
   });
 
   it('should parse a full US address (Google Sydney office)', () => {
