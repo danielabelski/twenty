@@ -6,7 +6,7 @@ icon: "play"
 
 import { VimeoEmbed } from '/snippets/vimeo-embed.mdx';
 
-## Cloud (fastest)
+## Signup
 
 <Steps>
   <Step title="Create your account">
@@ -22,34 +22,6 @@ import { VimeoEmbed } from '/snippets/vimeo-embed.mdx';
 
 <VimeoEmbed videoId="927066829" title="Creating a workspace" />
 
-## Self-Hosted (Docker)
-
-<Steps>
-  <Step title="Prerequisites">
-    Install [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/).
-  </Step>
-  <Step title="Configure environment">
-    ```bash
-    cd packages/twenty-docker
-    cp .env.example .env
-    ```
-    Edit `.env` to set your `SERVER_URL` and generate a strong `APP_SECRET`:
-    ```bash
-    openssl rand -base64 32
-    ```
-  </Step>
-  <Step title="Start Twenty">
-    ```bash
-    docker compose up -d
-    ```
-    This starts the server, background worker, PostgreSQL, and Redis.
-  </Step>
-  <Step title="Access your CRM">
-    Open [http://localhost:3000](http://localhost:3000) and create your first workspace.
-  </Step>
-</Steps>
-
-For production deployment, see the [Self-Host documentation](/developers/self-host/capabilities/docker-compose).
 
 ## Configure your workspace
 
