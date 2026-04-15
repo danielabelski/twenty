@@ -17,6 +17,10 @@
       "command": "npx",
       "args": ["-y", "@upstash/context7-mcp"],
       "env": {}
+    },
+    "twenty": {
+      "type": "streamable-http",
+      "url": "https://twentyfortwenty.twenty.com/mcp"
     }
   }
 }
