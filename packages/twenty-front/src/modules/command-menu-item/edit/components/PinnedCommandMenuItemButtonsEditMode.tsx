@@ -126,7 +126,6 @@ export const PinnedCommandMenuItemButtonsEditMode = () => {
                         shortLabel,
                         Icon,
                       }}
-                      disabled
                     />
                   </StyledCommandMenuItemContainer>
                 );
