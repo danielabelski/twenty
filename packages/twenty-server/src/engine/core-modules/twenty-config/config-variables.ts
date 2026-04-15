@@ -124,6 +124,8 @@ export class ConfigVariables {
     type: ConfigVariableType.STRING,
     isSensitive: false,
   })
+  @IsUrl({ require_tld: false, require_protocol: true })
+  @IsOptional()
   AUTH_GOOGLE_APIS_CALLBACK_URL: string;
 
   @ConfigVariablesMetadata({

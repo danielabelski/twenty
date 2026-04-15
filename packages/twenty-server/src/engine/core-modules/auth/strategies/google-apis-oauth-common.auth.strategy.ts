@@ -23,7 +23,9 @@ export abstract class GoogleAPIsOauthCommonStrategy extends PassportStrategy(
     super({
       clientID: twentyConfigService.get('AUTH_GOOGLE_CLIENT_ID'),
       clientSecret: twentyConfigService.get('AUTH_GOOGLE_CLIENT_SECRET'),
-      callbackURL: twentyConfigService.get('AUTH_GOOGLE_APIS_CALLBACK_URL'),
+      callbackURL:
+        twentyConfigService.get('AUTH_GOOGLE_APIS_CALLBACK_URL') ||
+        `${twentyConfigService.get('SERVER_URL')}/auth/google-apis/get-access-token`,
       scope: scopes,
       passReqToCallback: true,
     });
