@@ -384,8 +384,13 @@ export class WorkspaceService extends TypeOrmQueryService<WorkspaceEntity> {
     workspaceId: string;
     displayName: string;
   }): Promise<void> {
-    const lastWorkspaceCommand =
-      this.upgradeSequenceReaderService.getLastWorkspaceCommand();
+    const lastAttemptedInstanceCommand =
+      await this.upgradeMigrationService.getLastAttemptedInstanceCommandOrThrow();
+
+    const initialCursor =
+      this.upgradeSequenceReaderService.getInitialCursorForNewWorkspace(
+        lastAttemptedInstanceCommand,
+      );
 
     const appVersion = this.twentyConfigService.get('APP_VERSION');
 
@@ -401,10 +406,11 @@ export class WorkspaceService extends TypeOrmQueryService<WorkspaceEntity> {
         version: extractVersionMajorMinorPatch(appVersion),
       });
 
-      await this.upgradeMigrationService.markAsInitial({
-        name: lastWorkspaceCommand.name,
+      await this.upgradeMigrationService.markAsWorkspaceInitial({
+        name: initialCursor.name,
         workspaceId,
         executedByVersion: appVersion ?? 'unknown',
+        status: initialCursor.status,
         queryRunner,
       });
 
