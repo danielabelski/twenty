@@ -5,7 +5,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import GraphQLJSON from 'graphql-type-json';
 import { In, type Repository } from 'typeorm';
 import { isDefined } from 'twenty-shared/utils';
-import { PermissionFlagType } from 'twenty-shared/constants';
 
 import { UUIDScalarType } from 'src/engine/api/graphql/workspace-schema-builder/graphql-types/scalars';
 
@@ -60,8 +59,8 @@ import { loadDefaultAiProviders } from 'src/engine/metadata-modules/ai/ai-models
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { MetadataResolver } from 'src/engine/api/graphql/graphql-config/decorators/metadata-resolver.decorator';
 import { AdminPanelGuard } from 'src/engine/guards/admin-panel-guard';
+import { AdminPanelSecurityGuard } from 'src/engine/guards/admin-panel-security.guard';
 import { ServerLevelImpersonateGuard } from 'src/engine/guards/server-level-impersonate.guard';
-import { SettingsPermissionGuard } from 'src/engine/guards/settings-permission.guard';
 import { UserAuthGuard } from 'src/engine/guards/user-auth.guard';
 import { WorkspaceAuthGuard } from 'src/engine/guards/workspace-auth.guard';
 
@@ -80,11 +79,7 @@ import { AuthWorkspace } from 'src/engine/decorators/auth/auth-workspace.decorat
   PreventNestToAutoLogGraphqlErrorsFilter,
   ConfigVariableGraphqlApiExceptionFilter,
 )
-@UseGuards(
-  WorkspaceAuthGuard,
-  UserAuthGuard,
-  SettingsPermissionGuard(PermissionFlagType.SECURITY),
-)
+@UseGuards(WorkspaceAuthGuard, UserAuthGuard, AdminPanelSecurityGuard)
 export class AdminPanelResolver {
   constructor(
     private readonly adminUserLookupService: AdminPanelUserLookupService,
