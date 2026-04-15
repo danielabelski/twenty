@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { isNonEmptyString, isNull } from '@sniptt/guards';
@@ -33,6 +33,8 @@ import { isWorkDomain, isWorkEmail } from 'src/utils/is-work-email';
 
 @Injectable()
 export class CreateCompanyAndPersonService {
+  private readonly logger = new Logger(CreateCompanyAndPersonService.name);
+
   constructor(
     private readonly createPersonService: CreatePersonService,
     private readonly createCompaniesService: CreateCompanyService,
@@ -175,9 +177,11 @@ export class CreateCompanyAndPersonService {
           });
 
           if (!userWorkspace) {
-            throw new Error(
-              `UserWorkspace with id ${connectedAccount.userWorkspaceId} not found`,
+            this.logger.warn(
+              `UserWorkspace with id ${connectedAccount.userWorkspaceId} not found for connected account in workspace ${workspaceId} — proceeding without account owner`,
             );
+
+            return null;
           }
 
           const workspaceMemberRepository =

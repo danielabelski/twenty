@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { type Repository } from 'typeorm';
@@ -18,6 +19,10 @@ export type DeleteWorkspaceMemberConnectedAccountsCleanupJobData = {
 
 @Processor(MessageQueue.deleteCascadeQueue)
 export class DeleteWorkspaceMemberConnectedAccountsCleanupJob {
+  private readonly logger = new Logger(
+    DeleteWorkspaceMemberConnectedAccountsCleanupJob.name,
+  );
+
   constructor(
     private readonly globalWorkspaceOrmManager: GlobalWorkspaceOrmManager,
     @InjectRepository(ConnectedAccountEntity)
@@ -39,13 +44,19 @@ export class DeleteWorkspaceMemberConnectedAccountsCleanupJob {
         await this.globalWorkspaceOrmManager.getRepository<WorkspaceMemberWorkspaceEntity>(
           workspaceId,
           'workspaceMember',
+          { shouldBypassPermissionChecks: true },
         );
 
       const member = await workspaceMemberRepo.findOne({
         where: { id: workspaceMemberId },
+        withDeleted: true,
       });
 
       if (!member) {
+        this.logger.warn(
+          `Workspace member ${workspaceMemberId} not found (even with soft-deleted) in workspace ${workspaceId}`,
+        );
+
         return;
       }
 
@@ -53,14 +64,44 @@ export class DeleteWorkspaceMemberConnectedAccountsCleanupJob {
         where: { userId: member.userId, workspaceId },
       });
 
-      if (!userWorkspace) {
+      if (userWorkspace) {
+        await this.connectedAccountRepository.delete({
+          userWorkspaceId: userWorkspace.id,
+          workspaceId,
+        });
+
         return;
       }
 
-      await this.connectedAccountRepository.delete({
-        userWorkspaceId: userWorkspace.id,
-        workspaceId,
+      // UserWorkspace was already hard-deleted — look up connected accounts
+      // directly by the workspace member's userId via userWorkspace records
+      // that may still reference this workspace
+      const connectedAccounts = await this.connectedAccountRepository.find({
+        where: { workspaceId },
       });
+
+      const orphanedAccounts = [];
+
+      for (const account of connectedAccounts) {
+        const accountUserWorkspace =
+          await this.userWorkspaceRepository.findOne({
+            where: { id: account.userWorkspaceId },
+          });
+
+        if (!accountUserWorkspace) {
+          orphanedAccounts.push(account);
+        }
+      }
+
+      if (orphanedAccounts.length > 0) {
+        this.logger.warn(
+          `Found ${orphanedAccounts.length} orphaned connected account(s) in workspace ${workspaceId} after UserWorkspace hard-delete for member ${workspaceMemberId}`,
+        );
+
+        await this.connectedAccountRepository.delete(
+          orphanedAccounts.map((account) => account.id),
+        );
+      }
     }, authContext);
   }
 }
