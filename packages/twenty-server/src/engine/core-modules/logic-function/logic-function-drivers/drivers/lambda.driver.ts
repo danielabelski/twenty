@@ -17,6 +17,7 @@ import {
   type ListLayerVersionsCommandInput,
   LogType,
   PublishLayerVersionCommand,
+  ResourceConflictException,
   ResourceNotFoundException,
   UpdateFunctionConfigurationCommand,
   waitUntilFunctionActiveV2,
@@ -983,6 +984,7 @@ export class LambdaDriver implements LogicFunctionDriver {
 
     const canSkip =
       isDefined(lambdaExecutor) &&
+      lambdaExecutor.Configuration?.State === 'Active' &&
       !flatApplication.isSdkLayerStale &&
       this.hasExpectedLayers({
         lambdaExecutor,
@@ -1195,6 +1197,17 @@ export class LambdaDriver implements LogicFunctionDriver {
         throw new LogicFunctionException(
           `Function '${flatLogicFunction.id}' does not exist`,
           LogicFunctionExceptionCode.LOGIC_FUNCTION_NOT_FOUND,
+        );
+      }
+
+      if (error instanceof ResourceConflictException) {
+        this.logger.warn(
+          `Lambda function '${flatLogicFunction.id}' is not yet active (state conflict). Retrying after waiting for active state.`,
+        );
+
+        throw new LogicFunctionException(
+          `Function '${flatLogicFunction.id}' is not ready for invocation (currently updating or pending)`,
+          LogicFunctionExceptionCode.LOGIC_FUNCTION_EXECUTION_FAILED,
         );
       }
 
