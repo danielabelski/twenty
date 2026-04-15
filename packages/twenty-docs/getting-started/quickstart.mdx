@@ -1,0 +1,73 @@
+---
+title: Quickstart
+description: Get Twenty up and running in under 5 minutes — on the cloud or self-hosted.
+icon: "play"
+---
+
+Choose the path that works for you:
+
+## Cloud (fastest)
+
+<Steps>
+  <Step title="Create your account">
+    Go to [app.twenty.com](https://app.twenty.com) and sign up with your email or Google account.
+  </Step>
+  <Step title="Set up your workspace">
+    Name your workspace and invite your team. Your CRM comes pre-configured with Companies, People, and Opportunities objects.
+  </Step>
+  <Step title="Import your data">
+    Go to **Settings > Data Migration** and upload a CSV file, or use the API to import programmatically. [Import guide](/user-guide/data-migration/overview).
+  </Step>
+</Steps>
+
+## Self-Hosted (Docker)
+
+<Steps>
+  <Step title="Prerequisites">
+    Make sure you have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed.
+  </Step>
+  <Step title="Clone the repository">
+    ```bash
+    git clone https://github.com/twentyhq/twenty.git
+    cd twenty
+    ```
+  </Step>
+  <Step title="Configure environment">
+    ```bash
+    cd packages/twenty-docker
+    cp .env.example .env
+    ```
+    Edit `.env` to set your `SERVER_URL` and generate a strong `APP_SECRET`:
+    ```bash
+    openssl rand -base64 32
+    ```
+  </Step>
+  <Step title="Start Twenty">
+    ```bash
+    docker compose up -d
+    ```
+    This starts the server, background worker, PostgreSQL, and Redis.
+  </Step>
+  <Step title="Access your CRM">
+    Open [http://localhost:3000](http://localhost:3000) in your browser and create your first workspace.
+  </Step>
+</Steps>
+
+For production self-hosting guidance, see the [Self-Host documentation](/developers/self-host/self-host).
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Customize your Data Model" icon="database" href="/user-guide/data-model/overview">
+    Create custom objects and fields.
+  </Card>
+  <Card title="Build Workflows" icon="bolt" href="/user-guide/workflows/overview">
+    Automate your business processes.
+  </Card>
+  <Card title="Connect your Email" icon="envelope" href="/user-guide/calendar-emails/overview">
+    Sync your mailbox and calendar.
+  </Card>
+  <Card title="Explore the API" icon="plug" href="/developers/extend/api">
+    Build custom integrations.
+  </Card>
+</CardGroup>

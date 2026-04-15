@@ -1,35 +1,38 @@
 {
   "tabs": [
     {
+      "key": "gettingStarted",
+      "label": "Getting Started",
+      "groups": [
+        {
+          "key": "welcome",
+          "label": "Welcome",
+          "icon": "rocket",
+          "pages": [
+            "getting-started/introduction",
+            "getting-started/key-features",
+            "getting-started/quickstart"
+          ]
+        },
+        {
+          "key": "coreConcepts",
+          "label": "Core Concepts",
+          "icon": "lightbulb",
+          "pages": [
+            "getting-started/core-concepts/data-model",
+            "getting-started/core-concepts/layout",
+            "getting-started/core-concepts/workflows",
+            "getting-started/core-concepts/calendar-and-email",
+            "getting-started/core-concepts/ai",
+            "getting-started/core-concepts/dashboards"
+          ]
+        }
+      ]
+    },
+    {
       "key": "userGuide",
       "label": "User Guide",
       "groups": [
-        {
-          "key": "discoverTwenty",
-          "label": "Discover Twenty",
-          "icon": "rocket",
-          "pages": [
-            "user-guide/introduction",
-            {
-              "key": "gettingStartedCapabilities",
-              "label": "Capabilities",
-              "pages": [
-                "user-guide/getting-started/capabilities/what-is-twenty",
-                "user-guide/getting-started/capabilities/implementation-services",
-                "user-guide/getting-started/capabilities/glossary"
-              ]
-            },
-            {
-              "key": "gettingStartedHowTos",
-              "label": "How-Tos",
-              "pages": [
-                "user-guide/getting-started/how-tos/create-workspace",
-                "user-guide/getting-started/how-tos/navigate-around-twenty",
-                "user-guide/getting-started/how-tos/configure-your-workspace"
-              ]
-            }
-          ]
-        },
         {
           "key": "dataModel",
           "label": "Data Model",
@@ -37,8 +40,8 @@
           "pages": [
             "user-guide/data-model/overview",
             {
-              "key": "dataModelCapabilities",
-              "label": "Capabilities",
+              "key": "dataModelReference",
+              "label": "Reference",
               "pages": [
                 "user-guide/data-model/capabilities/objects",
                 "user-guide/data-model/capabilities/fields",
@@ -66,8 +69,8 @@
           "pages": [
             "user-guide/data-migration/overview",
             {
-              "key": "dataMigrationCapabilities",
-              "label": "Capabilities",
+              "key": "dataMigrationReference",
+              "label": "Reference",
               "pages": [
                 "user-guide/data-migration/capabilities/file-formats",
                 "user-guide/data-migration/capabilities/field-mapping",
@@ -101,8 +104,8 @@
           "pages": [
             "user-guide/calendar-emails/overview",
             {
-              "key": "calendarEmailsCapabilities",
-              "label": "Capabilities",
+              "key": "calendarEmailsReference",
+              "label": "Reference",
               "pages": [
                 "user-guide/calendar-emails/capabilities/mailbox",
                 "user-guide/calendar-emails/capabilities/calendar"
@@ -129,8 +132,8 @@
           "pages": [
             "user-guide/workflows/overview",
             {
-              "key": "workflowsCapabilities",
-              "label": "Capabilities",
+              "key": "workflowsReference",
+              "label": "Reference",
               "pages": [
                 "user-guide/workflows/capabilities/workflow-triggers",
                 "user-guide/workflows/capabilities/workflow-actions",
@@ -199,8 +202,8 @@
           "pages": [
             "user-guide/ai/overview",
             {
-              "key": "aiCapabilities",
-              "label": "Capabilities",
+              "key": "aiReference",
+              "label": "Reference",
               "pages": [
                 "user-guide/ai/capabilities/ai-chatbot",
                 "user-guide/ai/capabilities/ai-agents",
@@ -223,8 +226,8 @@
           "pages": [
             "user-guide/views-pipelines/overview",
             {
-              "key": "viewsPipelinesCapabilities",
-              "label": "Capabilities",
+              "key": "viewsPipelinesReference",
+              "label": "Reference",
               "pages": [
                 "user-guide/views-pipelines/capabilities/table-views",
                 "user-guide/views-pipelines/capabilities/kanban-views",
@@ -256,8 +259,8 @@
           "pages": [
             "user-guide/dashboards/overview",
             {
-              "key": "dashboardsCapabilities",
-              "label": "Capabilities",
+              "key": "dashboardsReference",
+              "label": "Reference",
               "pages": [
                 "user-guide/dashboards/capabilities/dashboards",
                 "user-guide/dashboards/capabilities/widgets",
@@ -281,8 +284,8 @@
           "pages": [
             "user-guide/permissions-access/overview",
             {
-              "key": "permissionsAccessCapabilities",
-              "label": "Capabilities",
+              "key": "permissionsAccessReference",
+              "label": "Reference",
               "pages": [
                 "user-guide/permissions-access/capabilities/permissions",
                 "user-guide/permissions-access/capabilities/sso-configuration"
@@ -304,8 +307,8 @@
           "pages": [
             "user-guide/billing/overview",
             {
-              "key": "billingCapabilities",
-              "label": "Capabilities",
+              "key": "billingReference",
+              "label": "Reference",
               "pages": [
                 "user-guide/billing/capabilities/pricing-plans",
                 "user-guide/billing/capabilities/workflow-credits"
@@ -327,8 +330,8 @@
           "pages": [
             "user-guide/settings/overview",
             {
-              "key": "settingsCapabilities",
-              "label": "Capabilities",
+              "key": "settingsReference",
+              "label": "Reference",
               "pages": [
                 "user-guide/settings/capabilities/workspace-settings",
                 "user-guide/settings/capabilities/member-management",
@@ -385,8 +388,8 @@
           "pages": [
             "developers/self-host/self-host",
             {
-              "key": "selfHostCapabilities",
-              "label": "Capabilities",
+              "key": "selfHostReference",
+              "label": "Reference",
               "pages": [
                 "developers/self-host/capabilities/docker-compose",
                 "developers/self-host/capabilities/setup",
@@ -404,8 +407,8 @@
           "pages": [
             "developers/contribute/contribute",
             {
-              "key": "contributeCapabilities",
-              "label": "Capabilities",
+              "key": "contributeReference",
+              "label": "Reference",
               "pages": [
                 "developers/contribute/capabilities/local-setup",
                 "developers/contribute/capabilities/bug-and-requests",

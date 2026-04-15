@@ -1,0 +1,24 @@
+/* CTA button — solid dark pill in light mode, inverted in dark mode */
+#topbar-cta-button a {
+  background-color: #141414 !important;
+  color: #ffffff !important;
+  padding: 0.5rem 1.25rem !important;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: opacity 0.15s ease;
+}
+
+#topbar-cta-button a:hover {
+  opacity: 0.85 !important;
+}
+
+:is(.dark, [data-theme="dark"]) #topbar-cta-button a {
+  background-color: #ffffff !important;
+  color: #141414 !important;
+}
+
+/* Center the tab links */
+.nav-tabs {
+  justify-content: center;
+  flex: 1;
+}

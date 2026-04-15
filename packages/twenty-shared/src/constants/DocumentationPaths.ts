@@ -63,6 +63,19 @@ export const DOCUMENTATION_PATHS = {
   DEVELOPERS_SELF_HOST_CAPABILITIES_UPGRADE_GUIDE:
     '/developers/self-host/capabilities/upgrade-guide',
   DEVELOPERS_SELF_HOST_SELF_HOST: '/developers/self-host/self-host',
+  GETTING_STARTED_CORE_CONCEPTS_AI: '/getting-started/core-concepts/ai',
+  GETTING_STARTED_CORE_CONCEPTS_CALENDAR_AND_EMAIL:
+    '/getting-started/core-concepts/calendar-and-email',
+  GETTING_STARTED_CORE_CONCEPTS_DASHBOARDS:
+    '/getting-started/core-concepts/dashboards',
+  GETTING_STARTED_CORE_CONCEPTS_DATA_MODEL:
+    '/getting-started/core-concepts/data-model',
+  GETTING_STARTED_CORE_CONCEPTS_LAYOUT: '/getting-started/core-concepts/layout',
+  GETTING_STARTED_CORE_CONCEPTS_WORKFLOWS:
+    '/getting-started/core-concepts/workflows',
+  GETTING_STARTED_INTRODUCTION: '/getting-started/introduction',
+  GETTING_STARTED_KEY_FEATURES: '/getting-started/key-features',
+  GETTING_STARTED_QUICKSTART: '/getting-started/quickstart',
   TWENTY_UI_DISPLAY_APP_TOOLTIP: '/twenty-ui/display/app-tooltip',
   TWENTY_UI_DISPLAY_CHECKMARK: '/twenty-ui/display/checkmark',
   TWENTY_UI_DISPLAY_CHIP: '/twenty-ui/display/chip',
@@ -179,19 +192,6 @@ export const DOCUMENTATION_PATHS = {
   USER_GUIDE_DATA_MODEL_HOW_TOS_DATA_MODEL_FAQ:
     '/user-guide/data-model/how-tos/data-model-faq',
   USER_GUIDE_DATA_MODEL_OVERVIEW: '/user-guide/data-model/overview',
-  USER_GUIDE_GETTING_STARTED_CAPABILITIES_GLOSSARY:
-    '/user-guide/getting-started/capabilities/glossary',
-  USER_GUIDE_GETTING_STARTED_CAPABILITIES_IMPLEMENTATION_SERVICES:
-    '/user-guide/getting-started/capabilities/implementation-services',
-  USER_GUIDE_GETTING_STARTED_CAPABILITIES_WHAT_IS_TWENTY:
-    '/user-guide/getting-started/capabilities/what-is-twenty',
-  USER_GUIDE_GETTING_STARTED_HOW_TOS_CONFIGURE_YOUR_WORKSPACE:
-    '/user-guide/getting-started/how-tos/configure-your-workspace',
-  USER_GUIDE_GETTING_STARTED_HOW_TOS_CREATE_WORKSPACE:
-    '/user-guide/getting-started/how-tos/create-workspace',
-  USER_GUIDE_GETTING_STARTED_HOW_TOS_NAVIGATE_AROUND_TWENTY:
-    '/user-guide/getting-started/how-tos/navigate-around-twenty',
-  USER_GUIDE_INTRODUCTION: '/user-guide/introduction',
   USER_GUIDE_PERMISSIONS_ACCESS_CAPABILITIES_PERMISSIONS:
     '/user-guide/permissions-access/capabilities/permissions',
   USER_GUIDE_PERMISSIONS_ACCESS_CAPABILITIES_SSO_CONFIGURATION:
