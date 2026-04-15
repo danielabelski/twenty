@@ -47,9 +47,19 @@ export const DOCUMENTATION_PATHS = {
   DEVELOPERS_CONTRIBUTE_CONTRIBUTE: '/developers/contribute/contribute',
   DEVELOPERS_EXTEND_API: '/developers/extend/api',
   DEVELOPERS_EXTEND_APPS_BUILDING: '/developers/extend/apps/building',
+  DEVELOPERS_EXTEND_APPS_CLI_AND_TESTING:
+    '/developers/extend/apps/cli-and-testing',
+  DEVELOPERS_EXTEND_APPS_DATA_MODEL: '/developers/extend/apps/data-model',
+  DEVELOPERS_EXTEND_APPS_FRONT_COMPONENTS:
+    '/developers/extend/apps/front-components',
   DEVELOPERS_EXTEND_APPS_GETTING_STARTED:
     '/developers/extend/apps/getting-started',
+  DEVELOPERS_EXTEND_APPS_LOGIC_FUNCTIONS:
+    '/developers/extend/apps/logic-functions',
   DEVELOPERS_EXTEND_APPS_PUBLISHING: '/developers/extend/apps/publishing',
+  DEVELOPERS_EXTEND_APPS_SKILLS_AND_AGENTS:
+    '/developers/extend/apps/skills-and-agents',
+  DEVELOPERS_EXTEND_OAUTH: '/developers/extend/oauth',
   DEVELOPERS_EXTEND_WEBHOOKS: '/developers/extend/webhooks',
   DEVELOPERS_INTRODUCTION: '/developers/introduction',
   DEVELOPERS_SELF_HOST_CAPABILITIES_CLOUD_PROVIDERS:
@@ -192,6 +202,7 @@ export const DOCUMENTATION_PATHS = {
   USER_GUIDE_DATA_MODEL_HOW_TOS_DATA_MODEL_FAQ:
     '/user-guide/data-model/how-tos/data-model-faq',
   USER_GUIDE_DATA_MODEL_OVERVIEW: '/user-guide/data-model/overview',
+  USER_GUIDE_INTRODUCTION: '/user-guide/introduction',
   USER_GUIDE_LAYOUT_CAPABILITIES_NAVIGATION:
     '/user-guide/layout/capabilities/navigation',
   USER_GUIDE_LAYOUT_CAPABILITIES_RECORD_PAGES:

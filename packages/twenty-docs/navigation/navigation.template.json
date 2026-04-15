@@ -14,6 +14,9 @@
     "userGuide": {
       "label": "User Guide",
       "groups": {
+        "userGuideOverview": {
+          "label": "Overview"
+        },
         "dataModel": {
           "label": "Data Model",
           "groups": {
@@ -148,16 +151,14 @@
     "developers": {
       "label": "Developers",
       "groups": {
-        "developersGroup": {
-          "label": "Developers"
+        "developersOverview": {
+          "label": "Overview"
         },
-        "extend": {
-          "label": "Extend",
-          "groups": {
-            "apps": {
-              "label": "Apps"
-            }
-          }
+        "apps": {
+          "label": "Apps"
+        },
+        "api": {
+          "label": "API"
         },
         "selfHost": {
           "label": "Self-Host",

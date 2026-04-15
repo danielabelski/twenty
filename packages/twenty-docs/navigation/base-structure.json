@@ -7,7 +7,6 @@
         {
           "key": "welcome",
           "label": "Welcome",
-          "icon": "rocket",
           "pages": [
             "getting-started/introduction",
             "getting-started/key-features",
@@ -17,7 +16,6 @@
         {
           "key": "coreConcepts",
           "label": "Core Concepts",
-          "icon": "lightbulb",
           "pages": [
             "getting-started/core-concepts/data-model",
             "getting-started/core-concepts/layout",
@@ -33,6 +31,13 @@
       "key": "userGuide",
       "label": "User Guide",
       "groups": [
+        {
+          "key": "userGuideOverview",
+          "label": "Overview",
+          "pages": [
+            "user-guide/introduction"
+          ]
+        },
         {
           "key": "dataModel",
           "label": "Data Model",
@@ -365,28 +370,35 @@
       "label": "Developers",
       "groups": [
         {
-          "key": "developersGroup",
-          "label": "Developers",
+          "key": "developersOverview",
+          "label": "Overview",
           "pages": [
             "developers/introduction"
           ]
         },
         {
-          "key": "extend",
-          "label": "Extend",
+          "key": "apps",
+          "label": "Apps",
+          "icon": "cube",
+          "pages": [
+            "developers/extend/apps/getting-started",
+            "developers/extend/apps/building",
+            "developers/extend/apps/data-model",
+            "developers/extend/apps/logic-functions",
+            "developers/extend/apps/front-components",
+            "developers/extend/apps/skills-and-agents",
+            "developers/extend/apps/cli-and-testing",
+            "developers/extend/apps/publishing"
+          ]
+        },
+        {
+          "key": "api",
+          "label": "API",
           "icon": "plug",
           "pages": [
             "developers/extend/api",
             "developers/extend/webhooks",
-            {
-              "key": "apps",
-              "label": "Apps",
-              "pages": [
-                "developers/extend/apps/getting-started",
-                "developers/extend/apps/building",
-                "developers/extend/apps/publishing"
-              ]
-            }
+            "developers/extend/oauth"
           ]
         },
         {

@@ -22,3 +22,26 @@
   justify-content: center;
   flex: 1;
 }
+
+/*
+ * HACK: Hide the "Overview" sidebar group header in the Developers tab.
+ *
+ * Mintlify requires every page to be inside a named group, and the tab's
+ * landing page is always the first page of the first group. We want the
+ * Developer Overview page to be the tab landing without showing a lonely
+ * "Overview" group header above a single item.
+ *
+ * We use :has() to scope the rule to only the sidebar group that contains
+ * the developers/introduction link, so other tabs are unaffected.
+ */
+div:has(> .sidebar-group a[href="/developers/introduction"]),
+div:has(> .sidebar-group a[href="/user-guide/introduction"]) {
+  display: none;
+}
+
+/* Remove the top margin on the group that follows the hidden overview group,
+   so it sits flush at the top of the sidebar without a gap. */
+div:has(> .sidebar-group a[href="/developers/introduction"]) + div,
+div:has(> .sidebar-group a[href="/user-guide/introduction"]) + div {
+  margin-top: 0 !important;
+}

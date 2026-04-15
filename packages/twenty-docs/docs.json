@@ -40,7 +40,6 @@
             "groups": [
               {
                 "group": "Welcome",
-                "icon": "rocket",
                 "pages": [
                   "getting-started/introduction",
                   "getting-started/key-features",
@@ -49,7 +48,6 @@
               },
               {
                 "group": "Core Concepts",
-                "icon": "lightbulb",
                 "pages": [
                   "getting-started/core-concepts/data-model",
                   "getting-started/core-concepts/layout",
@@ -64,6 +62,12 @@
           {
             "tab": "User Guide",
             "groups": [
+              {
+                "group": "Overview",
+                "pages": [
+                  "user-guide/introduction"
+                ]
+              },
               {
                 "group": "Data Model",
                 "icon": "database",
@@ -360,25 +364,32 @@
             "tab": "Developers",
             "groups": [
               {
-                "group": "Developers",
+                "group": "Overview",
                 "pages": [
                   "developers/introduction"
                 ]
               },
               {
-                "group": "Extend",
+                "group": "Apps",
+                "icon": "cube",
+                "pages": [
+                  "developers/extend/apps/getting-started",
+                  "developers/extend/apps/building",
+                  "developers/extend/apps/data-model",
+                  "developers/extend/apps/logic-functions",
+                  "developers/extend/apps/front-components",
+                  "developers/extend/apps/skills-and-agents",
+                  "developers/extend/apps/cli-and-testing",
+                  "developers/extend/apps/publishing"
+                ]
+              },
+              {
+                "group": "API",
                 "icon": "plug",
                 "pages": [
                   "developers/extend/api",
                   "developers/extend/webhooks",
-                  {
-                    "group": "Apps",
-                    "pages": [
-                      "developers/extend/apps/getting-started",
-                      "developers/extend/apps/building",
-                      "developers/extend/apps/publishing"
-                    ]
-                  }
+                  "developers/extend/oauth"
                 ]
               },
               {
@@ -497,7 +508,6 @@
             "groups": [
               {
                 "group": "Welcome",
-                "icon": "rocket",
                 "pages": [
                   "l/fr/getting-started/introduction",
                   "l/fr/getting-started/key-features",
@@ -506,7 +516,6 @@
               },
               {
                 "group": "Core Concepts",
-                "icon": "lightbulb",
                 "pages": [
                   "l/fr/getting-started/core-concepts/data-model",
                   "l/fr/getting-started/core-concepts/layout",
@@ -521,6 +530,12 @@
           {
             "tab": "Guide de l'utilisateur",
             "groups": [
+              {
+                "group": "Overview",
+                "pages": [
+                  "l/fr/user-guide/introduction"
+                ]
+              },
               {
                 "group": "Modèle de données",
                 "icon": "database",
@@ -817,25 +832,32 @@
             "tab": "Développeurs",
             "groups": [
               {
-                "group": "Développeurs",
+                "group": "Overview",
                 "pages": [
                   "l/fr/developers/introduction"
                 ]
               },
               {
-                "group": "Étendre",
+                "group": "Apps",
+                "icon": "cube",
+                "pages": [
+                  "l/fr/developers/extend/apps/getting-started",
+                  "l/fr/developers/extend/apps/building",
+                  "l/fr/developers/extend/apps/data-model",
+                  "l/fr/developers/extend/apps/logic-functions",
+                  "l/fr/developers/extend/apps/front-components",
+                  "l/fr/developers/extend/apps/skills-and-agents",
+                  "l/fr/developers/extend/apps/cli-and-testing",
+                  "l/fr/developers/extend/apps/publishing"
+                ]
+              },
+              {
+                "group": "API",
                 "icon": "plug",
                 "pages": [
                   "l/fr/developers/extend/api",
                   "l/fr/developers/extend/webhooks",
-                  {
-                    "group": "Apps",
-                    "pages": [
-                      "l/fr/developers/extend/apps/getting-started",
-                      "l/fr/developers/extend/apps/building",
-                      "l/fr/developers/extend/apps/publishing"
-                    ]
-                  }
+                  "l/fr/developers/extend/oauth"
                 ]
               },
               {
@@ -954,7 +976,6 @@
             "groups": [
               {
                 "group": "Welcome",
-                "icon": "rocket",
                 "pages": [
                   "l/ar/getting-started/introduction",
                   "l/ar/getting-started/key-features",
@@ -963,7 +984,6 @@
               },
               {
                 "group": "Core Concepts",
-                "icon": "lightbulb",
                 "pages": [
                   "l/ar/getting-started/core-concepts/data-model",
                   "l/ar/getting-started/core-concepts/layout",
@@ -978,6 +998,12 @@
           {
             "tab": "دليل المستخدم",
             "groups": [
+              {
+                "group": "Overview",
+                "pages": [
+                  "l/ar/user-guide/introduction"
+                ]
+              },
               {
                 "group": "نموذج البيانات",
                 "icon": "database",
@@ -1274,25 +1300,32 @@
             "tab": "المطورون",
             "groups": [
               {
-                "group": "المطورون",
+                "group": "Overview",
                 "pages": [
                   "l/ar/developers/introduction"
                 ]
               },
               {
-                "group": "التوسيع",
+                "group": "التطبيقات",
+                "icon": "cube",
+                "pages": [
+                  "l/ar/developers/extend/apps/getting-started",
+                  "l/ar/developers/extend/apps/building",
+                  "l/ar/developers/extend/apps/data-model",
+                  "l/ar/developers/extend/apps/logic-functions",
+                  "l/ar/developers/extend/apps/front-components",
+                  "l/ar/developers/extend/apps/skills-and-agents",
+                  "l/ar/developers/extend/apps/cli-and-testing",
+                  "l/ar/developers/extend/apps/publishing"
+                ]
+              },
+              {
+                "group": "API",
                 "icon": "plug",
                 "pages": [
                   "l/ar/developers/extend/api",
                   "l/ar/developers/extend/webhooks",
-                  {
-                    "group": "التطبيقات",
-                    "pages": [
-                      "l/ar/developers/extend/apps/getting-started",
-                      "l/ar/developers/extend/apps/building",
-                      "l/ar/developers/extend/apps/publishing"
-                    ]
-                  }
+                  "l/ar/developers/extend/oauth"
                 ]
               },
               {
@@ -1411,7 +1444,6 @@
             "groups": [
               {
                 "group": "Welcome",
-                "icon": "rocket",
                 "pages": [
                   "l/cs/getting-started/introduction",
                   "l/cs/getting-started/key-features",
@@ -1420,7 +1452,6 @@
               },
               {
                 "group": "Core Concepts",
-                "icon": "lightbulb",
                 "pages": [
                   "l/cs/getting-started/core-concepts/data-model",
                   "l/cs/getting-started/core-concepts/layout",
@@ -1435,6 +1466,12 @@
           {
             "tab": "Uživatelská příručka",
             "groups": [
+              {
+                "group": "Overview",
+                "pages": [
+                  "l/cs/user-guide/introduction"
+                ]
+              },
               {
                 "group": "Datový model",
                 "icon": "database",
@@ -1731,25 +1768,32 @@
             "tab": "Vývojáři",
             "groups": [
               {
-                "group": "Vývojáři",
+                "group": "Overview",
                 "pages": [
                   "l/cs/developers/introduction"
                 ]
               },
               {
-                "group": "Rozšíření",
+                "group": "Aplikace",
+                "icon": "cube",
+                "pages": [
+                  "l/cs/developers/extend/apps/getting-started",
+                  "l/cs/developers/extend/apps/building",
+                  "l/cs/developers/extend/apps/data-model",
+                  "l/cs/developers/extend/apps/logic-functions",
+                  "l/cs/developers/extend/apps/front-components",
+                  "l/cs/developers/extend/apps/skills-and-agents",
+                  "l/cs/developers/extend/apps/cli-and-testing",
+                  "l/cs/developers/extend/apps/publishing"
+                ]
+              },
+              {
+                "group": "API",
                 "icon": "plug",
                 "pages": [
                   "l/cs/developers/extend/api",
                   "l/cs/developers/extend/webhooks",
-                  {
-                    "group": "Aplikace",
-                    "pages": [
-                      "l/cs/developers/extend/apps/getting-started",
-                      "l/cs/developers/extend/apps/building",
-                      "l/cs/developers/extend/apps/publishing"
-                    ]
-                  }
+                  "l/cs/developers/extend/oauth"
                 ]
               },
               {
@@ -1868,7 +1912,6 @@
             "groups": [
               {
                 "group": "Welcome",
-                "icon": "rocket",
                 "pages": [
                   "l/de/getting-started/introduction",
                   "l/de/getting-started/key-features",
@@ -1877,7 +1920,6 @@
               },
               {
                 "group": "Core Concepts",
-                "icon": "lightbulb",
                 "pages": [
                   "l/de/getting-started/core-concepts/data-model",
                   "l/de/getting-started/core-concepts/layout",
@@ -1892,6 +1934,12 @@
           {
             "tab": "Benutzerhandbuch",
             "groups": [
+              {
+                "group": "Overview",
+                "pages": [
+                  "l/de/user-guide/introduction"
+                ]
+              },
               {
                 "group": "Datenmodell",
                 "icon": "database",
@@ -2188,25 +2236,32 @@
             "tab": "Entwickler",
             "groups": [
               {
-                "group": "Entwickler",
+                "group": "Overview",
                 "pages": [
                   "l/de/developers/introduction"
                 ]
               },
               {
-                "group": "Erweitern",
+                "group": "Apps",
+                "icon": "cube",
+                "pages": [
+                  "l/de/developers/extend/apps/getting-started",
+                  "l/de/developers/extend/apps/building",
+                  "l/de/developers/extend/apps/data-model",
+                  "l/de/developers/extend/apps/logic-functions",
+                  "l/de/developers/extend/apps/front-components",
+                  "l/de/developers/extend/apps/skills-and-agents",
+                  "l/de/developers/extend/apps/cli-and-testing",
+                  "l/de/developers/extend/apps/publishing"
+                ]
+              },
+              {
+                "group": "API",
                 "icon": "plug",
                 "pages": [
                   "l/de/developers/extend/api",
                   "l/de/developers/extend/webhooks",
-                  {
-                    "group": "Apps",
-                    "pages": [
-                      "l/de/developers/extend/apps/getting-started",
-                      "l/de/developers/extend/apps/building",
-                      "l/de/developers/extend/apps/publishing"
-                    ]
-                  }
+                  "l/de/developers/extend/oauth"
                 ]
               },
               {
@@ -2325,7 +2380,6 @@
             "groups": [
               {
                 "group": "Welcome",
-                "icon": "rocket",
                 "pages": [
                   "l/es/getting-started/introduction",
                   "l/es/getting-started/key-features",
@@ -2334,7 +2388,6 @@
               },
               {
                 "group": "Core Concepts",
-                "icon": "lightbulb",
                 "pages": [
                   "l/es/getting-started/core-concepts/data-model",
                   "l/es/getting-started/core-concepts/layout",
@@ -2349,6 +2402,12 @@
           {
             "tab": "Guía de usuario",
             "groups": [
+              {
+                "group": "Overview",
+                "pages": [
+                  "l/es/user-guide/introduction"
+                ]
+              },
               {
                 "group": "Modelo de datos",
                 "icon": "database",
@@ -2645,25 +2704,32 @@
             "tab": "Desarrolladores",
             "groups": [
               {
-                "group": "Desarrolladores",
+                "group": "Overview",
                 "pages": [
                   "l/es/developers/introduction"
                 ]
               },
               {
-                "group": "Ampliar",
+                "group": "Apps",
+                "icon": "cube",
+                "pages": [
+                  "l/es/developers/extend/apps/getting-started",
+                  "l/es/developers/extend/apps/building",
+                  "l/es/developers/extend/apps/data-model",
+                  "l/es/developers/extend/apps/logic-functions",
+                  "l/es/developers/extend/apps/front-components",
+                  "l/es/developers/extend/apps/skills-and-agents",
+                  "l/es/developers/extend/apps/cli-and-testing",
+                  "l/es/developers/extend/apps/publishing"
+                ]
+              },
+              {
+                "group": "API",
                 "icon": "plug",
                 "pages": [
                   "l/es/developers/extend/api",
                   "l/es/developers/extend/webhooks",
-                  {
-                    "group": "Apps",
-                    "pages": [
-                      "l/es/developers/extend/apps/getting-started",
-                      "l/es/developers/extend/apps/building",
-                      "l/es/developers/extend/apps/publishing"
-                    ]
-                  }
+                  "l/es/developers/extend/oauth"
                 ]
               },
               {
@@ -2782,7 +2848,6 @@
             "groups": [
               {
                 "group": "Welcome",
-                "icon": "rocket",
                 "pages": [
                   "l/it/getting-started/introduction",
                   "l/it/getting-started/key-features",
@@ -2791,7 +2856,6 @@
               },
               {
                 "group": "Core Concepts",
-                "icon": "lightbulb",
                 "pages": [
                   "l/it/getting-started/core-concepts/data-model",
                   "l/it/getting-started/core-concepts/layout",
@@ -2806,6 +2870,12 @@
           {
             "tab": "Guida utente",
             "groups": [
+              {
+                "group": "Overview",
+                "pages": [
+                  "l/it/user-guide/introduction"
+                ]
+              },
               {
                 "group": "Modello dati",
                 "icon": "database",
@@ -3102,25 +3172,32 @@
             "tab": "Sviluppatori",
             "groups": [
               {
-                "group": "Sviluppatori",
+                "group": "Overview",
                 "pages": [
                   "l/it/developers/introduction"
                 ]
               },
               {
-                "group": "Estendi",
+                "group": "App",
+                "icon": "cube",
+                "pages": [
+                  "l/it/developers/extend/apps/getting-started",
+                  "l/it/developers/extend/apps/building",
+                  "l/it/developers/extend/apps/data-model",
+                  "l/it/developers/extend/apps/logic-functions",
+                  "l/it/developers/extend/apps/front-components",
+                  "l/it/developers/extend/apps/skills-and-agents",
+                  "l/it/developers/extend/apps/cli-and-testing",
+                  "l/it/developers/extend/apps/publishing"
+                ]
+              },
+              {
+                "group": "API",
                 "icon": "plug",
                 "pages": [
                   "l/it/developers/extend/api",
                   "l/it/developers/extend/webhooks",
-                  {
-                    "group": "App",
-                    "pages": [
-                      "l/it/developers/extend/apps/getting-started",
-                      "l/it/developers/extend/apps/building",
-                      "l/it/developers/extend/apps/publishing"
-                    ]
-                  }
+                  "l/it/developers/extend/oauth"
                 ]
               },
               {
@@ -3239,7 +3316,6 @@
             "groups": [
               {
                 "group": "Welcome",
-                "icon": "rocket",
                 "pages": [
                   "l/ja/getting-started/introduction",
                   "l/ja/getting-started/key-features",
@@ -3248,7 +3324,6 @@
               },
               {
                 "group": "Core Concepts",
-                "icon": "lightbulb",
                 "pages": [
                   "l/ja/getting-started/core-concepts/data-model",
                   "l/ja/getting-started/core-concepts/layout",
@@ -3263,6 +3338,12 @@
           {
             "tab": "ユーザーガイド",
             "groups": [
+              {
+                "group": "Overview",
+                "pages": [
+                  "l/ja/user-guide/introduction"
+                ]
+              },
               {
                 "group": "データモデル",
                 "icon": "database",
@@ -3559,25 +3640,32 @@
             "tab": "開発者",
             "groups": [
               {
-                "group": "開発者",
+                "group": "Overview",
                 "pages": [
                   "l/ja/developers/introduction"
                 ]
               },
               {
-                "group": "拡張",
+                "group": "Apps",
+                "icon": "cube",
+                "pages": [
+                  "l/ja/developers/extend/apps/getting-started",
+                  "l/ja/developers/extend/apps/building",
+                  "l/ja/developers/extend/apps/data-model",
+                  "l/ja/developers/extend/apps/logic-functions",
+                  "l/ja/developers/extend/apps/front-components",
+                  "l/ja/developers/extend/apps/skills-and-agents",
+                  "l/ja/developers/extend/apps/cli-and-testing",
+                  "l/ja/developers/extend/apps/publishing"
+                ]
+              },
+              {
+                "group": "API",
                 "icon": "plug",
                 "pages": [
                   "l/ja/developers/extend/api",
                   "l/ja/developers/extend/webhooks",
-                  {
-                    "group": "Apps",
-                    "pages": [
-                      "l/ja/developers/extend/apps/getting-started",
-                      "l/ja/developers/extend/apps/building",
-                      "l/ja/developers/extend/apps/publishing"
-                    ]
-                  }
+                  "l/ja/developers/extend/oauth"
                 ]
               },
               {
@@ -3696,7 +3784,6 @@
             "groups": [
               {
                 "group": "Welcome",
-                "icon": "rocket",
                 "pages": [
                   "l/ko/getting-started/introduction",
                   "l/ko/getting-started/key-features",
@@ -3705,7 +3792,6 @@
               },
               {
                 "group": "Core Concepts",
-                "icon": "lightbulb",
                 "pages": [
                   "l/ko/getting-started/core-concepts/data-model",
                   "l/ko/getting-started/core-concepts/layout",
@@ -3720,6 +3806,12 @@
           {
             "tab": "사용자 안내서",
             "groups": [
+              {
+                "group": "Overview",
+                "pages": [
+                  "l/ko/user-guide/introduction"
+                ]
+              },
               {
                 "group": "데이터 모델",
                 "icon": "database",
@@ -4016,25 +4108,32 @@
             "tab": "개발자",
             "groups": [
               {
-                "group": "개발자",
+                "group": "Overview",
                 "pages": [
                   "l/ko/developers/introduction"
                 ]
               },
               {
-                "group": "확장",
+                "group": "Apps",
+                "icon": "cube",
+                "pages": [
+                  "l/ko/developers/extend/apps/getting-started",
+                  "l/ko/developers/extend/apps/building",
+                  "l/ko/developers/extend/apps/data-model",
+                  "l/ko/developers/extend/apps/logic-functions",
+                  "l/ko/developers/extend/apps/front-components",
+                  "l/ko/developers/extend/apps/skills-and-agents",
+                  "l/ko/developers/extend/apps/cli-and-testing",
+                  "l/ko/developers/extend/apps/publishing"
+                ]
+              },
+              {
+                "group": "API",
                 "icon": "plug",
                 "pages": [
                   "l/ko/developers/extend/api",
                   "l/ko/developers/extend/webhooks",
-                  {
-                    "group": "Apps",
-                    "pages": [
-                      "l/ko/developers/extend/apps/getting-started",
-                      "l/ko/developers/extend/apps/building",
-                      "l/ko/developers/extend/apps/publishing"
-                    ]
-                  }
+                  "l/ko/developers/extend/oauth"
                 ]
               },
               {
@@ -4153,7 +4252,6 @@
             "groups": [
               {
                 "group": "Welcome",
-                "icon": "rocket",
                 "pages": [
                   "l/pt/getting-started/introduction",
                   "l/pt/getting-started/key-features",
@@ -4162,7 +4260,6 @@
               },
               {
                 "group": "Core Concepts",
-                "icon": "lightbulb",
                 "pages": [
                   "l/pt/getting-started/core-concepts/data-model",
                   "l/pt/getting-started/core-concepts/layout",
@@ -4177,6 +4274,12 @@
           {
             "tab": "User Guide",
             "groups": [
+              {
+                "group": "Overview",
+                "pages": [
+                  "l/pt/user-guide/introduction"
+                ]
+              },
               {
                 "group": "Modelo de dados",
                 "icon": "database",
@@ -4473,25 +4576,32 @@
             "tab": "Programadores",
             "groups": [
               {
-                "group": "Programadores",
+                "group": "Overview",
                 "pages": [
                   "l/pt/developers/introduction"
                 ]
               },
               {
-                "group": "Extend",
+                "group": "Aplicativos",
+                "icon": "cube",
+                "pages": [
+                  "l/pt/developers/extend/apps/getting-started",
+                  "l/pt/developers/extend/apps/building",
+                  "l/pt/developers/extend/apps/data-model",
+                  "l/pt/developers/extend/apps/logic-functions",
+                  "l/pt/developers/extend/apps/front-components",
+                  "l/pt/developers/extend/apps/skills-and-agents",
+                  "l/pt/developers/extend/apps/cli-and-testing",
+                  "l/pt/developers/extend/apps/publishing"
+                ]
+              },
+              {
+                "group": "API",
                 "icon": "plug",
                 "pages": [
                   "l/pt/developers/extend/api",
                   "l/pt/developers/extend/webhooks",
-                  {
-                    "group": "Aplicativos",
-                    "pages": [
-                      "l/pt/developers/extend/apps/getting-started",
-                      "l/pt/developers/extend/apps/building",
-                      "l/pt/developers/extend/apps/publishing"
-                    ]
-                  }
+                  "l/pt/developers/extend/oauth"
                 ]
               },
               {
@@ -4610,7 +4720,6 @@
             "groups": [
               {
                 "group": "Welcome",
-                "icon": "rocket",
                 "pages": [
                   "l/ro/getting-started/introduction",
                   "l/ro/getting-started/key-features",
@@ -4619,7 +4728,6 @@
               },
               {
                 "group": "Core Concepts",
-                "icon": "lightbulb",
                 "pages": [
                   "l/ro/getting-started/core-concepts/data-model",
                   "l/ro/getting-started/core-concepts/layout",
@@ -4634,6 +4742,12 @@
           {
             "tab": "User Guide",
             "groups": [
+              {
+                "group": "Overview",
+                "pages": [
+                  "l/ro/user-guide/introduction"
+                ]
+              },
               {
                 "group": "Model de date",
                 "icon": "database",
@@ -4930,25 +5044,32 @@
             "tab": "Dezvoltatori",
             "groups": [
               {
-                "group": "Dezvoltatori",
+                "group": "Overview",
                 "pages": [
                   "l/ro/developers/introduction"
                 ]
               },
               {
-                "group": "Extend",
+                "group": "Aplicații",
+                "icon": "cube",
+                "pages": [
+                  "l/ro/developers/extend/apps/getting-started",
+                  "l/ro/developers/extend/apps/building",
+                  "l/ro/developers/extend/apps/data-model",
+                  "l/ro/developers/extend/apps/logic-functions",
+                  "l/ro/developers/extend/apps/front-components",
+                  "l/ro/developers/extend/apps/skills-and-agents",
+                  "l/ro/developers/extend/apps/cli-and-testing",
+                  "l/ro/developers/extend/apps/publishing"
+                ]
+              },
+              {
+                "group": "API",
                 "icon": "plug",
                 "pages": [
                   "l/ro/developers/extend/api",
                   "l/ro/developers/extend/webhooks",
-                  {
-                    "group": "Aplicații",
-                    "pages": [
-                      "l/ro/developers/extend/apps/getting-started",
-                      "l/ro/developers/extend/apps/building",
-                      "l/ro/developers/extend/apps/publishing"
-                    ]
-                  }
+                  "l/ro/developers/extend/oauth"
                 ]
               },
               {
@@ -5067,7 +5188,6 @@
             "groups": [
               {
                 "group": "Welcome",
-                "icon": "rocket",
                 "pages": [
                   "l/ru/getting-started/introduction",
                   "l/ru/getting-started/key-features",
@@ -5076,7 +5196,6 @@
               },
               {
                 "group": "Core Concepts",
-                "icon": "lightbulb",
                 "pages": [
                   "l/ru/getting-started/core-concepts/data-model",
                   "l/ru/getting-started/core-concepts/layout",
@@ -5091,6 +5210,12 @@
           {
             "tab": "Руководство пользователя",
             "groups": [
+              {
+                "group": "Overview",
+                "pages": [
+                  "l/ru/user-guide/introduction"
+                ]
+              },
               {
                 "group": "Модель данных",
                 "icon": "database",
@@ -5387,25 +5512,32 @@
             "tab": "Разработчики",
             "groups": [
               {
-                "group": "Разработчики",
+                "group": "Overview",
                 "pages": [
                   "l/ru/developers/introduction"
                 ]
               },
               {
-                "group": "Расширяйте",
+                "group": "Приложения",
+                "icon": "cube",
+                "pages": [
+                  "l/ru/developers/extend/apps/getting-started",
+                  "l/ru/developers/extend/apps/building",
+                  "l/ru/developers/extend/apps/data-model",
+                  "l/ru/developers/extend/apps/logic-functions",
+                  "l/ru/developers/extend/apps/front-components",
+                  "l/ru/developers/extend/apps/skills-and-agents",
+                  "l/ru/developers/extend/apps/cli-and-testing",
+                  "l/ru/developers/extend/apps/publishing"
+                ]
+              },
+              {
+                "group": "API",
                 "icon": "plug",
                 "pages": [
                   "l/ru/developers/extend/api",
                   "l/ru/developers/extend/webhooks",
-                  {
-                    "group": "Приложения",
-                    "pages": [
-                      "l/ru/developers/extend/apps/getting-started",
-                      "l/ru/developers/extend/apps/building",
-                      "l/ru/developers/extend/apps/publishing"
-                    ]
-                  }
+                  "l/ru/developers/extend/oauth"
                 ]
               },
               {
@@ -5524,7 +5656,6 @@
             "groups": [
               {
                 "group": "Welcome",
-                "icon": "rocket",
                 "pages": [
                   "l/tr/getting-started/introduction",
                   "l/tr/getting-started/key-features",
@@ -5533,7 +5664,6 @@
               },
               {
                 "group": "Core Concepts",
-                "icon": "lightbulb",
                 "pages": [
                   "l/tr/getting-started/core-concepts/data-model",
                   "l/tr/getting-started/core-concepts/layout",
@@ -5548,6 +5678,12 @@
           {
             "tab": "Kullanıcı Rehberi",
             "groups": [
+              {
+                "group": "Overview",
+                "pages": [
+                  "l/tr/user-guide/introduction"
+                ]
+              },
               {
                 "group": "Veri modeli",
                 "icon": "database",
@@ -5844,25 +5980,32 @@
             "tab": "Geliştiriciler",
             "groups": [
               {
-                "group": "Geliştiriciler",
+                "group": "Overview",
                 "pages": [
                   "l/tr/developers/introduction"
                 ]
               },
               {
-                "group": "Genişlet",
+                "group": "Uygulamalar",
+                "icon": "cube",
+                "pages": [
+                  "l/tr/developers/extend/apps/getting-started",
+                  "l/tr/developers/extend/apps/building",
+                  "l/tr/developers/extend/apps/data-model",
+                  "l/tr/developers/extend/apps/logic-functions",
+                  "l/tr/developers/extend/apps/front-components",
+                  "l/tr/developers/extend/apps/skills-and-agents",
+                  "l/tr/developers/extend/apps/cli-and-testing",
+                  "l/tr/developers/extend/apps/publishing"
+                ]
+              },
+              {
+                "group": "API",
                 "icon": "plug",
                 "pages": [
                   "l/tr/developers/extend/api",
                   "l/tr/developers/extend/webhooks",
-                  {
-                    "group": "Uygulamalar",
-                    "pages": [
-                      "l/tr/developers/extend/apps/getting-started",
-                      "l/tr/developers/extend/apps/building",
-                      "l/tr/developers/extend/apps/publishing"
-                    ]
-                  }
+                  "l/tr/developers/extend/oauth"
                 ]
               },
               {
@@ -5981,7 +6124,6 @@
             "groups": [
               {
                 "group": "Welcome",
-                "icon": "rocket",
                 "pages": [
                   "l/zh/getting-started/introduction",
                   "l/zh/getting-started/key-features",
@@ -5990,7 +6132,6 @@
               },
               {
                 "group": "Core Concepts",
-                "icon": "lightbulb",
                 "pages": [
                   "l/zh/getting-started/core-concepts/data-model",
                   "l/zh/getting-started/core-concepts/layout",
@@ -6005,6 +6146,12 @@
           {
             "tab": "用户指南",
             "groups": [
+              {
+                "group": "Overview",
+                "pages": [
+                  "l/zh/user-guide/introduction"
+                ]
+              },
               {
                 "group": "数据模型",
                 "icon": "database",
@@ -6301,25 +6448,32 @@
             "tab": "开发者",
             "groups": [
               {
-                "group": "开发者",
+                "group": "Overview",
                 "pages": [
                   "l/zh/developers/introduction"
                 ]
               },
               {
-                "group": "扩展",
+                "group": "应用",
+                "icon": "cube",
+                "pages": [
+                  "l/zh/developers/extend/apps/getting-started",
+                  "l/zh/developers/extend/apps/building",
+                  "l/zh/developers/extend/apps/data-model",
+                  "l/zh/developers/extend/apps/logic-functions",
+                  "l/zh/developers/extend/apps/front-components",
+                  "l/zh/developers/extend/apps/skills-and-agents",
+                  "l/zh/developers/extend/apps/cli-and-testing",
+                  "l/zh/developers/extend/apps/publishing"
+                ]
+              },
+              {
+                "group": "API",
                 "icon": "plug",
                 "pages": [
                   "l/zh/developers/extend/api",
                   "l/zh/developers/extend/webhooks",
-                  {
-                    "group": "应用",
-                    "pages": [
-                      "l/zh/developers/extend/apps/getting-started",
-                      "l/zh/developers/extend/apps/building",
-                      "l/zh/developers/extend/apps/publishing"
-                    ]
-                  }
+                  "l/zh/developers/extend/oauth"
                 ]
               },
               {
