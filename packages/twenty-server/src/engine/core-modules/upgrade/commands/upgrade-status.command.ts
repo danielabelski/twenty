@@ -38,7 +38,8 @@ export class UpgradeStatusCommand extends CommandRunner {
 
   @Option({
     flags: '-f, --failed-only',
-    description: 'Only display failed instance and workspace commands',
+    description:
+      'Hide up-to-date entries, only display failed and behind commands',
   })
   parseFailedOnly(): boolean {
     return true;
@@ -70,9 +71,7 @@ export class UpgradeStatusCommand extends CommandRunner {
       const instanceStatus =
         await this.upgradeStatusService.getInstanceStatus();
 
-      if (!options.failedOnly || instanceStatus.health === 'failed') {
-        lines.push(...this.formatInstanceStatus(instanceStatus));
-      }
+      lines.push(...this.formatInstanceStatus(instanceStatus));
 
       const workspaceStatuses =
         await this.upgradeStatusService.getWorkspaceStatuses(
@@ -117,14 +116,21 @@ export class UpgradeStatusCommand extends CommandRunner {
       (status) => status.health === 'failed',
     );
 
-    if (!failedOnly) {
-      const nonFailed = workspaceStatuses.filter(
-        (status) => status.health !== 'failed',
-      );
+    const upToDate = workspaceStatuses.filter(
+      (status) => status.health === 'up-to-date',
+    );
+    const behind = workspaceStatuses.filter(
+      (status) => status.health === 'behind',
+    );
 
-      for (const workspaceStatus of nonFailed) {
+    if (!failedOnly) {
+      for (const workspaceStatus of upToDate) {
         lines.push(...this.formatWorkspaceStatus(workspaceStatus));
       }
+    }
+
+    for (const workspaceStatus of behind) {
+      lines.push(...this.formatWorkspaceStatus(workspaceStatus));
     }
 
     if (failed.length > 0) {
