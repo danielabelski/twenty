@@ -2,11 +2,23 @@ import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 
 import { UpgradeMigrationService } from 'src/engine/core-modules/upgrade/services/upgrade-migration.service';
+import { UpgradeSequenceReaderService } from 'src/engine/core-modules/upgrade/services/upgrade-sequence-reader.service';
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import {
   UpgradeStatusService,
+  deriveHealth,
   extractVersionFromCommandName,
 } from 'src/engine/core-modules/upgrade/services/upgrade-status.service';
+
+const LAST_INSTANCE_COMMAND = '1.23.0_LastInstanceCommand_1780000002000';
+const LAST_WORKSPACE_COMMAND = '1.23.0_LastWorkspaceCommand_1780000003000';
+const EARLIER_COMMAND = '1.22.0_EarlierCommand_1776000001000';
+
+const MOCK_SEQUENCE = [
+  { kind: 'fast-instance', name: EARLIER_COMMAND },
+  { kind: 'fast-instance', name: LAST_INSTANCE_COMMAND },
+  { kind: 'workspace', name: LAST_WORKSPACE_COMMAND },
+];
 
 describe('extractVersionFromCommandName', () => {
   it('should extract version from standard command name', () => {
@@ -32,6 +44,44 @@ describe('extractVersionFromCommandName', () => {
   });
 });
 
+describe('deriveHealth', () => {
+  it('should return failed when migration status is failed', () => {
+    expect(
+      deriveHealth(
+        { name: LAST_WORKSPACE_COMMAND, status: 'failed' },
+        LAST_WORKSPACE_COMMAND,
+      ),
+    ).toBe('failed');
+  });
+
+  it('should return up-to-date when cursor matches last expected command', () => {
+    expect(
+      deriveHealth(
+        { name: LAST_WORKSPACE_COMMAND, status: 'completed' },
+        LAST_WORKSPACE_COMMAND,
+      ),
+    ).toBe('up-to-date');
+  });
+
+  it('should return behind when cursor is before last expected command', () => {
+    expect(
+      deriveHealth(
+        { name: EARLIER_COMMAND, status: 'completed' },
+        LAST_WORKSPACE_COMMAND,
+      ),
+    ).toBe('behind');
+  });
+
+  it('should return up-to-date when last expected command is null', () => {
+    expect(
+      deriveHealth(
+        { name: EARLIER_COMMAND, status: 'completed' },
+        null,
+      ),
+    ).toBe('up-to-date');
+  });
+});
+
 describe('UpgradeStatusService', () => {
   let service: UpgradeStatusService;
   let getLatestInstanceMigration: jest.Mock;
@@ -54,6 +104,12 @@ describe('UpgradeStatusService', () => {
           },
         },
         {
+          provide: UpgradeSequenceReaderService,
+          useValue: {
+            getUpgradeSequence: () => MOCK_SEQUENCE,
+          },
+        },
+        {
           provide: getRepositoryToken(WorkspaceEntity),
           useValue: { find: workspaceFind },
         },
@@ -64,56 +120,93 @@ describe('UpgradeStatusService', () => {
   });
 
   describe('getInstanceStatus', () => {
-    it('should return inferred version from latest completed instance command', async () => {
+    it('should return up-to-date when cursor is at last instance command', async () => {
       getLatestInstanceMigration.mockResolvedValue({
-        name: '1.21.0_SomeCommand_1775500003000',
+        name: LAST_INSTANCE_COMMAND,
         status: 'completed',
-        executedByVersion: '1.21.0',
+        executedByVersion: '1.23.0',
         errorMessage: null,
         createdAt: new Date('2025-06-01T00:00:00Z'),
       });
 
       const result = await service.getInstanceStatus();
 
-      expect(result.inferredVersion).toBe('1.21.0');
-      expect(result.latestCommand).toEqual(
-        expect.objectContaining({
-          name: '1.21.0_SomeCommand_1775500003000',
-          status: 'completed',
-        }),
-      );
+      expect(result.health).toBe('up-to-date');
+      expect(result.inferredVersion).toBe('1.23.0');
     });
 
-    it('should report failure when most recent command failed', async () => {
+    it('should return behind when cursor is before last instance command', async () => {
       getLatestInstanceMigration.mockResolvedValue({
-        name: '1.21.0_SecondCommand_1775500002000',
+        name: EARLIER_COMMAND,
+        status: 'completed',
+        executedByVersion: '1.22.0',
+        errorMessage: null,
+        createdAt: new Date('2025-06-01T00:00:00Z'),
+      });
+
+      const result = await service.getInstanceStatus();
+
+      expect(result.health).toBe('behind');
+      expect(result.inferredVersion).toBe('1.22.0');
+    });
+
+    it('should return failed when latest instance command failed', async () => {
+      getLatestInstanceMigration.mockResolvedValue({
+        name: LAST_INSTANCE_COMMAND,
         status: 'failed',
-        executedByVersion: '1.21.0',
+        executedByVersion: '1.23.0',
         errorMessage: 'column does not exist',
         createdAt: new Date('2025-06-01T01:00:00Z'),
       });
 
       const result = await service.getInstanceStatus();
 
-      expect(result.inferredVersion).toBe('1.21.0');
-      expect(result.latestCommand?.status).toBe('failed');
+      expect(result.health).toBe('failed');
       expect(result.latestCommand?.errorMessage).toBe(
         'column does not exist',
       );
     });
 
-    it('should return nulls when no migrations exist', async () => {
+    it('should return behind when no migrations exist', async () => {
       getLatestInstanceMigration.mockResolvedValue(null);
 
       const result = await service.getInstanceStatus();
 
+      expect(result.health).toBe('behind');
       expect(result.inferredVersion).toBeNull();
       expect(result.latestCommand).toBeNull();
     });
   });
 
   describe('getWorkspaceStatuses', () => {
-    it('should return status for each active workspace', async () => {
+    it('should return up-to-date for workspace at last command', async () => {
+      workspaceFind.mockResolvedValue([
+        { id: 'ws-1', displayName: 'Apple' },
+      ]);
+
+      getWorkspaceLastAttemptedCommandName.mockResolvedValue(
+        new Map([
+          [
+            'ws-1',
+            {
+              workspaceId: 'ws-1',
+              name: LAST_WORKSPACE_COMMAND,
+              status: 'completed',
+              executedByVersion: '1.23.0',
+              errorMessage: null,
+              createdAt: new Date('2025-06-01T00:00:00Z'),
+            },
+          ],
+        ]),
+      );
+
+      const results = await service.getWorkspaceStatuses();
+
+      expect(results).toHaveLength(1);
+      expect(results[0].health).toBe('up-to-date');
+    });
+
+    it('should return behind for workspace not at last command', async () => {
       workspaceFind.mockResolvedValue([
         { id: 'ws-1', displayName: 'Apple' },
         { id: 'ws-2', displayName: 'Google' },
@@ -125,9 +218,9 @@ describe('UpgradeStatusService', () => {
             'ws-1',
             {
               workspaceId: 'ws-1',
-              name: '1.21.0_SomeCommand_1775500003000',
+              name: LAST_WORKSPACE_COMMAND,
               status: 'completed',
-              executedByVersion: '1.21.0',
+              executedByVersion: '1.23.0',
               errorMessage: null,
               createdAt: new Date('2025-06-01T00:00:00Z'),
             },
@@ -136,9 +229,9 @@ describe('UpgradeStatusService', () => {
             'ws-2',
             {
               workspaceId: 'ws-2',
-              name: '1.20.0_OldCommand_1770000001000',
+              name: EARLIER_COMMAND,
               status: 'completed',
-              executedByVersion: '1.20.0',
+              executedByVersion: '1.22.0',
               errorMessage: null,
               createdAt: new Date('2025-05-01T00:00:00Z'),
             },
@@ -149,52 +242,11 @@ describe('UpgradeStatusService', () => {
       const results = await service.getWorkspaceStatuses();
 
       expect(results).toHaveLength(2);
-
-      expect(results[0].workspaceId).toBe('ws-1');
-      expect(results[0].displayName).toBe('Apple');
-      expect(results[0].inferredVersion).toBe('1.21.0');
-
-      expect(results[1].workspaceId).toBe('ws-2');
-      expect(results[1].displayName).toBe('Google');
-      expect(results[1].inferredVersion).toBe('1.20.0');
+      expect(results[0].health).toBe('up-to-date');
+      expect(results[1].health).toBe('behind');
     });
 
-    it('should filter by workspace ID when provided', async () => {
-      workspaceFind.mockResolvedValue([
-        { id: 'ws-1', displayName: 'Apple' },
-      ]);
-
-      getWorkspaceLastAttemptedCommandName.mockResolvedValue(
-        new Map([
-          [
-            'ws-1',
-            {
-              workspaceId: 'ws-1',
-              name: '1.21.0_SomeCommand_1775500003000',
-              status: 'completed',
-              executedByVersion: '1.21.0',
-              errorMessage: null,
-              createdAt: new Date('2025-06-01T00:00:00Z'),
-            },
-          ],
-        ]),
-      );
-
-      const results = await service.getWorkspaceStatuses('ws-1');
-
-      expect(results).toHaveLength(1);
-      expect(results[0].workspaceId).toBe('ws-1');
-
-      expect(workspaceFind).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: expect.objectContaining({
-            id: 'ws-1',
-          }),
-        }),
-      );
-    });
-
-    it('should handle workspace with no migration history', async () => {
+    it('should return behind for workspace with no migration history', async () => {
       workspaceFind.mockResolvedValue([
         { id: 'ws-1', displayName: 'Apple' },
       ]);
@@ -204,7 +256,7 @@ describe('UpgradeStatusService', () => {
       const results = await service.getWorkspaceStatuses();
 
       expect(results).toHaveLength(1);
-      expect(results[0].inferredVersion).toBeNull();
+      expect(results[0].health).toBe('behind');
       expect(results[0].latestCommand).toBeNull();
     });
 

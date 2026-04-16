@@ -6,6 +6,7 @@ import { Command, CommandRunner, Option } from 'nest-commander';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
 import {
   type MigrationCursorStatus,
+  type UpgradeHealth,
   UpgradeStatusService,
   type WorkspaceStatus,
 } from 'src/engine/core-modules/upgrade/services/upgrade-status.service';
@@ -13,6 +14,12 @@ import {
 type UpgradeStatusOptions = {
   workspaceId?: string;
   failedOnly?: boolean;
+};
+
+const HEALTH_LABELS: Record<UpgradeHealth, string> = {
+  'up-to-date': chalk.green('Up to date'),
+  behind: chalk.yellow('Behind'),
+  failed: chalk.red('Failed'),
 };
 
 @Command({
@@ -47,10 +54,7 @@ export class UpgradeStatusCommand extends CommandRunner {
       const instanceStatus =
         await this.upgradeStatusService.getInstanceStatus();
 
-      const instanceFailed =
-        instanceStatus.latestCommand?.status === 'failed';
-
-      if (!options.failedOnly || instanceFailed) {
+      if (!options.failedOnly || instanceStatus.health === 'failed') {
         lines.push(...this.formatInstanceStatus(instanceStatus));
       }
 
@@ -64,10 +68,7 @@ export class UpgradeStatusCommand extends CommandRunner {
       );
 
       lines.push(
-        ...this.formatSummary(
-          instanceStatus,
-          workspaceStatuses,
-        ),
+        ...this.formatSummary(instanceStatus, workspaceStatuses),
       );
 
       console.log(lines.join('\n'));
@@ -99,15 +100,15 @@ export class UpgradeStatusCommand extends CommandRunner {
     }
 
     const failed = workspaceStatuses.filter(
-      (status) => status.latestCommand?.status === 'failed',
+      (status) => status.health === 'failed',
     );
 
     if (!failedOnly) {
-      const upToDate = workspaceStatuses.filter(
-        (status) => status.latestCommand?.status !== 'failed',
+      const nonFailed = workspaceStatuses.filter(
+        (status) => status.health !== 'failed',
       );
 
-      for (const workspaceStatus of upToDate) {
+      for (const workspaceStatus of nonFailed) {
         lines.push(...this.formatWorkspaceStatus(workspaceStatus));
       }
     }
@@ -161,20 +162,16 @@ export class UpgradeStatusCommand extends CommandRunner {
   ): string[] {
     if (!status.latestCommand) {
       return [
-        `${indent}Inferred version: ${chalk.dim('no commands found')}`,
+        `${indent}Status:           ${HEALTH_LABELS[status.health]}`,
       ];
     }
 
     const { latestCommand } = status;
-    const statusLabel =
-      latestCommand.status === 'completed'
-        ? chalk.green('Up to date')
-        : chalk.red('Failed');
 
     const lines: string[] = [
       `${indent}Inferred version: ${status.inferredVersion ?? chalk.dim('unknown')}`,
       `${indent}Latest command:   ${latestCommand.name}`,
-      `${indent}Status:           ${statusLabel}`,
+      `${indent}Status:           ${HEALTH_LABELS[status.health]}`,
       `${indent}Executed by:      ${latestCommand.executedByVersion}`,
       `${indent}At:               ${latestCommand.createdAt.toISOString()}`,
     ];
@@ -194,16 +191,9 @@ export class UpgradeStatusCommand extends CommandRunner {
     instanceStatus: MigrationCursorStatus,
     workspaceStatuses: WorkspaceStatus[],
   ): string[] {
-    const lines: string[] = [
-      chalk.bold.underline('Summary'),
-    ];
+    const lines: string[] = [chalk.bold.underline('Summary')];
 
-    const instanceLabel =
-      instanceStatus.latestCommand?.status === 'failed'
-        ? chalk.red('Failed')
-        : chalk.green('Up to date');
-
-    lines.push(`  Instance: ${instanceLabel}`);
+    lines.push(`  Instance: ${HEALTH_LABELS[instanceStatus.health]}`);
 
     if (workspaceStatuses.length === 0) {
       lines.push(chalk.dim('  No workspaces'));
@@ -211,13 +201,24 @@ export class UpgradeStatusCommand extends CommandRunner {
       return lines;
     }
 
+    const upToDateCount = workspaceStatuses.filter(
+      (status) => status.health === 'up-to-date',
+    ).length;
+    const behindCount = workspaceStatuses.filter(
+      (status) => status.health === 'behind',
+    ).length;
     const failedStatuses = workspaceStatuses.filter(
-      (status) => status.latestCommand?.status === 'failed',
+      (status) => status.health === 'failed',
     );
-    const successCount = workspaceStatuses.length - failedStatuses.length;
+
+    const parts = [
+      chalk.green(`${upToDateCount} up to date`),
+      chalk.yellow(`${behindCount} behind`),
+      chalk.red(`${failedStatuses.length} failed`),
+    ];
 
     lines.push(
-      `  Workspaces: ${chalk.green(`${successCount} up to date`)}, ${chalk.red(`${failedStatuses.length} failed`)} (${workspaceStatuses.length} total)`,
+      `  Workspaces: ${parts.join(', ')} (${workspaceStatuses.length} total)`,
     );
 
     if (failedStatuses.length > 0) {

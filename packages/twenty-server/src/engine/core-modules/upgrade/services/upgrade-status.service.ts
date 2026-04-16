@@ -6,10 +6,14 @@ import { In, Repository } from 'typeorm';
 
 import { type UpgradeMigrationStatus } from 'src/engine/core-modules/upgrade/upgrade-migration.entity';
 import { UpgradeMigrationService } from 'src/engine/core-modules/upgrade/services/upgrade-migration.service';
+import { UpgradeSequenceReaderService } from 'src/engine/core-modules/upgrade/services/upgrade-sequence-reader.service';
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
+
+export type UpgradeHealth = 'up-to-date' | 'behind' | 'failed';
 
 export type MigrationCursorStatus = {
   inferredVersion: string | null;
+  health: UpgradeHealth;
   latestCommand: {
     name: string;
     status: UpgradeMigrationStatus;
@@ -30,6 +34,7 @@ export type WorkspaceStatus = MigrationCursorStatus & {
 export class UpgradeStatusService {
   constructor(
     private readonly upgradeMigrationService: UpgradeMigrationService,
+    private readonly upgradeSequenceReaderService: UpgradeSequenceReaderService,
     @InjectRepository(WorkspaceEntity)
     private readonly workspaceRepository: Repository<WorkspaceEntity>,
   ) {}
@@ -38,7 +43,15 @@ export class UpgradeStatusService {
     const migration =
       await this.upgradeMigrationService.getLatestInstanceMigration();
 
-    return this.buildCursorStatusFromMigration(migration);
+    const sequence = this.upgradeSequenceReaderService.getUpgradeSequence();
+    const lastInstanceStep = [...sequence]
+      .reverse()
+      .find(
+        (step) =>
+          step.kind === 'fast-instance' || step.kind === 'slow-instance',
+      );
+
+    return this.buildCursorStatus(migration, lastInstanceStep?.name ?? null);
   }
 
   async getWorkspaceStatuses(
@@ -52,16 +65,21 @@ export class UpgradeStatusService {
         workspaceIds,
       );
 
+    const sequence = this.upgradeSequenceReaderService.getUpgradeSequence();
+    const lastStepName =
+      sequence.length > 0 ? sequence[sequence.length - 1].name : null;
+
     return workspaces.map((workspace) => ({
-      ...this.buildCursorStatusFromMigration(
+      ...this.buildCursorStatus(
         cursors.get(workspace.id) ?? null,
+        lastStepName,
       ),
       workspaceId: workspace.id,
       displayName: workspace.displayName ?? null,
     }));
   }
 
-  private buildCursorStatusFromMigration(
+  private buildCursorStatus(
     migration: {
       name: string;
       status: UpgradeMigrationStatus;
@@ -69,13 +87,17 @@ export class UpgradeStatusService {
       errorMessage: string | null;
       createdAt: Date;
     } | null,
+    lastExpectedCommandName: string | null,
   ): MigrationCursorStatus {
     if (!migration) {
-      return { inferredVersion: null, latestCommand: null };
+      return { inferredVersion: null, health: 'behind', latestCommand: null };
     }
+
+    const health = deriveHealth(migration, lastExpectedCommandName);
 
     return {
       inferredVersion: extractVersionFromCommandName(migration.name),
+      health,
       latestCommand: {
         name: migration.name,
         status: migration.status,
@@ -102,6 +124,24 @@ export class UpgradeStatusService {
     });
   }
 }
+
+export const deriveHealth = (
+  migration: { name: string; status: UpgradeMigrationStatus },
+  lastExpectedCommandName: string | null,
+): UpgradeHealth => {
+  if (migration.status === 'failed') {
+    return 'failed';
+  }
+
+  if (
+    lastExpectedCommandName !== null &&
+    migration.name !== lastExpectedCommandName
+  ) {
+    return 'behind';
+  }
+
+  return 'up-to-date';
+};
 
 export const extractVersionFromCommandName = (name: string): string | null => {
   const firstUnderscore = name.indexOf('_');
