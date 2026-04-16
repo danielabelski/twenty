@@ -64,40 +64,38 @@ export const ViewFieldsSearchDropdownSection = ({
   );
 
   return (
-    <>
-      <DropdownMenuItemsContainer>
-        {filteredFields.length > 0 ? (
-          filteredFields.map((fieldMetadataItem) => {
-            const isVisible = visibleFieldIds.has(fieldMetadataItem.id);
-            const isLabelIdentifier =
-              fieldMetadataItem.id === fieldMetadataItemLabelIdentifier?.id;
+    <DropdownMenuItemsContainer>
+      {filteredFields.length > 0 ? (
+        filteredFields.map((fieldMetadataItem) => {
+          const isVisible = visibleFieldIds.has(fieldMetadataItem.id);
+          const isLabelIdentifier =
+            fieldMetadataItem.id === fieldMetadataItemLabelIdentifier?.id;
 
-            return (
-              <MenuItem
-                key={fieldMetadataItem.id}
-                LeftIcon={getIcon(fieldMetadataItem.icon)}
-                iconButtons={
-                  isLabelIdentifier
-                    ? undefined
-                    : [
-                        {
-                          Icon: isVisible ? IconEyeOff : IconEye,
-                          onClick: () =>
-                            handleChangeFieldVisibility({
-                              fieldMetadataId: fieldMetadataItem.id,
-                              isVisible: !isVisible,
-                            }),
-                        },
-                      ]
-                }
-                text={fieldMetadataItem.label}
-              />
-            );
-          })
-        ) : (
-          <MenuItem text={t`No results`} />
-        )}
-      </DropdownMenuItemsContainer>
-    </>
+          return (
+            <MenuItem
+              key={fieldMetadataItem.id}
+              LeftIcon={getIcon(fieldMetadataItem.icon)}
+              iconButtons={
+                isLabelIdentifier
+                  ? undefined
+                  : [
+                      {
+                        Icon: isVisible ? IconEyeOff : IconEye,
+                        onClick: () =>
+                          handleChangeFieldVisibility({
+                            fieldMetadataId: fieldMetadataItem.id,
+                            isVisible: !isVisible,
+                          }),
+                      },
+                    ]
+              }
+              text={fieldMetadataItem.label}
+            />
+          );
+        })
+      ) : (
+        <MenuItem text={t`No results`} />
+      )}
+    </DropdownMenuItemsContainer>
   );
 };
