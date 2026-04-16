@@ -169,9 +169,9 @@ const validateAndInferPhoneInput = ({
   }
 
   return {
-    callingCode,
-    countryCode,
-    number,
+    callingCode: isNonEmptyString(callingCode) ? callingCode : undefined,
+    countryCode: isNonEmptyString(countryCode) ? countryCode : undefined,
+    number: isDefined(number) ? null : undefined,
   };
 };
 
