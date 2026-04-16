@@ -1,11 +1,11 @@
 import { isNonEmptyString } from '@sniptt/guards';
-import { useCallback } from 'react';
 import { useStore } from 'jotai';
+import { useCallback } from 'react';
 import { Key } from 'ts-key-enum';
 
+import { isSelectedItemIdComponentFamilyState } from '@/ui/layout/selectable-list/states/isSelectedItemIdComponentFamilyState';
 import { selectableItemIdsComponentState } from '@/ui/layout/selectable-list/states/selectableItemIdsComponentState';
 import { selectedItemIdComponentState } from '@/ui/layout/selectable-list/states/selectedItemIdComponentState';
-import { isSelectedItemIdComponentFamilyState } from '@/ui/layout/selectable-list/states/isSelectedItemIdComponentFamilyState';
 import { useHotkeysOnFocusedElement } from '@/ui/utilities/hotkey/hooks/useHotkeysOnFocusedElement';
 
 type Direction = 'up' | 'down' | 'left' | 'right';
@@ -155,6 +155,7 @@ export const useSelectableListHotKeys = (
     callback: () => handleSelect('left'),
     focusId,
     dependencies: [handleSelect],
+    options: { enableOnFormTags: false },
   });
 
   useHotkeysOnFocusedElement({
@@ -162,5 +163,6 @@ export const useSelectableListHotKeys = (
     callback: () => handleSelect('right'),
     focusId,
     dependencies: [handleSelect],
+    options: { enableOnFormTags: false },
   });
 };
