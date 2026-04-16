@@ -28,6 +28,22 @@ const HEALTH_LABELS: Record<UpgradeHealth, string> = {
     'Display upgrade status for instance and workspace commands, inferring versions from migration history',
 })
 export class UpgradeStatusCommand extends CommandRunner {
+  @Option({
+    flags: '-w, --workspace-id <workspaceId>',
+    description: 'Filter to a single workspace by ID',
+  })
+  parseWorkspaceId(value: string): string {
+    return value;
+  }
+
+  @Option({
+    flags: '-f, --failed-only',
+    description: 'Only display failed instance and workspace commands',
+  })
+  parseFailedOnly(): boolean {
+    return true;
+  }
+
   private readonly logger = new Logger(UpgradeStatusCommand.name);
 
   constructor(
@@ -67,9 +83,7 @@ export class UpgradeStatusCommand extends CommandRunner {
         ...this.formatWorkspaceStatuses(workspaceStatuses, options.failedOnly),
       );
 
-      lines.push(
-        ...this.formatSummary(instanceStatus, workspaceStatuses),
-      );
+      lines.push(...this.formatSummary(instanceStatus, workspaceStatuses));
 
       console.log(lines.join('\n'));
     } catch (error) {
@@ -117,8 +131,7 @@ export class UpgradeStatusCommand extends CommandRunner {
       const groupedByCommand = new Map<string, WorkspaceStatus[]>();
 
       for (const workspaceStatus of failed) {
-        const commandName =
-          workspaceStatus.latestCommand?.name ?? 'unknown';
+        const commandName = workspaceStatus.latestCommand?.name ?? 'unknown';
 
         if (!groupedByCommand.has(commandName)) {
           groupedByCommand.set(commandName, []);
@@ -161,9 +174,7 @@ export class UpgradeStatusCommand extends CommandRunner {
     indent = '  ',
   ): string[] {
     if (!status.latestCommand) {
-      return [
-        `${indent}Status:           ${HEALTH_LABELS[status.health]}`,
-      ];
+      return [`${indent}Status:           ${HEALTH_LABELS[status.health]}`];
     }
 
     const { latestCommand } = status;
@@ -178,9 +189,7 @@ export class UpgradeStatusCommand extends CommandRunner {
 
     if (latestCommand.status === 'failed' && latestCommand.errorMessage) {
       lines.push(
-        chalk.red(
-          `${indent}Error:            ${latestCommand.errorMessage}`,
-        ),
+        chalk.red(`${indent}Error:            ${latestCommand.errorMessage}`),
       );
     }
 
@@ -221,6 +230,24 @@ export class UpgradeStatusCommand extends CommandRunner {
       `  Workspaces: ${parts.join(', ')} (${workspaceStatuses.length} total)`,
     );
 
+    const behindStatuses = workspaceStatuses.filter(
+      (status) => status.health === 'behind',
+    );
+
+    if (behindStatuses.length > 0) {
+      const behindCounts = new Map<string, number>();
+
+      for (const status of behindStatuses) {
+        const commandName = status.latestCommand?.name ?? 'no commands';
+
+        behindCounts.set(commandName, (behindCounts.get(commandName) ?? 0) + 1);
+      }
+
+      for (const [commandName, count] of behindCounts) {
+        lines.push(chalk.yellow(`    ${count} behind at: ${commandName}`));
+      }
+    }
+
     if (failedStatuses.length > 0) {
       const failureCounts = new Map<string, number>();
 
@@ -234,30 +261,12 @@ export class UpgradeStatusCommand extends CommandRunner {
       }
 
       for (const [commandName, count] of failureCounts) {
-        lines.push(
-          chalk.red(`    ${count} failed at: ${commandName}`),
-        );
+        lines.push(chalk.red(`    ${count} failed at: ${commandName}`));
       }
     }
 
     lines.push('');
 
     return lines;
-  }
-
-  @Option({
-    flags: '-w, --workspace-id <workspaceId>',
-    description: 'Filter to a single workspace by ID',
-  })
-  parseWorkspaceId(value: string): string {
-    return value;
-  }
-
-  @Option({
-    flags: '-f, --failed-only',
-    description: 'Only display failed instance and workspace commands',
-  })
-  parseFailedOnly(): boolean {
-    return true;
   }
 }
