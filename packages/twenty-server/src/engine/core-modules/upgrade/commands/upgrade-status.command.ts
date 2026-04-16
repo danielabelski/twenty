@@ -65,14 +65,7 @@ export class UpgradeStatusCommand extends CommandRunner {
     options: UpgradeStatusOptions,
   ): Promise<void> {
     try {
-      const appVersion =
-        this.twentyConfigService.get('APP_VERSION') ?? 'unknown';
-
-      const lines: string[] = [
-        '',
-        chalk.bold(`APP_VERSION: ${appVersion}`),
-        '',
-      ];
+      const lines: string[] = this.formatHeader();
 
       const instanceStatus =
         await this.upgradeStatusService.getInstanceStatus();
@@ -100,6 +93,13 @@ export class UpgradeStatusCommand extends CommandRunner {
         chalk.red(`Failed to retrieve upgrade status: ${error.message}`),
       );
     }
+  }
+
+  private formatHeader(): string[] {
+    const appVersion =
+      this.twentyConfigService.get('APP_VERSION') ?? 'unknown';
+
+    return ['', chalk.bold(`APP_VERSION: ${appVersion}`), ''];
   }
 
   private formatInstanceStatus(status: MigrationCursorStatus): string[] {
