@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { WorkspaceActivationStatus } from 'twenty-shared/workspace';
@@ -32,6 +32,8 @@ export type WorkspaceStatus = MigrationCursorStatus & {
 
 @Injectable()
 export class UpgradeStatusService {
+  private readonly logger = new Logger(UpgradeStatusService.name);
+
   constructor(
     private readonly upgradeMigrationService: UpgradeMigrationService,
     private readonly upgradeSequenceReaderService: UpgradeSequenceReaderService,
@@ -55,14 +57,26 @@ export class UpgradeStatusService {
   }
 
   async getWorkspaceStatuses(
-    workspaceId?: string,
+    filterWorkspaceIds?: string[],
   ): Promise<WorkspaceStatus[]> {
-    const workspaces = await this.loadWorkspaces(workspaceId);
+    const workspaces = await this.loadWorkspaces(filterWorkspaceIds);
 
-    const workspaceIds = workspaces.map((workspace) => workspace.id);
+    if (filterWorkspaceIds) {
+      const foundIds = new Set(workspaces.map((workspace) => workspace.id));
+
+      for (const requestedId of filterWorkspaceIds) {
+        if (!foundIds.has(requestedId)) {
+          this.logger.warn(
+            `Workspace ${requestedId} not found or not active/suspended`,
+          );
+        }
+      }
+    }
+
+    const loadedWorkspaceIds = workspaces.map((workspace) => workspace.id);
     const cursors =
       await this.upgradeMigrationService.getWorkspaceLastAttemptedCommandName(
-        workspaceIds,
+        loadedWorkspaceIds,
       );
 
     const sequence = this.upgradeSequenceReaderService.getUpgradeSequence();
@@ -109,12 +123,14 @@ export class UpgradeStatusService {
   }
 
   private async loadWorkspaces(
-    workspaceId?: string,
+    workspaceIds?: string[],
   ): Promise<Pick<WorkspaceEntity, 'id' | 'displayName'>[]> {
     return this.workspaceRepository.find({
       select: ['id', 'displayName'],
       where: {
-        ...(workspaceId ? { id: workspaceId } : {}),
+        ...(workspaceIds && workspaceIds.length > 0
+          ? { id: In(workspaceIds) }
+          : {}),
         activationStatus: In([
           WorkspaceActivationStatus.ACTIVE,
           WorkspaceActivationStatus.SUSPENDED,

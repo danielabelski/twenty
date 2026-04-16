@@ -12,7 +12,7 @@ import {
 } from 'src/engine/core-modules/upgrade/services/upgrade-status.service';
 
 type UpgradeStatusOptions = {
-  workspaceId?: string;
+  workspaceId?: Set<string>;
   failedOnly?: boolean;
 };
 
@@ -29,11 +29,17 @@ const HEALTH_LABELS: Record<UpgradeHealth, string> = {
 })
 export class UpgradeStatusCommand extends CommandRunner {
   @Option({
-    flags: '-w, --workspace-id <workspaceId>',
-    description: 'Filter to a single workspace by ID',
+    flags: '-w, --workspace-id [workspace_id]',
+    description:
+      'Filter to specific workspace IDs. Can be passed multiple times.',
+    required: false,
   })
-  parseWorkspaceId(value: string): string {
-    return value;
+  parseWorkspaceId(value: string, previous?: Set<string>): Set<string> {
+    const accumulator = previous ?? new Set<string>();
+
+    accumulator.add(value);
+
+    return accumulator;
   }
 
   @Option({
@@ -73,9 +79,13 @@ export class UpgradeStatusCommand extends CommandRunner {
 
       lines.push(...this.formatInstanceStatus(instanceStatus));
 
+      const requestedWorkspaceIds = options.workspaceId
+        ? [...options.workspaceId]
+        : undefined;
+
       const workspaceStatuses =
         await this.upgradeStatusService.getWorkspaceStatuses(
-          options.workspaceId,
+          requestedWorkspaceIds,
         );
 
       lines.push(
