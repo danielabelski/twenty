@@ -1,3 +1,6 @@
+import { RESEND_EMAILS_ON_BROADCAST_ID } from 'src/fields/resend-emails-on-broadcast.field';
+import { SEGMENT_ON_RESEND_BROADCAST_ID } from 'src/fields/segment-on-resend-broadcast.field';
+import { TEMPLATE_ON_RESEND_BROADCAST_ID } from 'src/fields/template-on-resend-broadcast.field';
 import {
   BROADCAST_CREATED_AT_FIELD_UNIVERSAL_IDENTIFIER,
   BROADCAST_FROM_ADDRESS_FIELD_UNIVERSAL_IDENTIFIER,
@@ -66,6 +69,27 @@ export default defineView({
       isVisible: true,
       size: 12,
       position: 5,
+    },
+    {
+      universalIdentifier: '4d7eb630-9f44-4090-a887-7fb08e0c49ed',
+      fieldMetadataUniversalIdentifier: SEGMENT_ON_RESEND_BROADCAST_ID,
+      isVisible: true,
+      size: 12,
+      position: 6,
+    },
+    {
+      universalIdentifier: '82646a38-16f8-45a9-8b97-a3e910865bbf',
+      fieldMetadataUniversalIdentifier: TEMPLATE_ON_RESEND_BROADCAST_ID,
+      isVisible: true,
+      size: 12,
+      position: 7,
+    },
+    {
+      universalIdentifier: 'e1726752-fed7-4e9b-b395-e47b60f3d56d',
+      fieldMetadataUniversalIdentifier: RESEND_EMAILS_ON_BROADCAST_ID,
+      isVisible: true,
+      size: 12,
+      position: 8,
     },
   ],
 });

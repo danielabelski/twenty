@@ -1,3 +1,5 @@
+import { BROADCAST_ON_RESEND_EMAIL_ID } from 'src/fields/broadcast-on-resend-email.field';
+import { CONTACT_ON_RESEND_EMAIL_ID } from 'src/fields/contact-on-resend-email.field';
 import { PERSON_ON_RESEND_EMAIL_ID } from 'src/fields/person-on-resend-email.field';
 import {
   EMAIL_CREATED_AT_FIELD_UNIVERSAL_IDENTIFIER,
@@ -55,6 +57,20 @@ export default defineView({
       isVisible: true,
       size: 12,
       position: 4,
+    },
+    {
+      universalIdentifier: 'abee6dcd-4754-45b2-ae77-d42bec85afad',
+      fieldMetadataUniversalIdentifier: CONTACT_ON_RESEND_EMAIL_ID,
+      isVisible: true,
+      size: 12,
+      position: 5,
+    },
+    {
+      universalIdentifier: '8d7df695-5ffb-46b7-9a57-ac979988351f',
+      fieldMetadataUniversalIdentifier: BROADCAST_ON_RESEND_EMAIL_ID,
+      isVisible: true,
+      size: 12,
+      position: 6,
     },
   ],
 });

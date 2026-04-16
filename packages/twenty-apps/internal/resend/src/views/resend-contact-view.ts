@@ -1,4 +1,6 @@
 import { PERSON_ON_RESEND_CONTACT_ID } from 'src/fields/person-on-resend-contact.field';
+import { RESEND_EMAILS_ON_CONTACT_ID } from 'src/fields/resend-emails-on-contact.field';
+import { SEGMENT_ON_RESEND_CONTACT_ID } from 'src/fields/segment-on-resend-contact.field';
 import {
   CONTACT_CREATED_AT_FIELD_UNIVERSAL_IDENTIFIER,
   CONTACT_EMAIL_FIELD_UNIVERSAL_IDENTIFIER,
@@ -65,6 +67,20 @@ export default defineView({
       isVisible: true,
       size: 12,
       position: 5,
+    },
+    {
+      universalIdentifier: '54949f7e-0454-45a5-9e30-8f16f75adeaa',
+      fieldMetadataUniversalIdentifier: SEGMENT_ON_RESEND_CONTACT_ID,
+      isVisible: true,
+      size: 12,
+      position: 6,
+    },
+    {
+      universalIdentifier: 'fbbe207d-dbda-4bda-935c-a6fa9ae30645',
+      fieldMetadataUniversalIdentifier: RESEND_EMAILS_ON_CONTACT_ID,
+      isVisible: true,
+      size: 12,
+      position: 7,
     },
   ],
 });
