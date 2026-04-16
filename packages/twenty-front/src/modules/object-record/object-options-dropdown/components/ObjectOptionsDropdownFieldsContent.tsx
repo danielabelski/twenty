@@ -8,6 +8,7 @@ import { DropdownMenuSeparator } from '@/ui/layout/dropdown/components/DropdownM
 import { ViewFieldsSearchDropdownSection } from '@/views/components/ViewFieldsSearchDropdownSection';
 import { ViewFieldsVisibleDropdownSection } from '@/views/components/ViewFieldsVisibleDropdownSection';
 import { useLingui } from '@lingui/react/macro';
+import { isNonEmptyString } from '@sniptt/guards';
 import { useState } from 'react';
 import { IconChevronLeft, IconEyeOff } from 'twenty-ui/display';
 import { MenuItemNavigate } from 'twenty-ui/navigation';
@@ -37,7 +38,7 @@ export const ObjectOptionsDropdownFieldsContent = () => {
         onChange={(event) => setSearchInput(event.target.value)}
       />
       <DropdownMenuSeparator />
-      {searchInput.length > 0 ? (
+      {isNonEmptyString(searchInput) ? (
         <ViewFieldsSearchDropdownSection searchInput={searchInput} />
       ) : (
         <>
