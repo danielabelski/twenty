@@ -349,13 +349,26 @@
                       "user-guide/settings/capabilities/profile-settings",
                       "user-guide/settings/capabilities/experience-settings",
                       "user-guide/settings/capabilities/domains-settings",
-                      "user-guide/settings/capabilities/updates-settings"
+                      "user-guide/settings/capabilities/community-settings"
                     ]
                   },
                   {
                     "group": "How-Tos",
                     "pages": [
                       "user-guide/settings/how-tos/settings-faq"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Legal",
+                "icon": "book",
+                "pages": [
+                  "user-guide/legal/overview",
+                  {
+                    "group": "How-Tos",
+                    "pages": [
+                      "user-guide/legal/how-tos/legal-faq"
                     ]
                   }
                 ]
@@ -801,8 +814,7 @@
                       "l/fr/user-guide/settings/capabilities/member-management",
                       "l/fr/user-guide/settings/capabilities/profile-settings",
                       "l/fr/user-guide/settings/capabilities/experience-settings",
-                      "l/fr/user-guide/settings/capabilities/domains-settings",
-                      "l/fr/user-guide/settings/capabilities/updates-settings"
+                      "l/fr/user-guide/settings/capabilities/domains-settings"
                     ]
                   },
                   {
@@ -1254,8 +1266,7 @@
                       "l/ar/user-guide/settings/capabilities/member-management",
                       "l/ar/user-guide/settings/capabilities/profile-settings",
                       "l/ar/user-guide/settings/capabilities/experience-settings",
-                      "l/ar/user-guide/settings/capabilities/domains-settings",
-                      "l/ar/user-guide/settings/capabilities/updates-settings"
+                      "l/ar/user-guide/settings/capabilities/domains-settings"
                     ]
                   },
                   {
@@ -1707,8 +1718,7 @@
                       "l/cs/user-guide/settings/capabilities/member-management",
                       "l/cs/user-guide/settings/capabilities/profile-settings",
                       "l/cs/user-guide/settings/capabilities/experience-settings",
-                      "l/cs/user-guide/settings/capabilities/domains-settings",
-                      "l/cs/user-guide/settings/capabilities/updates-settings"
+                      "l/cs/user-guide/settings/capabilities/domains-settings"
                     ]
                   },
                   {
@@ -2160,8 +2170,7 @@
                       "l/de/user-guide/settings/capabilities/member-management",
                       "l/de/user-guide/settings/capabilities/profile-settings",
                       "l/de/user-guide/settings/capabilities/experience-settings",
-                      "l/de/user-guide/settings/capabilities/domains-settings",
-                      "l/de/user-guide/settings/capabilities/updates-settings"
+                      "l/de/user-guide/settings/capabilities/domains-settings"
                     ]
                   },
                   {
@@ -2613,8 +2622,7 @@
                       "l/es/user-guide/settings/capabilities/member-management",
                       "l/es/user-guide/settings/capabilities/profile-settings",
                       "l/es/user-guide/settings/capabilities/experience-settings",
-                      "l/es/user-guide/settings/capabilities/domains-settings",
-                      "l/es/user-guide/settings/capabilities/updates-settings"
+                      "l/es/user-guide/settings/capabilities/domains-settings"
                     ]
                   },
                   {
@@ -3066,8 +3074,7 @@
                       "l/it/user-guide/settings/capabilities/member-management",
                       "l/it/user-guide/settings/capabilities/profile-settings",
                       "l/it/user-guide/settings/capabilities/experience-settings",
-                      "l/it/user-guide/settings/capabilities/domains-settings",
-                      "l/it/user-guide/settings/capabilities/updates-settings"
+                      "l/it/user-guide/settings/capabilities/domains-settings"
                     ]
                   },
                   {
@@ -3519,8 +3526,7 @@
                       "l/ja/user-guide/settings/capabilities/member-management",
                       "l/ja/user-guide/settings/capabilities/profile-settings",
                       "l/ja/user-guide/settings/capabilities/experience-settings",
-                      "l/ja/user-guide/settings/capabilities/domains-settings",
-                      "l/ja/user-guide/settings/capabilities/updates-settings"
+                      "l/ja/user-guide/settings/capabilities/domains-settings"
                     ]
                   },
                   {
@@ -3972,8 +3978,7 @@
                       "l/ko/user-guide/settings/capabilities/member-management",
                       "l/ko/user-guide/settings/capabilities/profile-settings",
                       "l/ko/user-guide/settings/capabilities/experience-settings",
-                      "l/ko/user-guide/settings/capabilities/domains-settings",
-                      "l/ko/user-guide/settings/capabilities/updates-settings"
+                      "l/ko/user-guide/settings/capabilities/domains-settings"
                     ]
                   },
                   {
@@ -4425,8 +4430,7 @@
                       "l/pt/user-guide/settings/capabilities/member-management",
                       "l/pt/user-guide/settings/capabilities/profile-settings",
                       "l/pt/user-guide/settings/capabilities/experience-settings",
-                      "l/pt/user-guide/settings/capabilities/domains-settings",
-                      "l/pt/user-guide/settings/capabilities/updates-settings"
+                      "l/pt/user-guide/settings/capabilities/domains-settings"
                     ]
                   },
                   {
@@ -4878,8 +4882,7 @@
                       "l/ro/user-guide/settings/capabilities/member-management",
                       "l/ro/user-guide/settings/capabilities/profile-settings",
                       "l/ro/user-guide/settings/capabilities/experience-settings",
-                      "l/ro/user-guide/settings/capabilities/domains-settings",
-                      "l/ro/user-guide/settings/capabilities/updates-settings"
+                      "l/ro/user-guide/settings/capabilities/domains-settings"
                     ]
                   },
                   {
@@ -5331,8 +5334,7 @@
                       "l/ru/user-guide/settings/capabilities/member-management",
                       "l/ru/user-guide/settings/capabilities/profile-settings",
                       "l/ru/user-guide/settings/capabilities/experience-settings",
-                      "l/ru/user-guide/settings/capabilities/domains-settings",
-                      "l/ru/user-guide/settings/capabilities/updates-settings"
+                      "l/ru/user-guide/settings/capabilities/domains-settings"
                     ]
                   },
                   {
@@ -5765,8 +5767,7 @@
                       "l/tr/user-guide/settings/capabilities/member-management",
                       "l/tr/user-guide/settings/capabilities/profile-settings",
                       "l/tr/user-guide/settings/capabilities/experience-settings",
-                      "l/tr/user-guide/settings/capabilities/domains-settings",
-                      "l/tr/user-guide/settings/capabilities/updates-settings"
+                      "l/tr/user-guide/settings/capabilities/domains-settings"
                     ]
                   },
                   {
@@ -6218,8 +6219,7 @@
                       "l/zh/user-guide/settings/capabilities/member-management",
                       "l/zh/user-guide/settings/capabilities/profile-settings",
                       "l/zh/user-guide/settings/capabilities/experience-settings",
-                      "l/zh/user-guide/settings/capabilities/domains-settings",
-                      "l/zh/user-guide/settings/capabilities/updates-settings"
+                      "l/zh/user-guide/settings/capabilities/domains-settings"
                     ]
                   },
                   {
