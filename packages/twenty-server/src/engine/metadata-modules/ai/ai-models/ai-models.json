@@ -2015,7 +2015,7 @@
         "inputCostPerMillionTokens": 0.15,
         "outputCostPerMillionTokens": 0.6,
         "cachedInputCostPerMillionTokens": 0.015,
-        "contextWindowTokens": 256000,
+        "contextWindowTokens": 262144,
         "maxOutputTokens": 256000,
         "modalities": ["image"],
         "supportsReasoning": true,
@@ -2027,8 +2027,9 @@
         "modelFamily": "MISTRAL",
         "inputCostPerMillionTokens": 0.1,
         "outputCostPerMillionTokens": 0.1,
-        "contextWindowTokens": 128000,
-        "maxOutputTokens": 128000
+        "contextWindowTokens": 262144,
+        "maxOutputTokens": 128000,
+        "modalities": ["image"]
       },
       {
         "name": "devstral-medium-latest",
@@ -2114,7 +2115,7 @@
         "inputCostPerMillionTokens": 0.15,
         "outputCostPerMillionTokens": 0.6,
         "cachedInputCostPerMillionTokens": 0.015,
-        "contextWindowTokens": 256000,
+        "contextWindowTokens": 262144,
         "maxOutputTokens": 256000,
         "modalities": ["image"],
         "supportsReasoning": true
@@ -2191,7 +2192,7 @@
         "modelFamily": "MISTRAL",
         "inputCostPerMillionTokens": 0.1,
         "outputCostPerMillionTokens": 0.3,
-        "contextWindowTokens": 32000,
+        "contextWindowTokens": 32768,
         "maxOutputTokens": 32000,
         "modalities": ["audio"]
       },
@@ -2221,7 +2222,7 @@
         "inputCostPerMillionTokens": 1.4,
         "outputCostPerMillionTokens": 4.4,
         "cachedInputCostPerMillionTokens": 0.14,
-        "contextWindowTokens": 1000000,
+        "contextWindowTokens": 1048576,
         "maxOutputTokens": 131072,
         "supportsReasoning": true
       },
@@ -2252,8 +2253,9 @@
         "modelFamily": "MISTRAL",
         "inputCostPerMillionTokens": 0.04,
         "outputCostPerMillionTokens": 0.04,
-        "contextWindowTokens": 128000,
-        "maxOutputTokens": 128000
+        "contextWindowTokens": 131072,
+        "maxOutputTokens": 128000,
+        "modalities": ["image"]
       },
       {
         "name": "mistral-medium-latest",
